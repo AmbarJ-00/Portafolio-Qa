@@ -236,30 +236,30 @@ export const portfolioConfig = {
   certifications: [
     {
       id: "istqb-ctfl",
-      titleKey: "certs.istqb.title",
+      titleKey: "certifications.istqb.title",
       authority: "ISTQB (International Software Testing Qualifications Board)",
       image: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=600", // Placeholder for actual certificate style, high res and clean
       tools: ["ISTQB Glossary", "Test Case Design", "Static Analysis", "Defect Management"],
       integrations: ["Standardized QA Terminology", "Waterfall & Agile Test Cycles"],
-      translationKey: "certs.istqb"
+      translationKey: "certifications.istqb"
     },
     {
       id: "postman-api-expert",
-      titleKey: "certs.postman.title",
+      titleKey: "certifications.postman.title",
       authority: "Postman Academy",
       image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600",
       tools: ["Newman", "API Mocking", "Postman Assertions", "Environment Variables"],
       integrations: ["CI/CD Integration", "Data-driven Testing"],
-      translationKey: "certs.postman"
+      translationKey: "certifications.postman"
     },
     {
       id: "scrum-master-psm",
-      titleKey: "certs.scrum.title",
+      titleKey: "certifications.scrum.title",
       authority: "Scrum.org",
       image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=600",
       tools: ["Sprint Backlogs", "Burndown Charts", "Retro Templates"],
       integrations: ["Jira Software", "Agile Scaling"],
-      translationKey: "certs.scrum"
+      translationKey: "certifications.scrum"
     }
   ],
   documentation: {
@@ -267,9 +267,9 @@ export const portfolioConfig = {
     templates: [
       {
         id: "doc-test-plan",
-        titleKey: "doc.testplan.title",
-        descriptionKey: "doc.testplan.desc",
-        methodologyKey: "doc.testplan.method",
+        titleKey: "documentation.testplan.title",
+        descriptionKey: "documentation.testplan.desc",
+        methodologyKey: "documentation.testplan.method",
         parameters: [
           "Scope of Testing",
           "Test Environment",
@@ -285,9 +285,9 @@ export const portfolioConfig = {
       },
       {
         id: "doc-bug-report",
-        titleKey: "doc.bugreport.title",
-        descriptionKey: "doc.bugreport.desc",
-        methodologyKey: "doc.bugreport.method",
+        titleKey: "documentation.bugreport.title",
+        descriptionKey: "documentation.bugreport.desc",
+        methodologyKey: "documentation.bugreport.method",
         parameters: [
           "Steps to Reproduce",
           "Expected Result vs Actual Result",
@@ -303,9 +303,9 @@ export const portfolioConfig = {
       },
       {
         id: "doc-req-checklist",
-        titleKey: "doc.reqchecklist.title",
-        descriptionKey: "doc.reqchecklist.desc",
-        methodologyKey: "doc.reqchecklist.method",
+        titleKey: "documentation.reqchecklist.title",
+        descriptionKey: "documentation.reqchecklist.desc",
+        methodologyKey: "documentation.reqchecklist.method",
         parameters: [
           "Requirement Uniqueness",
           "Measurability & Testability",

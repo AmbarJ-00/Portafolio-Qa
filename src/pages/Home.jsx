@@ -2,13 +2,24 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { ShieldCheck, Award, ArrowRight, ChevronRight, Terminal } from 'lucide-react';
 import { GiAlienBug } from "react-icons/gi";
 import SEO from '../components/SEO.jsx';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
+  const personal = store.personal;
+  const getText = (value, key) => value || t(key);
+
+  const heroBadge = personal.heroBadge || t('home.hero_badge');
+  const heroHeadline = personal.heroHeadline || t('home.hero_title');
+  const heroSubtitle = personal.heroSubtitle || t('home.hero_subtitle');
+  const ctaPrimary = personal.primaryButton || t('cta.view_projects');
+  const ctaSecondary = personal.secondaryButton || t('cta.view_docs');
+  const role = personal.role || t(personal.roleKey);
+  const tagline = personal.tagline || t(personal.taglineKey);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -48,7 +59,7 @@ const Home = () => {
           <div className="space-y-6 max-w-4xl">
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 bg-brand-electric-500/10 dark:bg-brand-lilac-500/20 text-brand-electric-600 dark:text-brand-lilac-300 text-xs font-bold uppercase tracking-widest rounded-full border border-brand-electric-500/20 dark:border-brand-lilac-500/20">
               <Terminal className="w-3.5 h-3.5" />
-              <span>{t('home.hero_badge')}</span>
+              <span>{heroBadge}</span>
             </motion.div>
 
             <motion.h1 
@@ -56,10 +67,10 @@ const Home = () => {
               id="hero-heading"
               className="text-4xl sm:text-6xl md:text-7xl font-display font-extrabold tracking-tight leading-none"
             >
-              <span className="text-brand-navy-900 dark:text-brand-ash-100">{t('home.hero_title')}</span>
+              <span className="text-brand-navy-900 dark:text-brand-ash-100">{heroHeadline}</span>
               <br />
               <span className="bg-gradient-to-r from-brand-navy-800 via-brand-electric-500 to-brand-lilac-500 dark:from-brand-lilac-400 dark:via-brand-lilac-500 dark:to-brand-lilac-300 bg-clip-text text-transparent">
-                {portfolioConfig.personal.name}
+                {personal.name}
               </span>
             </motion.h1>
 
@@ -67,14 +78,14 @@ const Home = () => {
               variants={itemVariants}
               className="text-lg md:text-xl font-medium text-brand-navy-700 dark:text-brand-ash-300 max-w-2xl leading-relaxed"
             >
-              {t(portfolioConfig.personal.roleKey)}
+              {role}
             </motion.p>
 
             <motion.p 
               variants={itemVariants}
               className="text-base md:text-lg text-brand-navy-600 dark:text-brand-ash-400 max-w-3xl leading-relaxed"
             >
-              {t(portfolioConfig.personal.taglineKey)}
+              {tagline}
             </motion.p>
 
             {/* CTAs */}

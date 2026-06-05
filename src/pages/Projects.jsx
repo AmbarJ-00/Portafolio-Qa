@@ -2,13 +2,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { Activity, ArrowUpRight } from 'lucide-react';
 import { GiAlienBug } from "react-icons/gi";
 import SEO from '../components/SEO.jsx';
 
 const Projects = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -54,7 +55,7 @@ const Projects = () => {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {portfolioConfig.projects.map((project) => {
+          {store.projects.map((project) => {
             const title = t(project.titleKey);
             const desc = t(project.descriptionKey);
 

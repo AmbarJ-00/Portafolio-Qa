@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { FileText, Clipboard, CheckCircle, HelpCircle, Layers, Settings } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
 const Documentation = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
   const [copiedId, setCopiedId] = useState(null);
 
   const copyToClipboard = (template) => {
@@ -64,7 +65,7 @@ const Documentation = () => {
           animate={{ opacity: 1 }}
           className="text-base text-brand-navy-700 dark:text-brand-ash-300 leading-relaxed max-w-4xl"
         >
-          {t(portfolioConfig.documentation.methodsKey)}
+          {t(store.documentation.methodsKey)}
         </motion.p>
 
         {/* Templates List */}
@@ -74,7 +75,7 @@ const Documentation = () => {
           animate="visible"
           className="space-y-10"
         >
-          {portfolioConfig.documentation.templates.map((template) => {
+          {store.documentation.templates.map((template) => {
             const title = t(template.titleKey);
             const desc = t(template.descriptionKey);
             const method = t(template.methodologyKey);

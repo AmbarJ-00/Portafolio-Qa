@@ -143,6 +143,11 @@ export const en = {
       exp: "4 years in Kanban environments.",
       use_cases: "Managing Work In Progress (WIP) limits to optimize ticket transition speed between development and testing states."
     },
+    patrones_de_diseno: {
+      desc: "Applying design patterns to build more robust, maintainable, and reusable test automation libraries.",
+      exp: "4 years of experience using architecture patterns in testing and automation suites.",
+      use_cases: "Implementing Page Object Model and Single Responsibility principles to reduce test script maintenance."
+    },
     jmeter: {
       desc: "Load testing script design and performance auditing for transactional backend endpoints.",
       exp: "3 years of non-functional testing.",

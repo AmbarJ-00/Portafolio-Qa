@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { Award, BookOpen, Maximize2, ExternalLink, X, Settings } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
 const Certifications = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
   const [expandedImage, setExpandedImage] = useState(null);
 
   const containerVariants = {
@@ -49,7 +50,7 @@ const Certifications = () => {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {portfolioConfig.certifications.map((cert) => {
+          {store.certifications.map((cert) => {
             const title = t(cert.titleKey);
             const desc = t(cert.contentSummaryKey || `${cert.translationKey}.desc`);
 

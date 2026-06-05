@@ -32,3 +32,10 @@ Ejecutar el script de humo local para comprobar la integridad de datos y traducc
 ```bash
 node qa/smoke-tests.js
 ```
+
+El script ahora valida tanto la consistencia de traducciones como la integridad de los datos de configuración pública y administrativa.
+
+## Informacion del admin
+Ruta del admin: http://localhost:3000/backoffice/login
+
+Password: AdminQA#2026

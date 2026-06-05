@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { 
   ArrowLeft, ExternalLink, Github, Activity, Shield, 
   Layers, AlertTriangle, CheckCircle, FileText 
@@ -13,8 +13,9 @@ import SEO from '../components/SEO.jsx';
 const ProjectDetail = () => {
   const { projectId } = useParams();
   const { t } = useTranslation();
+  const { store } = usePortfolio();
 
-  const project = portfolioConfig.projects.find((p) => p.id === projectId);
+  const project = store.projects.find((p) => p.id === projectId);
 
   if (!project) {
     return <Navigate to="/projects" replace />;

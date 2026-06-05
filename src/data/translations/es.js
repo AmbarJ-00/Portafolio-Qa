@@ -143,6 +143,11 @@ export const es = {
       exp: "4 años administrando flujos visuales.",
       use_cases: "Ajuste de límites de trabajo en progreso (WIP) para balancear la carga de validación entre desarrolladores y QA."
     },
+    patrones_de_diseno: {
+      desc: "Uso de patrones de diseño para crear pruebas más robustas, mantenibles y reutilizables en bibliotecas de automatización.",
+      exp: "4 años aplicando patrones de arquitectura en suites de testing y automatización.",
+      use_cases: "Implementación de Page Object Model y Single Responsibility para reducir el mantenimiento de scripts de prueba."
+    },
     jmeter: {
       desc: "Diseño de pruebas de carga concurrentes y análisis de métricas de rendimiento en endpoints transaccionales del servidor.",
       exp: "3 años realizando pruebas no funcionales.",

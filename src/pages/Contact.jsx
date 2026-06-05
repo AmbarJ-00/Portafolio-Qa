@@ -4,12 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { Mail, Linkedin, MapPin, Briefcase, Calendar, CheckCircle } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
 const Contact = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,8 +84,8 @@ const Contact = () => {
                   <span className="text-xxs font-bold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest block">
                     {t('contact.email_label')}
                   </span>
-                  <a href={`mailto:${portfolioConfig.personal.email}`} className="text-sm font-bold text-brand-navy-950 dark:text-white hover:underline">
-                    {portfolioConfig.personal.email}
+                  <a href={`mailto:${store.personal.email}`} className="text-sm font-bold text-brand-navy-950 dark:text-white hover:underline">
+                    {store.personal.email}
                   </a>
                 </div>
               </div>
@@ -96,8 +97,8 @@ const Contact = () => {
                   <span className="text-xxs font-bold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest block">
                     {t('contact.linkedin_label')}
                   </span>
-                  <a href={portfolioConfig.personal.linkedin} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-brand-navy-950 dark:text-white hover:underline">
-                    {portfolioConfig.personal.name}
+                  <a href={store.personal.linkedin} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-brand-navy-950 dark:text-white hover:underline">
+                    {store.personal.name}
                   </a>
                 </div>
               </div>
@@ -110,7 +111,7 @@ const Contact = () => {
                     {t('contact.country_residence')}
                   </span>
                   <p className="text-sm font-bold text-brand-navy-950 dark:text-white">
-                    {portfolioConfig.personal.location}
+                    {store.personal.location}
                   </p>
                 </div>
               </div>
@@ -123,7 +124,7 @@ const Contact = () => {
                     {t('contact.work_mode_label')}
                   </span>
                   <p className="text-sm font-bold text-brand-navy-950 dark:text-white">
-                    {t(portfolioConfig.personal.workModeKey)}
+                    {t(store.personal.workModeKey)}
                   </p>
                 </div>
               </div>
@@ -136,7 +137,7 @@ const Contact = () => {
                     {t('contact.availability_label')}
                   </span>
                   <p className="text-sm font-bold text-brand-navy-950 dark:text-white">
-                    {t(portfolioConfig.personal.availabilityKey)}
+                    {t(store.personal.availabilityKey)}
                   </p>
                 </div>
               </div>

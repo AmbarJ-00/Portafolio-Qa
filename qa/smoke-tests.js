@@ -27,6 +27,10 @@ function getObjectPaths(obj, prefix = '') {
   return paths;
 }
 
+const isValidUrl = (value) => typeof value === 'string' && /^https?:\/\/.+/.test(value);
+const isValidEmail = (value) => typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const keyExists = (path) => pathsEs.includes(path) || pathsEn.includes(path);
+
 console.log('==================================================');
 console.log('🤖 INICIANDO PRUEBAS DE HUMO (SMOKE TESTS) QA...');
 console.log('==================================================\n');
@@ -88,26 +92,16 @@ portfolioConfig.projects.forEach(project => {
   const risksKey = `${project.translationKey}.risks`;
   const bugsKey = `${project.translationKey}.bugs_detailed`;
 
-  if (!pathsEs.includes(titleKey)) {
-    console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción para título (${titleKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(descKey)) {
-    console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción para descripción (${descKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(strategyKey)) {
-    console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción para estrategia (${strategyKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(risksKey)) {
-    console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción para riesgos (${risksKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(bugsKey)) {
-    console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción para reporte de bugs (${bugsKey})`);
-    failures++;
-  }
+  [[titleKey, 'título'], [descKey, 'descripción'], [strategyKey, 'estrategia'], [risksKey, 'riesgos'], [bugsKey, 'reporte de bugs']].forEach(([path, label]) => {
+    if (!pathsEs.includes(path)) {
+      console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción EN ES para ${label} (${path})`);
+      failures++;
+    }
+    if (!pathsEn.includes(path)) {
+      console.error(`❌ ERROR: Proyecto [${project.id}] falta clave traducción EN EN para ${label} (${path})`);
+      failures++;
+    }
+  });
 });
 
 // Verificar Certificaciones
@@ -115,14 +109,16 @@ portfolioConfig.certifications.forEach(cert => {
   const titleKey = cert.titleKey;
   const descKey = `${cert.translationKey}.desc`;
 
-  if (!pathsEs.includes(titleKey)) {
-    console.error(`❌ ERROR: Certificación [${cert.id}] falta clave traducción para título (${titleKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(descKey)) {
-    console.error(`❌ ERROR: Certificación [${cert.id}] falta clave traducción para descripción (${descKey})`);
-    failures++;
-  }
+  [[titleKey, 'título'], [descKey, 'descripción']].forEach(([path, label]) => {
+    if (!pathsEs.includes(path)) {
+      console.error(`❌ ERROR: Certificación [${cert.id}] falta clave traducción EN ES para ${label} (${path})`);
+      failures++;
+    }
+    if (!pathsEn.includes(path)) {
+      console.error(`❌ ERROR: Certificación [${cert.id}] falta clave traducción EN EN para ${label} (${path})`);
+      failures++;
+    }
+  });
 });
 
 // Verificar Documentación
@@ -131,19 +127,67 @@ portfolioConfig.documentation.templates.forEach(tpl => {
   const descKey = tpl.descriptionKey;
   const methodologyKey = tpl.methodologyKey;
 
-  if (!pathsEs.includes(titleKey)) {
-    console.error(`❌ ERROR: Plantilla Documento [${tpl.id}] falta clave traducción para título (${titleKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(descKey)) {
-    console.error(`❌ ERROR: Plantilla Documento [${tpl.id}] falta clave traducción para descripción (${descKey})`);
-    failures++;
-  }
-  if (!pathsEs.includes(methodologyKey)) {
-    console.error(`❌ ERROR: Plantilla Documento [${tpl.id}] falta clave traducción para metodología (${methodologyKey})`);
+  [[titleKey, 'título'], [descKey, 'descripción'], [methodologyKey, 'metodología']].forEach(([path, label]) => {
+    if (!pathsEs.includes(path)) {
+      console.error(`❌ ERROR: Plantilla Documento [${tpl.id}] falta clave traducción EN ES para ${label} (${path})`);
+      failures++;
+    }
+    if (!pathsEn.includes(path)) {
+      console.error(`❌ ERROR: Plantilla Documento [${tpl.id}] falta clave traducción EN EN para ${label} (${path})`);
+      failures++;
+    }
+  });
+});
+
+console.log('\n👉 [TEST 3] Verificando consistencia de datos de configuración y enlaces públicos...');
+
+if (!isValidEmail(portfolioConfig.personal.email)) {
+  console.error(`❌ ERROR: El correo personal no es válido (${portfolioConfig.personal.email}).`);
+  failures++;
+}
+if (!isValidUrl(portfolioConfig.personal.github)) {
+  console.error(`❌ ERROR: La URL de GitHub no es válida (${portfolioConfig.personal.github}).`);
+  failures++;
+}
+if (!isValidUrl(portfolioConfig.personal.linkedin)) {
+  console.error(`❌ ERROR: La URL de LinkedIn no es válida (${portfolioConfig.personal.linkedin}).`);
+  failures++;
+}
+
+['roleKey', 'taglineKey', 'availabilityKey', 'workModeKey'].forEach((keyName) => {
+  const path = portfolioConfig.personal[keyName];
+  if (!keyExists(path)) {
+    console.error(`❌ ERROR: La clave personal ${keyName} no existe en las traducciones (${path}).`);
     failures++;
   }
 });
+
+portfolioConfig.projects.forEach(project => {
+  if (!isValidUrl(project.demo)) {
+    console.error(`❌ ERROR: El demo del proyecto [${project.id}] no es una URL válida (${project.demo}).`);
+    failures++;
+  }
+  if (!isValidUrl(project.repository)) {
+    console.error(`❌ ERROR: El repositorio del proyecto [${project.id}] no es una URL válida (${project.repository}).`);
+    failures++;
+  }
+  if (typeof project.metrics.coverage !== 'number' || project.metrics.coverage < 0 || project.metrics.coverage > 100) {
+    console.error(`❌ ERROR: La cobertura del proyecto [${project.id}] debe ser un número entre 0 y 100.`);
+    failures++;
+  }
+});
+
+portfolioConfig.certifications.forEach(cert => {
+  if (!isValidUrl(cert.image)) {
+    console.error(`❌ ERROR: La imagen de la certificación [${cert.id}] no es una URL válida (${cert.image}).`);
+    failures++;
+  }
+});
+
+if (!keyExists(portfolioConfig.documentation.methodsKey)) {
+  console.error(`❌ ERROR: La clave de método de documentación no existe en traducciones (${portfolioConfig.documentation.methodsKey}).`);
+  failures++;
+}
 
 console.log('\n==================================================');
 if (failures === 0) {

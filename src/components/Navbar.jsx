@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { Menu, X, Sun, Moon, Globe, Github, Linkedin } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const { store } = usePortfolio();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -19,15 +20,12 @@ const Navbar = () => {
     document.documentElement.lang = nextLang;
   };
 
-  const navLinks = [
-    { path: '/', labelKey: 'nav.home' },
-    { path: '/projects', labelKey: 'nav.projects' },
-    { path: '/skills', labelKey: 'nav.skills' },
-    { path: '/documentation', labelKey: 'nav.documentation' },
-    { path: '/certifications', labelKey: 'nav.certifications' },
-    { path: '/about', labelKey: 'nav.about' },
-    { path: '/contact', labelKey: 'nav.contact' },
-  ];
+  const navLinks = store.settings.navbar.items.filter(
+    (item) =>
+      item.active &&
+      !item.path.startsWith('/admin') &&
+      !item.path.startsWith('/backoffice')
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full nav-blur">
@@ -64,7 +62,7 @@ const Navbar = () => {
                   }`
                 }
               >
-                {t(link.labelKey)}
+                {link.labelKey ? t(link.labelKey) : link.name}
               </NavLink>
             ))}
           </nav>
@@ -73,7 +71,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center space-x-3">
             {/* Social Links */}
             <a
-              href={portfolioConfig.personal.github}
+              href={store.settings.contact.github || store.personal.github}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-brand-navy-600 dark:text-brand-ash-300 hover:text-brand-electric-600 hover:dark:text-brand-electric-300 rounded-md transition-colors"
@@ -82,7 +80,7 @@ const Navbar = () => {
               <Github className="w-5 h-5" />
             </a>
             <a
-              href={portfolioConfig.personal.linkedin}
+              href={store.settings.contact.linkedin || store.personal.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-brand-navy-600 dark:text-brand-ash-300 hover:text-brand-electric-600 hover:dark:text-brand-electric-300 rounded-md transition-colors"
@@ -168,7 +166,7 @@ const Navbar = () => {
                     }`
                   }
                 >
-                  {t(link.labelKey)}
+                  {link.labelKey ? t(link.labelKey) : link.name}
                 </NavLink>
               ))}
               
@@ -176,7 +174,7 @@ const Navbar = () => {
 
               <div className="flex items-center justify-around py-2">
                 <a
-                  href={portfolioConfig.personal.github}
+                  href={store.settings.contact.github || store.personal.github}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-brand-navy-600 dark:text-brand-ash-300 font-medium py-1.5 px-3 hover:bg-brand-ash-50 rounded"
@@ -186,7 +184,7 @@ const Navbar = () => {
                   <span>GitHub</span>
                 </a>
                 <a
-                  href={portfolioConfig.personal.linkedin}
+                  href={store.settings.contact.linkedin || store.personal.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-brand-navy-600 dark:text-brand-ash-300 font-medium py-1.5 px-3 hover:bg-brand-ash-50 rounded"

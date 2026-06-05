@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { portfolioConfig } from '../data/portfolioData.js';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import * as LucideIcons from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
 const Skills = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
   const [selectedSkill, setSelectedSkill] = useState(null);
 
   const containerVariants = {
@@ -56,7 +57,7 @@ const Skills = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
         >
-          {portfolioConfig.skills.map((skill) => (
+          {store.skills.map((skill) => (
             <motion.button
               key={skill.id}
               variants={itemVariants}
