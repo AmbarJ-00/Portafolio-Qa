@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { PortfolioProvider } from './context/PortfolioContext.jsx';
 import { AdminAuthProvider } from './context/AdminAuthContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
+import { ToastContainer } from './components/Toast.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 import Layout from './components/Layout.jsx';
 import { Terminal } from 'lucide-react';
 
@@ -16,6 +19,7 @@ const Certifications = lazy(() => import('./pages/Certifications.jsx'));
 const About = lazy(() => import('./pages/About.jsx'));
 const Contact = lazy(() => import('./pages/Contact.jsx'));
 const CustomModule = lazy(() => import('./pages/CustomModule.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound.jsx'));
 
 const AdminLogin = lazy(() => import('./admin/AdminLogin.jsx'));
 const AdminLayout = lazy(() => import('./admin/AdminLayout.jsx'));
@@ -29,6 +33,7 @@ const ContactManager = lazy(() => import('./admin/sections/ContactManager.jsx'))
 const AppearanceManager = lazy(() => import('./admin/sections/AppearanceManager.jsx'));
 const NavbarManager = lazy(() => import('./admin/sections/NavbarManager.jsx'));
 const ModulesManager = lazy(() => import('./admin/sections/ModulesManager.jsx'));
+const AboutMeManager = lazy(() => import('./admin/sections/AboutMeManager.jsx'));
 const AdminRoute = lazy(() => import('./admin/AdminRoute.jsx'));
 
 // Loading fallback component
@@ -46,46 +51,53 @@ const Loader = () => (
 
 function App() {
   return (
-    <Router>
-      <ThemeProvider>
-        <PortfolioProvider>
-          <AdminAuthProvider>
-            <Suspense fallback={<Loader />}>
-              <Routes>
-                <Route path="/" element={<Layout><Home /></Layout>} />
-                <Route path="/projects" element={<Layout><Projects /></Layout>} />
-                <Route path="/projects/:projectId" element={<Layout><ProjectDetail /></Layout>} />
-                <Route path="/skills" element={<Layout><Skills /></Layout>} />
-                <Route path="/documentation" element={<Layout><Documentation /></Layout>} />
-                <Route path="/certifications" element={<Layout><Certifications /></Layout>} />
-                <Route path="/about" element={<Layout><About /></Layout>} />
-                <Route path="/contact" element={<Layout><Contact /></Layout>} />
-                <Route path="/modules/:moduleId" element={<Layout><CustomModule /></Layout>} />
+    <ErrorBoundary>
+      <Router>
+        <ThemeProvider>
+          <PortfolioProvider>
+            <ToastProvider>
+              <AdminAuthProvider>
+                <Suspense fallback={<Loader />}>
+                  <Routes>
+                    <Route path="/" element={<Layout><Home /></Layout>} />
+                    <Route path="/projects" element={<Layout><Projects /></Layout>} />
+                    <Route path="/projects/:projectId" element={<Layout><ProjectDetail /></Layout>} />
+                    <Route path="/skills" element={<Layout><Skills /></Layout>} />
+                    <Route path="/documentation" element={<Layout><Documentation /></Layout>} />
+                    <Route path="/certifications" element={<Layout><Certifications /></Layout>} />
+                    <Route path="/about" element={<Layout><About /></Layout>} />
+                    <Route path="/contact" element={<Layout><Contact /></Layout>} />
+                    <Route path="/modules/:moduleId" element={<Layout><CustomModule /></Layout>} />
 
-                <Route path="/backoffice/login" element={<AdminLogin />} />
-                <Route path="/backoffice" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="general" element={<GeneralConfig />} />
-                  <Route path="projects" element={<ProjectsManager />} />
-                  <Route path="skills" element={<SkillsManager />} />
-                  <Route path="certifications" element={<CertificationsManager />} />
-                  <Route path="documentation" element={<DocumentationManager />} />
-                  <Route path="contact" element={<ContactManager />} />
-                  <Route path="appearance" element={<AppearanceManager />} />
-                  <Route path="navbar" element={<NavbarManager />} />
-                  <Route path="modules" element={<ModulesManager />} />
-                </Route>
-                <Route path="/admin/login" element={<Navigate to="/backoffice/login" replace />} />
-                <Route path="/admin" element={<Navigate to="/backoffice" replace />} />
+                    <Route path="/backoffice/login" element={<AdminLogin />} />
+                    <Route path="/backoffice" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="general" element={<GeneralConfig />} />
+                      <Route path="projects" element={<ProjectsManager />} />
+                      <Route path="skills" element={<SkillsManager />} />
+                      <Route path="certifications" element={<CertificationsManager />} />
+                      <Route path="documentation" element={<DocumentationManager />} />
+                      <Route path="contact" element={<ContactManager />} />
+                      <Route path="appearance" element={<AppearanceManager />} />
+                      <Route path="navbar" element={<NavbarManager />} />
+                      <Route path="modules" element={<ModulesManager />} />
+                      <Route path="about" element={<AboutMeManager />} />
+                    </Route>
+                    <Route path="/admin/login" element={<Navigate to="/backoffice/login" replace />} />
+                    <Route path="/admin" element={<Navigate to="/backoffice" replace />} />
 
-                {/* Fallback to Home */}
-                <Route path="*" element={<Layout><Home /></Layout>} />
-              </Routes>
-            </Suspense>
-          </AdminAuthProvider>
-        </PortfolioProvider>
-      </ThemeProvider>
-    </Router>
+                    {/* Fallback to NotFound */}
+                    <Route path="/404" element={<Layout><NotFound /></Layout>} />
+                    <Route path="*" element={<Layout><NotFound /></Layout>} />
+                  </Routes>
+                </Suspense>
+              </AdminAuthProvider>
+              <ToastContainer />
+            </ToastProvider>
+          </PortfolioProvider>
+        </ThemeProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

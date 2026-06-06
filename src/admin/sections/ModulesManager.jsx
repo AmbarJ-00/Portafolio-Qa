@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
-import { Plus, GripVertical, Info, ArrowUpDown, X } from 'lucide-react';
+import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
+import { Plus, GripVertical, Info, ArrowUpDown, X, Edit, Trash2 } from 'lucide-react';
+import Modal from '../../components/Modal.jsx';
 
 const moduleSchema = z.object({
   name: z.string().min(3, 'El nombre es obligatorio'),
@@ -28,32 +32,40 @@ const defaultModuleValues = {
   animation: 'fade-in'
 };
 
-const SortableModuleItem = ({ module, onEdit, onDelete, listeners, attributes, setNodeRef, transform, transition }) => (
-  <div
-    ref={setNodeRef}
-    style={{ transform: CSS.Transform.toString(transform), transition }}
-    className="group flex items-center justify-between gap-3 rounded-3xl border border-[#17364F] bg-[#11243B] p-4 shadow-lg shadow-[#0D1A2F]/20 focus-within:ring-2 focus-within:ring-[#09D8C7]"
-  >
-    <div className="flex items-center gap-3">
-      <div className="rounded-2xl bg-[#0D1A2F] p-2 text-[#09D8C7]">
-        <GripVertical className="w-5 h-5" {...listeners} {...attributes} />
+const SortableModuleItem = ({ module, onEdit, onDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: module.id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className="group flex items-center justify-between gap-3 rounded-3xl border border-[#17364F] bg-[#11243B] p-4 shadow-lg shadow-[#0D1A2F]/20 focus-within:ring-2 focus-within:ring-[#09D8C7]"
+    >
+      <div className="flex items-center gap-3">
+        <div className="rounded-2xl bg-[#0D1A2F] p-2 text-[#09D8C7]">
+          <GripVertical className="w-5 h-5 cursor-grab" {...listeners} {...attributes} />
+        </div>
+        <div>
+          <p className="font-semibold text-white">{module.name}</p>
+          <p className="text-sm text-[#A5F5E0]">{module.description}</p>
+        </div>
       </div>
-      <div>
-        <p className="font-semibold text-white">{module.name}</p>
-        <p className="text-sm text-[#A5F5E0]">{module.description}</p>
+      <div className="flex items-center gap-2">
+        <button onClick={() => onEdit(module)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition">Editar</button>
+        <button onClick={() => onDelete(module)} className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 focus:outline-none focus:ring-2 focus:ring-[#BD0927] transition">Eliminar</button>
       </div>
     </div>
-    <div className="flex items-center gap-2">
-      <button onClick={() => onEdit(module)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]">Editar</button>
-      <button onClick={() => onDelete(module.id)} className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 focus:outline-none focus:ring-2 focus:ring-[#BD0927]">Eliminar</button>
-    </div>
-  </div>
-);
+  );
+};
 
 const ModulesManager = () => {
   const { store, actions } = usePortfolio();
+  const { toast } = useToast();
   const [activeModule, setActiveModule] = useState(null);
   const [showInstructions, setShowInstructions] = useState(true);
+
+  // Deletion confirm states
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [moduleToDelete, setModuleToDelete] = useState(null);
 
   const {
     register,
@@ -81,10 +93,10 @@ const ModulesManager = () => {
       name: module.name,
       icon: module.icon,
       description: module.description,
-      cards: module.cards.join(', '),
-      accentColor: module.colors.accent,
-      surfaceColor: module.colors.surface,
-      animation: module.animation
+      cards: module.cards ? module.cards.join(', ') : '',
+      accentColor: module.colors?.accent || '#09D8C7',
+      surfaceColor: module.colors?.surface || '#0D1A2F',
+      animation: module.animation || 'fade-in'
     });
   };
 
@@ -94,14 +106,42 @@ const ModulesManager = () => {
   };
 
   const onCreateModule = (data) => {
-    actions.addModule(data);
-    reset(defaultModuleValues);
+    try {
+      actions.addModule(data);
+      toast.success('Módulo creado con éxito');
+      reset(defaultModuleValues);
+    } catch (e) {
+      toast.error('Error al crear el módulo');
+    }
   };
 
   const onUpdateModule = (data) => {
     if (!activeModule) return;
-    actions.updateModule(activeModule.id, data);
-    closeEditor();
+    try {
+      actions.updateModule(activeModule.id, data);
+      toast.success('Módulo actualizado correctamente');
+      closeEditor();
+    } catch (e) {
+      toast.error('Error al actualizar el módulo');
+    }
+  };
+
+  const handleDeleteClick = (module) => {
+    setModuleToDelete(module);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (moduleToDelete) {
+      try {
+        actions.deleteModule(moduleToDelete.id);
+        toast.success('Módulo eliminado correctamente');
+      } catch (e) {
+        toast.error('Error al eliminar el módulo');
+      }
+      setModuleToDelete(null);
+    }
+    setIsDeleteConfirmOpen(false);
   };
 
   const handleDragEnd = (event) => {
@@ -111,6 +151,7 @@ const ModulesManager = () => {
       const newIndex = store.settings.modules.findIndex((item) => item.id === over?.id);
       const nextOrder = arrayMove(store.settings.modules, oldIndex, newIndex);
       actions.reorderModules(nextOrder);
+      toast.success('Orden de módulos actualizado');
     }
   };
 
@@ -121,18 +162,18 @@ const ModulesManager = () => {
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-[#09D8C7]/80">Panel administrativo</p>
             <h1 className="mt-4 text-4xl font-bold">Gestión de módulos</h1>
-            <p className="mt-3 max-w-2xl text-sm text-[#C9F7EE]">Administra módulos reutilizables con sus tarjetas, colores y animaciones desde un solo panel.</p>
+            <p className="mt-3 max-w-2xl text-sm text-[#C9F7EE]">Administra módulos reutilizables con sus tarjetas, colores y animaciones.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowInstructions((prev) => !prev)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition"
             >
               <Info className="w-4 h-4" /> {showInstructions ? 'Ocultar' : 'Ver'} instrucciones
             </button>
             <button
               onClick={() => reset(defaultModuleValues)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-[#09D8C7] px-4 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#09D8C7] px-4 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition"
             >
               <Plus className="w-4 h-4" /> Nuevo módulo
             </button>
@@ -150,24 +191,6 @@ const ModulesManager = () => {
               </div>
               <p className="mt-3 text-sm text-[#C9F7EE]">Un módulo es una sección configurable que agrupa tarjetas, colores y animaciones para presentar contenido público de forma consistente.</p>
             </div>
-            <div className="grid gap-4">
-              <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-5">
-                <p className="font-semibold text-white">Cómo crearlo</p>
-                <p className="mt-2 text-sm text-[#C9F7EE]">Completa el formulario con nombre, icono, descripción y tarjetas separadas por comas.</p>
-              </div>
-              <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-5">
-                <p className="font-semibold text-white">Cómo editarlo</p>
-                <p className="mt-2 text-sm text-[#C9F7EE]">Pulsa editar para abrir un modal independiente, así separas creación y edición.</p>
-              </div>
-            </div>
-            <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-5">
-              <p className="font-semibold text-white">Cómo modificar su apariencia</p>
-              <p className="mt-2 text-sm text-[#C9F7EE]">Ajusta los colores de acento y superficie para mantener la identidad visual del módulo.</p>
-            </div>
-            <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-5">
-              <p className="font-semibold text-white">Cómo reordenarlo</p>
-              <p className="mt-2 text-sm text-[#C9F7EE]">Arrastra los módulos en la lista para cambiar su prioridad y posición.</p>
-            </div>
           </div>
         </section>
       )}
@@ -176,12 +199,12 @@ const ModulesManager = () => {
         <section className="space-y-4">
           <div className="rounded-[1.75rem] border border-[#17364F] bg-[#11243B]/90 p-6 shadow-lg shadow-[#0D1A2F]/20 text-[#E2E8F0]">
             <h2 className="text-xl font-semibold text-white">Módulos existentes</h2>
-            <p className="mt-1 text-sm text-[#C9F7EE]">Haz clic en editar para abrir la ventana de edición independiente.</p>
+            <p className="mt-1 text-sm text-[#C9F7EE]">Haz clic en editar para abrir la ventana de edición independiente o arrastra para reordenar.</p>
           </div>
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={store.settings.modules.map((item) => item.id)} strategy={verticalListSortingStrategy}>
               {store.settings.modules.map((module) => (
-                <SortableModuleItem key={module.id} module={module} onEdit={openEditor} onDelete={actions.deleteModule} />
+                <SortableModuleItem key={module.id} module={module} onEdit={openEditor} onDelete={handleDeleteClick} />
               ))}
             </SortableContext>
           </DndContext>
@@ -217,7 +240,6 @@ const ModulesManager = () => {
                 rows={4}
                 className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
               />
-              <p className="text-xs text-[#C9F7EE]">Describe brevemente qué hace este módulo.</p>
               {errors.description && <p className="text-xs text-[#FCA5A5]">{errors.description.message}</p>}
             </div>
 
@@ -254,13 +276,13 @@ const ModulesManager = () => {
               <button
                 type="reset"
                 onClick={() => reset(defaultModuleValues)}
-                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#17364F] hover:bg-[#17364F]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]/30 transition"
               >
                 Limpiar
               </button>
               <button
                 type="submit"
-                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition"
               >
                 Crear módulo
               </button>
@@ -274,27 +296,31 @@ const ModulesManager = () => {
           isOpen={Boolean(activeModule)}
           onClose={closeEditor}
           title="Editar módulo"
-          subtitle="Actualiza los detalles sin mezclar el flujo de creación."
+          subtitle="Actualiza los detalles del módulo."
           footer={
             <div className="flex flex-wrap justify-end gap-3">
               <button
                 type="button"
                 onClick={closeEditor}
-                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10"
+                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 transition"
               >
                 Cancelar
               </button>
               <button
                 form="edit-module-form"
                 type="submit"
-                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6]"
+                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition"
               >
                 Guardar cambios
               </button>
             </div>
           }
         >
-          <form id="edit-module-form" onSubmit={handleSubmitEdit(onUpdateModule)} className="space-y-5">
+          <form 
+            id="edit-module-form" 
+            onSubmit={handleSubmitEdit(onUpdateModule)} 
+            className="space-y-5 max-h-[60vh] overflow-y-auto pr-2"
+          >
             {[
               { name: 'name', label: 'Nombre del módulo', hint: 'Mínimo 3 caracteres' },
               { name: 'icon', label: 'Icono Lucide', hint: 'Ej: Layers, Monitor, FileCode' },
@@ -319,7 +345,6 @@ const ModulesManager = () => {
                 rows={4}
                 className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
               />
-              <p className="text-xs text-[#C9F7EE]">Describe qué controla este módulo.</p>
               {editErrors.description && <p className="text-xs text-[#FCA5A5]">{editErrors.description.message}</p>}
             </div>
 
@@ -354,6 +379,17 @@ const ModulesManager = () => {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Eliminar Módulo"
+        description={`¿Estás seguro de que deseas eliminar el módulo "${moduleToDelete?.name || ''}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

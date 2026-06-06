@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
 import Modal from '../../components/Modal.jsx';
 import { Plus, Trash2, Edit, GripVertical, Link2, HelpCircle, X } from 'lucide-react';
 
@@ -26,7 +28,7 @@ const SortableNavItem = ({ item, onToggle, onEdit, onDelete }) => {
     >
       <div className="flex items-center gap-3">
         <div className="rounded-2xl bg-[#09D8C7]/10 p-2 text-[#09D8C7]">
-          <GripVertical className="w-5 h-5" {...listeners} {...attributes} />
+          <GripVertical className="w-5 h-5 cursor-grab" {...listeners} {...attributes} />
         </div>
         <div>
           <p className="font-semibold text-white">{item.name}</p>
@@ -34,13 +36,13 @@ const SortableNavItem = ({ item, onToggle, onEdit, onDelete }) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={() => onToggle(item.id)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10">
+        <button onClick={() => onToggle(item.id, !item.active)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition">
           {item.active ? 'Visible' : 'Oculto'}
         </button>
-        <button onClick={() => onEdit(item)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10">
+        <button onClick={() => onEdit(item)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition">
           <Edit className="w-4 h-4" />
         </button>
-        <button onClick={() => onDelete(item.id)} className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20">
+        <button onClick={() => onDelete(item)} className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 transition">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -50,10 +52,15 @@ const SortableNavItem = ({ item, onToggle, onEdit, onDelete }) => {
 
 const NavbarManager = () => {
   const { store, actions } = usePortfolio();
+  const { toast } = useToast();
   const [activeNav, setActiveNav] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  // Deletion confirm states
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [navToDelete, setNavToDelete] = useState(null);
+
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(navSchema),
     defaultValues: {
       name: '',
@@ -63,18 +70,53 @@ const NavbarManager = () => {
   });
 
   const onSubmit = (data) => {
-    if (activeNav) {
-      actions.updateNavbarItem(activeNav.id, data);
-    } else {
-      actions.addNavbarItem(data);
+    try {
+      if (activeNav) {
+        actions.updateNavbarItem(activeNav.id, data);
+        toast.success('Enlace de navegación actualizado correctamente');
+      } else {
+        actions.addNavbarItem(data);
+        toast.success('Enlace de navegación creado con éxito');
+      }
+      setActiveNav(null);
+      reset({ name: '', path: '/nuevo-enlace', active: true });
+    } catch (e) {
+      toast.error('Error al guardar el enlace de navegación');
     }
-    setActiveNav(null);
-    reset({ name: '', path: '/nuevo-enlace', active: true });
   };
 
   const handleEdit = (item) => {
     setActiveNav(item);
-    reset({ name: item.name, path: item.path, active: item.active });
+    setValue('name', item.name);
+    setValue('path', item.path);
+    setValue('active', item.active);
+  };
+
+  const handleToggle = (id, newActive) => {
+    try {
+      actions.updateNavbarItem(id, { active: newActive });
+      toast.success(newActive ? 'Enlace ahora es visible' : 'Enlace ahora está oculto');
+    } catch (e) {
+      toast.error('Error al cambiar la visibilidad');
+    }
+  };
+
+  const handleDeleteClick = (item) => {
+    setNavToDelete(item);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (navToDelete) {
+      try {
+        actions.deleteNavbarItem(navToDelete.id);
+        toast.success('Enlace de navegación eliminado correctamente');
+      } catch (e) {
+        toast.error('Error al eliminar el enlace');
+      }
+      setNavToDelete(null);
+    }
+    setIsDeleteConfirmOpen(false);
   };
 
   const handleTransfer = (active, over) => {
@@ -83,6 +125,7 @@ const NavbarManager = () => {
       const newIndex = store.settings.navbar.items.findIndex((item) => item.id === over?.id);
       const nextOrder = arrayMove(store.settings.navbar.items, oldIndex, newIndex);
       actions.reorderNavbarItems(nextOrder);
+      toast.success('Orden del menú actualizado');
     }
   };
 
@@ -99,7 +142,7 @@ const NavbarManager = () => {
           </div>
           <button
             onClick={() => setHelpOpen(true)}
-            className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20"
+            className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 transition duration-200"
           >
             <HelpCircle className="w-4 h-4" /> Ayuda
           </button>
@@ -114,9 +157,9 @@ const NavbarManager = () => {
                 <SortableNavItem
                   key={item.id}
                   item={item}
-                  onToggle={(id) => actions.updateNavbarItem(id, { active: !item.active })}
+                  onToggle={handleToggle}
                   onEdit={handleEdit}
-                  onDelete={actions.deleteNavbarItem}
+                  onDelete={handleDeleteClick}
                 />
               ))}
             </SortableContext>
@@ -132,7 +175,7 @@ const NavbarManager = () => {
             {activeNav && (
               <button
                 onClick={() => { setActiveNav(null); reset({ name: '', path: '/nuevo-enlace', active: true }); }}
-                className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10"
+                className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition"
               >
                 <X className="w-4 h-4" /> Cancelar
               </button>
@@ -189,21 +232,20 @@ const NavbarManager = () => {
               <p className="font-semibold text-white">Ruta clara</p>
               <p className="mt-2 text-sm text-[#C9F7EE]">Usa rutas limpias: /projects, /skills, /contact.</p>
             </div>
-            <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-              <p className="font-semibold text-white">Visibilidad</p>
-              <p className="mt-2 text-sm text-[#C9F7EE]">Oculta los enlaces que no deben verse en el menú público.</p>
-            </div>
-            <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-              <p className="font-semibold text-white">Orden</p>
-              <p className="mt-2 text-sm text-[#C9F7EE]">Arrastra para definir el flujo principal de navegación.</p>
-            </div>
-            <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-              <p className="font-semibold text-white">Nombres</p>
-              <p className="mt-2 text-sm text-[#C9F7EE]">Mantén nombres breves y en español para el menú público.</p>
-            </div>
           </div>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Eliminar Enlace de Menú"
+        description={`¿Estás seguro de que deseas eliminar el enlace de navegación "${navToDelete?.name || ''}"? Esta acción no se puede deshacer y puede afectar la navegación del usuario público.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

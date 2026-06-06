@@ -21,11 +21,11 @@ const ProjectDetail = () => {
     return <Navigate to="/projects" replace />;
   }
 
-  const title = t(project.titleKey);
-  const desc = t(project.descriptionKey);
-  const strategySummary = t(`${project.translationKey}.strategy_summary`);
-  const risksText = t(`${project.translationKey}.risks`);
-  const bugsDetailedText = t(`${project.translationKey}.bugs_detailed`);
+  const title = project.titleKey ? t(project.titleKey) : project.title;
+  const desc = project.descriptionKey ? t(project.descriptionKey) : project.description;
+  const strategySummary = project.translationKey ? t(`${project.translationKey}.strategy_summary`) : project.testingStrategy;
+  const risksText = project.translationKey ? t(`${project.translationKey}.risks`) : project.risks;
+  const bugsDetailedText = project.translationKey ? t(`${project.translationKey}.bugs_detailed`) : project.bugs;
 
   const containerVariants = {
     hidden: { opacity: 0, y: 15 },
@@ -76,7 +76,7 @@ const ProjectDetail = () => {
           </div>
           
           <div className="flex gap-4">
-            {project.demo && (
+            {project.demo && project.demoVisibility !== 'hide' && project.demoVisibility !== 'hidden' && (
               <a
                 href={project.demo}
                 target="_blank"
