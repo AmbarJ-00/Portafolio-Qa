@@ -26,6 +26,9 @@ build/
 *.sln
 *.sw?
 
+# checklist Qa
+qa/
+
 # Environment variables
 .env
 .env.local
