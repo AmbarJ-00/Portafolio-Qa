@@ -26,8 +26,9 @@ build/
 *.sln
 *.sw?
 
-# checklist Qa
+# checklist Qas
 qa/
+*.checklist.md
 
 # Environment variables
 .env

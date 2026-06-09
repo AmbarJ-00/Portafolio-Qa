@@ -79,7 +79,15 @@ const getInitialState = () => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (!parsed.aboutItems) parsed.aboutItems = [];
+      if (!parsed.heroCards) {
+        parsed.heroCards = [
+          { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
+          { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
+        ];
+      }
+      return parsed;
     } catch (error) {
       console.warn('Failed to parse local portfolio store', error);
     }
@@ -87,6 +95,11 @@ const getInitialState = () => {
 
   return {
     ...defaultPortfolioConfig,
+    aboutItems: [],
+    heroCards: [
+      { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
+      { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
+    ],
     settings: {
       seo: {
         title: 'Sofia Rodriguez | QA Lead',
@@ -269,6 +282,8 @@ export const PortfolioProvider = ({ children }) => {
       testPlan: project.testPlan,
       risks: project.risks,
       bugs: project.bugs,
+      status: project.status || 'active',
+      demoVisibility: project.demoVisibility || 'show',
       metrics: {
         coverage: Number(project.coverage) || 0,
         improvements: Number(project.improvements) || 0,
@@ -296,6 +311,8 @@ export const PortfolioProvider = ({ children }) => {
               ...project,
               ...payload,
               integrations: splitCsv(payload.integrations || project.integrations),
+              status: payload.status ?? project.status ?? 'active',
+              demoVisibility: payload.demoVisibility ?? project.demoVisibility ?? 'show',
               metrics: {
                 ...project.metrics,
                 coverage: Number(payload.coverage ?? project.metrics.coverage),
@@ -560,6 +577,104 @@ export const PortfolioProvider = ({ children }) => {
     }));
   };
 
+  const addAboutItem = (item) => {
+    setStore((prev) => ({
+      ...prev,
+      aboutItems: [
+        {
+          id: createId('about'),
+          type: item.type || 'pilar',
+          title: item.title,
+          description: item.description,
+          position: item.position || 'center',
+          priority: Number(item.priority) || 0,
+          status: item.status || 'active',
+          behavior: item.behavior || 'card'
+        },
+        ...prev.aboutItems
+      ]
+    }));
+  };
+
+  const updateAboutItem = (itemId, payload) => {
+    setStore((prev) => ({
+      ...prev,
+      aboutItems: prev.aboutItems.map((item) =>
+        item.id === itemId ? { ...item, ...payload, priority: Number(payload.priority ?? item.priority) } : item
+      )
+    }));
+  };
+
+  const deleteAboutItem = (itemId) => {
+    setStore((prev) => ({
+      ...prev,
+      aboutItems: prev.aboutItems.filter((item) => item.id !== itemId)
+    }));
+  };
+
+  const reorderAboutItems = (newOrder) => {
+    setStore((prev) => ({
+      ...prev,
+      aboutItems: newOrder
+    }));
+  };
+
+  const addHeroCard = (card) => {
+    setStore((prev) => ({
+      ...prev,
+      heroCards: [
+        {
+          id: createId('hero-card'),
+          title: card.title,
+          description: card.description,
+          icon: card.icon || 'ShieldCheck',
+          status: card.status || 'active',
+          priority: Number(card.priority) || 0
+        },
+        ...prev.heroCards
+      ]
+    }));
+  };
+
+  const updateHeroCard = (cardId, payload) => {
+    setStore((prev) => ({
+      ...prev,
+      heroCards: prev.heroCards.map((card) =>
+        card.id === cardId ? { ...card, ...payload, priority: Number(payload.priority ?? card.priority) } : card
+      )
+    }));
+  };
+
+  const deleteHeroCard = (cardId) => {
+    setStore((prev) => ({
+      ...prev,
+      heroCards: prev.heroCards.filter((card) => card.id !== cardId)
+    }));
+  };
+
+  const reorderHeroCards = (newOrder) => {
+    setStore((prev) => ({
+      ...prev,
+      heroCards: newOrder
+    }));
+  };
+
+  const duplicateHeroCard = (cardId) => {
+    setStore((prev) => {
+      const card = prev.heroCards.find((item) => item.id === cardId);
+      if (!card) return prev;
+      const copy = {
+        ...card,
+        id: createId('hero-card'),
+        title: `${card.title} (Copy)`,
+      };
+      return {
+        ...prev,
+        heroCards: [copy, ...prev.heroCards]
+      };
+    });
+  };
+
   const actions = {
     updatePersonal,
     updateSEO,
@@ -588,7 +703,16 @@ export const PortfolioProvider = ({ children }) => {
     addModule,
     updateModule,
     deleteModule,
-    reorderModules
+    reorderModules,
+    addAboutItem,
+    updateAboutItem,
+    deleteAboutItem,
+    reorderAboutItems,
+    addHeroCard,
+    updateHeroCard,
+    deleteHeroCard,
+    reorderHeroCards,
+    duplicateHeroCard
   };
 
   return (

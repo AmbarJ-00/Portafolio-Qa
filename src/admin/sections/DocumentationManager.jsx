@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
 import { Plus, Trash2, Edit, HelpCircle } from 'lucide-react';
 import Modal from '../../components/Modal.jsx';
 
@@ -20,8 +22,13 @@ const docSchema = z.object({
 
 const DocumentationManager = () => {
   const { store, actions } = usePortfolio();
+  const { toast } = useToast();
   const [activeDoc, setActiveDoc] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
+
+  // Deletion confirm states
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [docToDelete, setDocToDelete] = useState(null);
 
   const defaultValues = {
     title: '',
@@ -53,10 +60,10 @@ const DocumentationManager = () => {
       type: template.type,
       template: template.template,
       methodology: template.methodology || '',
-      questions: (template.questions || []).join(', '),
-      parameters: (template.parameters || []).join(', '),
-      checklist: (template.checklist || []).join(', '),
-      strategies: (template.strategies || []).join(', ')
+      questions: template.questions ? template.questions.join(', ') : '',
+      parameters: template.parameters ? template.parameters.join(', ') : '',
+      checklist: template.checklist ? template.checklist.join(', ') : '',
+      strategies: template.strategies ? template.strategies.join(', ') : ''
     });
   };
 
@@ -66,14 +73,42 @@ const DocumentationManager = () => {
   };
 
   const onCreateTemplate = (data) => {
-    actions.addDocumentationTemplate(data);
-    reset(defaultValues);
+    try {
+      actions.addDocumentationTemplate(data);
+      toast.success('Plantilla de documentación creada con éxito');
+      reset(defaultValues);
+    } catch (e) {
+      toast.error('Error al crear la plantilla');
+    }
   };
 
   const onUpdateTemplate = (data) => {
     if (!activeDoc) return;
-    actions.updateDocumentationTemplate(activeDoc.id, data);
-    closeEditor();
+    try {
+      actions.updateDocumentationTemplate(activeDoc.id, data);
+      toast.success('Plantilla de documentación actualizada correctamente');
+      closeEditor();
+    } catch (e) {
+      toast.error('Error al actualizar la plantilla');
+    }
+  };
+
+  const handleDeleteClick = (template) => {
+    setDocToDelete(template);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (docToDelete) {
+      try {
+        actions.deleteDocumentationTemplate(docToDelete.id);
+        toast.success('Plantilla de documentación eliminada correctamente');
+      } catch (e) {
+        toast.error('Error al eliminar la plantilla');
+      }
+      setDocToDelete(null);
+    }
+    setIsDeleteConfirmOpen(false);
   };
 
   return (
@@ -90,14 +125,14 @@ const DocumentationManager = () => {
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={closeEditor}
-              className="inline-flex items-center gap-2 rounded-2xl bg-[#09D8C7] px-4 py-3 text-sm font-semibold text-[#0D1A2F] shadow-lg shadow-[#09D8C7]/20 transition hover:bg-[#08c1b6]"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#09D8C7] px-4 py-3 text-sm font-semibold text-[#0D1A2F] shadow-lg shadow-[#09D8C7]/20 transition hover:bg-[#08c1b6] duration-200"
             >
               <Plus className="w-4 h-4" /> Nueva plantilla
             </button>
             <button
               type="button"
               onClick={() => setHelpOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition duration-200"
             >
               <HelpCircle className="w-4 h-4" /> Ayuda
             </button>
@@ -120,14 +155,14 @@ const DocumentationManager = () => {
           </div>
 
           {store.documentation.templates.map((template) => (
-            <article key={template.id} className="group rounded-[1.75rem] border border-[#17364F] bg-[#0E2036] p-6 shadow-lg shadow-[#0D1A2F]/15 transition hover:-translate-y-1 hover:border-[#09D8C7]">
+            <article key={template.id} className="group rounded-[1.75rem] border border-[#17364F] bg-[#0E2036] p-6 shadow-lg shadow-[#0D1A2F]/15 transition duration-200 hover:-translate-y-1 hover:border-[#09D8C7]">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#09D8C7]/80">{template.category}</p>
                   <h3 className="mt-2 text-2xl font-semibold text-white">{template.title}</h3>
                   <p className="mt-2 text-sm text-[#B8EDE6]">{template.type}</p>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 shrink-0">
                   <button
                     onClick={() => openEditor(template)}
                     className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] px-4 py-2 text-sm font-semibold text-[#09D8C7] transition hover:bg-[#09D8C7]/10"
@@ -135,7 +170,7 @@ const DocumentationManager = () => {
                     <Edit className="w-4 h-4" /> Editar
                   </button>
                   <button
-                    onClick={() => actions.deleteDocumentationTemplate(template.id)}
+                    onClick={() => handleDeleteClick(template)}
                     className="inline-flex items-center gap-2 rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-4 py-2 text-sm font-semibold text-[#BD0927] transition hover:bg-[#BD0927]/20"
                   >
                     <Trash2 className="w-4 h-4" /> Eliminar
@@ -151,16 +186,11 @@ const DocumentationManager = () => {
           <div className="flex items-center justify-between gap-4 pb-4 border-b border-[#09D8C7]/10">
             <div>
               <h2 className="text-2xl font-semibold text-white">Formulario de plantilla</h2>
-              <p className="mt-1 text-sm text-[#B8EDE6]">Rellena los campos para crear o actualizar una plantilla QA.</p>
+              <p className="mt-1 text-sm text-[#B8EDE6]">Rellena los campos para crear una plantilla QA.</p>
             </div>
-            {activeDoc && (
-              <span className="rounded-full bg-[#09D8C7]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#09D8C7]">
-                Editando
-              </span>
-            )}
           </div>
 
-          <form onSubmit={handleSubmitCreate(onCreateTemplate)} className="mt-6 space-y-5">
+          <form onSubmit={handleSubmit(onCreateTemplate)} className="mt-6 space-y-5">
             {[
               { name: 'title', label: 'Título', placeholder: 'Plantilla de reporte QA' },
               { name: 'category', label: 'Categoría', placeholder: 'Checklist, Guía, Reporte' },
@@ -197,7 +227,7 @@ const DocumentationManager = () => {
             ))}
 
             <div className="flex justify-end gap-3 pt-3">
-              <button type="reset" onClick={() => reset(defaultValues)} className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#B8EDE6] hover:bg-[#17364F]/10">
+              <button type="reset" onClick={() => reset(defaultValues)} className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#B8EDE6] hover:bg-[#17364F]/10 transition">
                 Limpiar
               </button>
               <button type="submit" className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] transition hover:bg-[#08c1b6]">
@@ -207,32 +237,37 @@ const DocumentationManager = () => {
           </form>
         </section>
       </div>
+
       {activeDoc && (
         <Modal
           isOpen={Boolean(activeDoc)}
           onClose={closeEditor}
           title="Editar plantilla QA"
-          subtitle="Edita la plantilla sin reutilizar el formulario de creación principal."
+          subtitle="Edita la plantilla seleccionada."
           footer={
             <div className="flex flex-wrap justify-end gap-3">
               <button
                 type="button"
                 onClick={closeEditor}
-                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#B8EDE6] hover:bg-[#17364F]/10"
+                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#B8EDE6] hover:bg-[#17364F]/10 transition"
               >
                 Cancelar
               </button>
               <button
                 form="edit-doc-form"
                 type="submit"
-                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6]"
+                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition"
               >
                 Guardar cambios
               </button>
             </div>
           }
         >
-          <form id="edit-doc-form" onSubmit={handleSubmitEdit(onUpdateTemplate)} className="mt-6 space-y-5">
+          <form 
+            id="edit-doc-form" 
+            onSubmit={handleSubmitEdit(onUpdateTemplate)} 
+            className="mt-6 space-y-5 max-h-[60vh] overflow-y-auto pr-2"
+          >
             {[
               { name: 'title', label: 'Título', placeholder: 'Plantilla de reporte QA' },
               { name: 'category', label: 'Categoría', placeholder: 'Checklist, Guía, Reporte' },
@@ -250,6 +285,7 @@ const DocumentationManager = () => {
                 {editErrors[field.name] && <p className="text-xs text-[#FF7E8B]">{editErrors[field.name].message}</p>}
               </div>
             ))}
+
             {[
               { name: 'methodology', label: 'Metodología', placeholder: 'Describe el proceso o enfoque usado.' },
               { name: 'questions', label: 'Preguntas (separadas por comas)', placeholder: '¿Funciona? ¿Se muestra correctamente?' },
@@ -293,20 +329,19 @@ const DocumentationManager = () => {
             <p className="font-semibold text-white">Cómo usar el formulario</p>
             <p className="mt-2 text-sm text-[#C9F7EE]">Completa el título, categoría, tipo y nombre de plantilla para crear una plantilla válida. Los campos adicionales son opcionales.</p>
           </div>
-          <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Campos opcionales</p>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#C9F7EE]">
-              <li>Metodología: Describe el enfoque de la plantilla.</li>
-              <li>Preguntas: Agrega preguntas clave separadas por comas.</li>
-              <li>Parámetros, checklist y estrategias: agrega elementos reutilizables para cada plantilla.</li>
-            </ul>
-          </div>
-          <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Edición segura</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Al editar una plantilla, el formulario principal se mantiene separado para no perder datos de creación en progreso.</p>
-          </div>
         </div>
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Eliminar Plantilla QA"
+        description={`¿Estás seguro de que deseas eliminar la plantilla "${docToDelete?.title || ''}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

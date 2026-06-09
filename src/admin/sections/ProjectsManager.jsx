@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
 import { Plus, Trash2, Copy, Edit, X, HelpCircle } from 'lucide-react';
 import Modal from '../../components/Modal.jsx';
 
@@ -10,9 +12,9 @@ const projectSchema = z.object({
   title: z.string().min(3, 'El título es obligatorio'),
   description: z.string().min(15, 'La descripción es obligatoria'),
   category: z.string().min(3, 'La categoría es obligatoria'),
-  demo: z.string().url('La URL de demo debe ser válida'),
-  repository: z.string().url('La URL del repositorio debe ser válida'),
-  image: z.string().url('La URL de imagen debe ser válida'),
+  demo: z.string().url('La URL de demo debe ser válida').optional().or(z.literal('')),
+  repository: z.string().url('La URL del repositorio debe ser válida').optional().or(z.literal('')),
+  image: z.string().url('La URL de imagen debe ser válida').optional().or(z.literal('')),
   integrations: z.string().optional(),
   objectives: z.string().optional(),
   testingStrategy: z.string().optional(),
@@ -26,22 +28,29 @@ const projectSchema = z.object({
   bugsResolved: z.number().min(0),
   ambiguitiesFound: z.number().min(0),
   qualityImpact: z.string().optional(),
-  enableMetrics: z.boolean().optional()
+  enableMetrics: z.boolean().optional(),
+  status: z.string().optional(),
+  demoVisibility: z.string().optional()
 });
 
 const ProjectsManager = () => {
   const { store, actions } = usePortfolio();
+  const { toast } = useToast();
   const [activeProject, setActiveProject] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+
+  // Deletion state
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   const defaultValues = useMemo(() => ({
     title: '',
     description: '',
     category: '',
-    demo: 'https://',
-    repository: 'https://',
-    image: 'https://',
+    demo: '',
+    repository: '',
+    image: '',
     integrations: '',
     objectives: '',
     testingStrategy: '',
@@ -55,7 +64,9 @@ const ProjectsManager = () => {
     bugsResolved: 0,
     ambiguitiesFound: 0,
     qualityImpact: '',
-    enableMetrics: true
+    enableMetrics: true,
+    status: 'active',
+    demoVisibility: 'show'
   }), []);
 
   const {
@@ -85,23 +96,25 @@ const ProjectsManager = () => {
       title: project.title,
       description: project.description,
       category: project.category,
-      demo: project.demo,
-      repository: project.repository,
-      image: project.image,
-      integrations: project.integrations.join(', '),
-      objectives: project.objectives,
-      testingStrategy: project.testingStrategy,
-      testPlan: project.testPlan,
-      risks: project.risks,
-      bugs: project.bugs,
-      coverage: project.metrics.coverage,
-      improvements: project.metrics.improvements,
-      riskCoverage: project.metrics.riskCoverage,
-      findingsCritical: project.metrics.findingsCritical,
-      bugsResolved: project.metrics.bugsResolved,
-      ambiguitiesFound: project.metrics.ambiguitiesFound,
-      qualityImpact: project.metrics.qualityImpact,
-      enableMetrics: project.enableMetrics
+      demo: project.demo || '',
+      repository: project.repository || '',
+      image: project.image || '',
+      integrations: project.integrations ? project.integrations.join(', ') : '',
+      objectives: project.objectives || '',
+      testingStrategy: project.testingStrategy || '',
+      testPlan: project.testPlan || '',
+      risks: project.risks || '',
+      bugs: project.bugs || '',
+      coverage: project.metrics?.coverage || 0,
+      improvements: project.metrics?.improvements || 0,
+      riskCoverage: project.metrics?.riskCoverage || 0,
+      findingsCritical: project.metrics?.findingsCritical || 0,
+      bugsResolved: project.metrics?.bugsResolved || 0,
+      ambiguitiesFound: project.metrics?.ambiguitiesFound || 0,
+      qualityImpact: project.metrics?.qualityImpact || '',
+      enableMetrics: project.enableMetrics !== false,
+      status: project.status || 'active',
+      demoVisibility: project.demoVisibility || 'show'
     });
   };
 
@@ -112,14 +125,51 @@ const ProjectsManager = () => {
   };
 
   const onCreateProject = (data) => {
-    actions.addProject(data);
-    reset(defaultValues);
+    try {
+      actions.addProject(data);
+      toast.success('Proyecto creado con éxito');
+      reset(defaultValues);
+    } catch (e) {
+      toast.error('Error al crear el proyecto');
+    }
   };
 
   const onUpdateProject = (data) => {
     if (!activeProject) return;
-    actions.updateProject(activeProject.id, data);
-    closeEditor();
+    try {
+      actions.updateProject(activeProject.id, data);
+      toast.success('Proyecto actualizado correctamente');
+      closeEditor();
+    } catch (e) {
+      toast.error('Error al actualizar el proyecto');
+    }
+  };
+
+  const handleDeleteClick = (project) => {
+    setProjectToDelete(project);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (projectToDelete) {
+      try {
+        actions.deleteProject(projectToDelete.id);
+        toast.success('Proyecto eliminado correctamente');
+      } catch (e) {
+        toast.error('Error al eliminar el proyecto');
+      }
+      setProjectToDelete(null);
+    }
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const handleDuplicate = (id) => {
+    try {
+      actions.duplicateProject(id);
+      toast.success('Proyecto duplicado correctamente');
+    } catch (e) {
+      toast.error('Error al duplicar el proyecto');
+    }
   };
 
   return (
@@ -136,13 +186,13 @@ const ProjectsManager = () => {
           <div className="flex flex-wrap items-center justify-end gap-3">
             <button
               onClick={() => setHelpOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 transition"
             >
               <HelpCircle className="w-4 h-4" /> Ayuda
             </button>
             <button
               onClick={() => { closeEditor(); setIsEditing(false); }}
-              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 transition"
             >
               <Plus className="w-4 h-4" />
               Nuevo proyecto
@@ -157,26 +207,37 @@ const ProjectsManager = () => {
             <article key={project.id} className="rounded-[1.75rem] border border-[#17364F] bg-[#0D1A2F] p-6 shadow-lg shadow-[#0D1A2F]/10 text-[#E2E8F0]">
               <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-start">
                 <div className="space-y-2">
-                  <p className="text-sm uppercase tracking-[0.3em] text-[#A5B4FC]">{project.category}</p>
-                  <h2 className="text-2xl font-semibold text-white">{project.title}</h2>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm uppercase tracking-[0.3em] text-[#A5B4FC]">{project.category}</p>
+                    {project.status && project.status !== 'active' && (
+                      <span className={`text-[10px] border px-2 py-0.5 rounded-full font-semibold uppercase ${
+                        project.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' : 
+                        project.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' : 
+                        'bg-red-950/80 text-red-400 border-red-500/20'
+                      }`}>
+                        {project.status === 'maintenance' ? 'Mantenimiento' : project.status === 'learning' ? 'En proceso' : 'Inactivo'}
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-2xl font-semibold text-white">{project.titleKey ? `${project.title} (i18n)` : project.title}</h2>
                   <p className="text-sm leading-6 text-[#C9F7EE] line-clamp-3">{project.description}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <button
                     onClick={() => openEditor(project)}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/20"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/20 transition"
                   >
                     <Edit className="w-4 h-4" /> Editar
                   </button>
                   <button
-                    onClick={() => actions.duplicateProject(project.id)}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#0D1A2F]/90 px-3 py-2 text-sm text-[#C9F7EE] hover:bg-[#0D1A2F]"
+                    onClick={() => handleDuplicate(project.id)}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#0D1A2F]/90 px-3 py-2 text-sm text-[#C9F7EE] hover:bg-[#0D1A2F] transition"
                   >
                     <Copy className="w-4 h-4" /> Duplicar
                   </button>
                   <button
-                    onClick={() => actions.deleteProject(project.id)}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20"
+                    onClick={() => handleDeleteClick(project)}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 transition"
                   >
                     <Trash2 className="w-4 h-4" /> Eliminar
                   </button>
@@ -190,7 +251,7 @@ const ProjectsManager = () => {
           <div className="flex items-center justify-between gap-4 border-b border-[#09D8C7]/10 pb-4">
             <div>
               <h2 className="text-xl font-semibold text-white">Crear un proyecto</h2>
-              <p className="text-sm text-[#C9F7EE]/80">Rellena el formulario para añadir un proyecto nuevo, sin mezclar la edición.</p>
+              <p className="text-sm text-[#C9F7EE]/80">Rellena el formulario para añadir un proyecto nuevo.</p>
             </div>
           </div>
 
@@ -198,14 +259,14 @@ const ProjectsManager = () => {
             {[
               { name: 'title', label: 'Título', placeholder: 'Portal QA Automation' },
               { name: 'category', label: 'Categoría', placeholder: 'Automatización QA, Seguridad, Frontend' },
-              { name: 'demo', label: 'Demo URL', type: 'url', placeholder: 'https://demo.ejemplo.com' },
-              { name: 'repository', label: 'Repositorio URL', type: 'url', placeholder: 'https://github.com/usuario/proyecto' },
-              { name: 'image', label: 'Imagen URL', type: 'url', placeholder: 'https://imagenes.ejemplo.com/preview.png' }
+              { name: 'demo', label: 'Demo URL (Opcional)', type: 'text', placeholder: 'https://demo.ejemplo.com' },
+              { name: 'repository', label: 'Repositorio URL (Opcional)', type: 'text', placeholder: 'https://github.com/usuario/proyecto' },
+              { name: 'image', label: 'Imagen URL (Opcional)', type: 'text', placeholder: 'https://imagenes.ejemplo.com/preview.png' }
             ].map((field) => (
               <div key={field.name} className="space-y-2">
                 <label className="text-sm font-semibold text-white">{field.label}</label>
                 <input
-                  type={field.type || 'text'}
+                  type="text"
                   {...register(field.name)}
                   placeholder={field.placeholder}
                   className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
@@ -213,6 +274,33 @@ const ProjectsManager = () => {
                 {errors[field.name] && <p className="text-xs text-[#BD0927]">{errors[field.name].message}</p>}
               </div>
             ))}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-white">Estado público</label>
+                <select
+                  {...register('status')}
+                  className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo (Ocultar)</option>
+                  <option value="maintenance">En Mantenimiento</option>
+                  <option value="learning">En Proceso de Adquisición</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-white">Visibilidad Demo</label>
+                <select
+                  {...register('demoVisibility')}
+                  className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+                >
+                  <option value="show">Mostrar</option>
+                  <option value="hide">Ocultar</option>
+                  <option value="auto">Automático (Verificar URL)</option>
+                </select>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-white">Descripción</label>
@@ -229,26 +317,26 @@ const ProjectsManager = () => {
               <label className="text-sm font-semibold text-white">Integraciones</label>
               <input
                 {...register('integrations')}
-                placeholder="GitHub | Vercel | Supabase"
+                placeholder="GitHub, Vercel, Supabase"
                 className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
               />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4">
               {[
                 { name: 'coverage', label: 'Cobertura (%)', type: 'number' },
                 { name: 'riskCoverage', label: 'Cobertura de riesgos (%)', type: 'number' },
-                { name: 'improvements', label: 'Mejoras', type: 'number' },
+                { name: 'improvements', label: 'Mejoras (%)', type: 'number' },
                 { name: 'findingsCritical', label: 'Hallazgos críticos', type: 'number' },
                 { name: 'bugsResolved', label: 'Bugs resueltos', type: 'number' },
-                { name: 'ambiguitiesFound', label: 'Ambigüedades encontradas', type: 'number' }
+                { name: 'ambiguitiesFound', label: 'Ambigüedades', type: 'number' }
               ].map((field) => (
                 <div key={field.name} className="space-y-2">
                   <label className="text-sm font-semibold text-white">{field.label}</label>
                   <input
                     type={field.type}
                     {...register(field.name, { valueAsNumber: true })}
-                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
+                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
                   />
                 </div>
               ))}
@@ -269,14 +357,14 @@ const ProjectsManager = () => {
                     {...register(field.name)}
                     rows={2}
                     placeholder={field.placeholder}
-                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
+                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
                   />
                 </div>
               ))}
             </div>
 
             <div className="flex justify-end gap-4 pt-4">
-              <button type="reset" className="rounded-2xl border border-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/10">
+              <button type="reset" className="rounded-2xl border border-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/10 transition">
                 Limpiar
               </button>
               <button type="submit" className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition">
@@ -287,6 +375,7 @@ const ProjectsManager = () => {
         </div>
       </section>
 
+      {/* Help Modal */}
       <Modal
         isOpen={helpOpen}
         onClose={() => setHelpOpen(false)}
@@ -307,49 +396,43 @@ const ProjectsManager = () => {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
             <p className="font-semibold text-white">Título</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Nombre corto y descriptivo del proyecto. Mínimo 3 caracteres.</p>
+            <p className="mt-2 text-sm text-[#C9F7EE]">Nombre del proyecto. Mínimo 3 caracteres.</p>
           </div>
           <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Descripción</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Resumen funcional del proyecto. Mínimo 20 caracteres.</p>
+            <p className="font-semibold text-white">Visibilidad Demo</p>
+            <p className="mt-2 text-sm text-[#C9F7EE]">Permite forzar ocultación del botón Demo en la ficha pública.</p>
           </div>
           <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
             <p className="font-semibold text-white">Integraciones</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Formato esperado: GitHub | Vercel | Supabase.</p>
+            <p className="mt-2 text-sm text-[#C9F7EE]">Usa comas para separar tags (ej: Jest, Playwright, Docker).</p>
           </div>
           <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Objetivos</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Lista separada por líneas o viñetas.</p>
-          </div>
-          <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Riesgos</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Descripción breve de riesgos identificados.</p>
-          </div>
-          <div className="rounded-3xl border border-[#17364F] bg-[#0D1A2F]/80 p-4">
-            <p className="font-semibold text-white">Métricas</p>
-            <p className="mt-2 text-sm text-[#C9F7EE]">Solo números o porcentajes.</p>
+            <p className="font-semibold text-white">Estado público</p>
+            <p className="mt-2 text-sm text-[#C9F7EE]">Usa "Mantenimiento" o "En proceso" para habilitar las visualizaciones especiales de tarjetas.</p>
           </div>
         </div>
       </Modal>
+
+      {/* Editing Modal */}
       {isEditing && activeProject && (
         <Modal
           isOpen={isEditing}
           onClose={closeEditor}
           title="Editar proyecto"
-          subtitle="Actualiza el proyecto seleccionado con campos específicos en un popup independiente."
+          subtitle="Actualiza el proyecto seleccionado con campos específicos."
           footer={
             <div className="flex flex-wrap justify-end gap-3">
               <button
                 type="button"
                 onClick={closeEditor}
-                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10"
+                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 transition"
               >
                 Cancelar
               </button>
               <button
                 form="edit-project-form"
                 type="submit"
-                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6]"
+                className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition"
               >
                 Actualizar proyecto
               </button>
@@ -360,14 +443,14 @@ const ProjectsManager = () => {
             {[
               { name: 'title', label: 'Título', placeholder: 'Portal QA Automation' },
               { name: 'category', label: 'Categoría', placeholder: 'Automatización QA, Seguridad, Frontend' },
-              { name: 'demo', label: 'Demo URL', type: 'url', placeholder: 'https://demo.ejemplo.com' },
-              { name: 'repository', label: 'Repositorio URL', type: 'url', placeholder: 'https://github.com/usuario/proyecto' },
-              { name: 'image', label: 'Imagen URL', type: 'url', placeholder: 'https://imagenes.ejemplo.com/preview.png' }
+              { name: 'demo', label: 'Demo URL (Opcional)', type: 'text', placeholder: 'https://demo.ejemplo.com' },
+              { name: 'repository', label: 'Repositorio URL (Opcional)', type: 'text', placeholder: 'https://github.com/usuario/proyecto' },
+              { name: 'image', label: 'Imagen URL (Opcional)', type: 'text', placeholder: 'https://imagenes.ejemplo.com/preview.png' }
             ].map((field) => (
               <div key={field.name} className="space-y-2">
                 <label className="text-sm font-semibold text-white">{field.label}</label>
                 <input
-                  type={field.type || 'text'}
+                  type="text"
                   {...registerEdit(field.name)}
                   placeholder={field.placeholder}
                   className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
@@ -375,6 +458,33 @@ const ProjectsManager = () => {
                 {editErrors[field.name] && <p className="text-xs text-[#BD0927]">{editErrors[field.name].message}</p>}
               </div>
             ))}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-white">Estado público</label>
+                <select
+                  {...registerEdit('status')}
+                  className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo (Ocultar)</option>
+                  <option value="maintenance">En Mantenimiento</option>
+                  <option value="learning">En Proceso de Adquisición</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-white">Visibilidad Demo</label>
+                <select
+                  {...registerEdit('demoVisibility')}
+                  className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+                >
+                  <option value="show">Mostrar</option>
+                  <option value="hide">Ocultar</option>
+                  <option value="auto">Automático (Verificar URL)</option>
+                </select>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-white">Descripción</label>
@@ -391,26 +501,26 @@ const ProjectsManager = () => {
               <label className="text-sm font-semibold text-white">Integraciones</label>
               <input
                 {...registerEdit('integrations')}
-                placeholder="GitHub | Vercel | Supabase"
+                placeholder="GitHub, Vercel, Supabase"
                 className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
               />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4">
               {[
                 { name: 'coverage', label: 'Cobertura (%)', type: 'number' },
                 { name: 'riskCoverage', label: 'Cobertura de riesgos (%)', type: 'number' },
-                { name: 'improvements', label: 'Mejoras', type: 'number' },
+                { name: 'improvements', label: 'Mejoras (%)', type: 'number' },
                 { name: 'findingsCritical', label: 'Hallazgos críticos', type: 'number' },
                 { name: 'bugsResolved', label: 'Bugs resueltos', type: 'number' },
-                { name: 'ambiguitiesFound', label: 'Ambigüedades encontradas', type: 'number' }
+                { name: 'ambiguitiesFound', label: 'Ambigüedades', type: 'number' }
               ].map((field) => (
                 <div key={field.name} className="space-y-2">
                   <label className="text-sm font-semibold text-white">{field.label}</label>
                   <input
                     type={field.type}
                     {...registerEdit(field.name, { valueAsNumber: true })}
-                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
+                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
                   />
                 </div>
               ))}
@@ -431,7 +541,7 @@ const ProjectsManager = () => {
                     {...registerEdit(field.name)}
                     rows={2}
                     placeholder={field.placeholder}
-                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
+                    className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
                   />
                 </div>
               ))}
@@ -439,6 +549,17 @@ const ProjectsManager = () => {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Eliminar Proyecto"
+        description={`¿Estás seguro de que deseas eliminar el proyecto "${projectToDelete?.title || ''}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

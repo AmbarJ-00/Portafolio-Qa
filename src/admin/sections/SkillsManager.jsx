@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
 import {
   Plus,
   Trash2,
@@ -24,6 +26,7 @@ import {
   Server,
   GitBranch
 } from 'lucide-react';
+import Modal from '../../components/Modal.jsx';
 
 const skillSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -33,7 +36,8 @@ const skillSchema = z.object({
   color: z.string().min(3, 'El color es obligatorio'),
   tools: z.string().optional(),
   relation: z.string().optional(),
-  description: z.string().optional()
+  description: z.string().optional(),
+  status: z.string().optional()
 });
 
 const defaultSkillValues = {
@@ -44,7 +48,8 @@ const defaultSkillValues = {
   color: '#09D8C7',
   tools: '',
   relation: '',
-  description: ''
+  description: '',
+  status: 'active'
 };
 
 const helpIcons = [
@@ -67,23 +72,34 @@ const SortableItem = ({ skill, onEdit, onDelete, listeners, attributes, setNodeR
   >
     <div className="flex items-center gap-3">
       <div className="rounded-2xl bg-[#0D1A2F] p-2 text-[#09D8C7]">
-        <GripVertical className="w-5 h-5" {...listeners} {...attributes} />
+        <GripVertical className="w-5 h-5 cursor-grab" {...listeners} {...attributes} />
       </div>
       <div>
-        <h3 className="font-semibold text-[#E2E8F0]">{skill.name}</h3>
+        <h3 className="font-semibold text-[#E2E8F0] flex items-center gap-2">
+          {skill.name}
+          {skill.status && skill.status !== 'active' && (
+            <span className={`text-[9px] border px-2 py-0.5 rounded-full font-semibold uppercase ${
+              skill.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' : 
+              skill.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' : 
+              'bg-red-950/80 text-red-400 border-red-500/20'
+            }`}>
+              {skill.status === 'maintenance' ? 'Mantenimiento' : skill.status === 'learning' ? 'En proceso' : 'Inactivo'}
+            </span>
+          )}
+        </h3>
         <p className="text-sm text-[#A5B4FC]">{skill.category}</p>
       </div>
     </div>
     <div className="flex items-center gap-2">
       <button
         onClick={() => onEdit(skill)}
-        className="rounded-2xl border border-[#17364F] px-3 py-2 text-sm text-[#C9F7EE] hover:bg-[#09D8C7]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+        className="rounded-2xl border border-[#17364F] px-3 py-2 text-sm text-[#C9F7EE] hover:bg-[#09D8C7]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition"
       >
         <Edit className="w-4 h-4" />
       </button>
       <button
-        onClick={() => onDelete(skill.id)}
-        className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 focus:outline-none focus:ring-2 focus:ring-[#BD0927]"
+        onClick={() => onDelete(skill)}
+        className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 px-3 py-2 text-sm text-[#BD0927] hover:bg-[#BD0927]/20 focus:outline-none focus:ring-2 focus:ring-[#BD0927] transition"
       >
         <Trash2 className="w-4 h-4" />
       </button>
@@ -93,8 +109,13 @@ const SortableItem = ({ skill, onEdit, onDelete, listeners, attributes, setNodeR
 
 const SkillsManager = () => {
   const { store, actions } = usePortfolio();
+  const { toast } = useToast();
   const [activeSkill, setActiveSkill] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
+
+  // Deletion state
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState(null);
 
   const {
     register,
@@ -117,15 +138,25 @@ const SkillsManager = () => {
   });
 
   const onCreateSkill = (data) => {
-    actions.addSkill(data);
-    reset(defaultSkillValues);
+    try {
+      actions.addSkill(data);
+      toast.success('Habilidad creada con éxito');
+      reset(defaultSkillValues);
+    } catch (e) {
+      toast.error('Error al crear la habilidad');
+    }
   };
 
   const onUpdateSkill = (data) => {
     if (!activeSkill) return;
-    actions.updateSkill(activeSkill.id, data);
-    setActiveSkill(null);
-    resetEdit(defaultSkillValues);
+    try {
+      actions.updateSkill(activeSkill.id, data);
+      toast.success('Habilidad actualizada correctamente');
+      setActiveSkill(null);
+      resetEdit(defaultSkillValues);
+    } catch (e) {
+      toast.error('Error al actualizar la habilidad');
+    }
   };
 
   const openEditModal = (skill) => {
@@ -136,15 +167,34 @@ const SkillsManager = () => {
       level: skill.level,
       icon: skill.icon,
       color: skill.color || '#09D8C7',
-      tools: skill.tools.join(', '),
-      relation: skill.relation?.join(', ') || '',
-      description: skill.description || ''
+      tools: skill.tools ? skill.tools.join(', ') : '',
+      relation: skill.relation ? skill.relation.join(', ') : '',
+      description: skill.description || '',
+      status: skill.status || 'active'
     });
   };
 
   const closeEditModal = () => {
     setActiveSkill(null);
     resetEdit(defaultSkillValues);
+  };
+
+  const handleDeleteClick = (skill) => {
+    setSkillToDelete(skill);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (skillToDelete) {
+      try {
+        actions.deleteSkill(skillToDelete.id);
+        toast.success('Habilidad eliminada correctamente');
+      } catch (e) {
+        toast.error('Error al eliminar la habilidad');
+      }
+      setSkillToDelete(null);
+    }
+    setIsDeleteConfirmOpen(false);
   };
 
   const handleDragEnd = (event) => {
@@ -154,6 +204,7 @@ const SkillsManager = () => {
       const newIndex = store.skills.findIndex((skill) => skill.id === over?.id);
       const nextOrder = arrayMove(store.skills, oldIndex, newIndex);
       actions.reorderSkills(nextOrder);
+      toast.success('Orden de habilidades actualizado');
     }
   };
 
@@ -168,7 +219,7 @@ const SkillsManager = () => {
           </div>
           <button
             onClick={() => setShowHelp(true)}
-            className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]"
+            className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 focus:outline-none focus:ring-2 focus:ring-[#09D8C7] transition"
           >
             <HelpCircle className="w-4 h-4" /> Guía de iconos Lucide
           </button>
@@ -188,7 +239,7 @@ const SkillsManager = () => {
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={store.skills.map((skill) => skill.id)} strategy={verticalListSortingStrategy}>
               {store.skills.map((skill) => (
-                <SortableSkillItem key={skill.id} skill={skill} onEdit={openEditModal} onDelete={actions.deleteSkill} />
+                <SortableSkillItem key={skill.id} skill={skill} onEdit={openEditModal} onDelete={handleDeleteClick} />
               ))}
             </SortableContext>
           </DndContext>
@@ -197,7 +248,7 @@ const SkillsManager = () => {
         <section className="rounded-[2rem] border border-[#17364F] bg-[#11243B]/95 p-6 shadow-lg shadow-[#0D1A2F]/20 text-[#E2E8F0]">
           <div className="flex flex-col gap-3">
             <h2 className="text-2xl font-semibold text-white">Crear nueva skill</h2>
-            <p className="text-sm text-[#C9F7EE]">El formulario de creación permanece independiente de la edición. Se reinicia automáticamente después de guardar.</p>
+            <p className="text-sm text-[#C9F7EE]">El formulario de creación permanece independiente de la edición.</p>
           </div>
           <form onSubmit={handleSubmit(onCreateSkill)} className="mt-6 space-y-5">
             {[
@@ -241,6 +292,19 @@ const SkillsManager = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-semibold text-white">Estado público</label>
+              <select
+                {...register('status')}
+                className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+              >
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo (Ocultar)</option>
+                <option value="maintenance">En Mantenimiento</option>
+                <option value="learning">En Proceso de Adquisición</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-semibold text-white">Descripción</label>
               <textarea
                 {...register('description')}
@@ -254,7 +318,7 @@ const SkillsManager = () => {
               <button
                 type="reset"
                 onClick={() => reset(defaultSkillValues)}
-                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+                className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 focus:outline-none focus:ring-2 focus:ring-[#09D8C7]/30 transition"
               >
                 Limpiar formulario
               </button>
@@ -273,7 +337,7 @@ const SkillsManager = () => {
         isOpen={showHelp}
         onClose={() => setShowHelp(false)}
         title="Guía de iconos Lucide"
-        subtitle="Selecciona el nombre exacto del icono que usarás para la skill y mantén coherencia visual."
+        subtitle="Selecciona el nombre exacto del icono que usarás para la skill."
         footer={
           <div className="flex justify-end">
             <button
@@ -299,37 +363,38 @@ const SkillsManager = () => {
             </div>
           ))}
         </div>
-        <div className="mt-6 rounded-3xl border border-[#09D8C7] bg-[#0D1A2F]/5 p-4 text-sm text-[#C9F7EE]">
-          <p className="font-semibold text-white">Ejemplo de uso</p>
-          <p className="mt-2">Para una skill de desarrollo, usa <span className="font-mono text-[#A5F3FC]">Code</span>. Para seguridad, usa <span className="font-mono text-[#A5F3FC]">Shield</span>.</p>
-        </div>
       </Modal>
 
+      {/* Edit modal scroll container wrapped form */}
       <Modal
         isOpen={Boolean(activeSkill)}
         onClose={closeEditModal}
         title="Editar skill"
-        subtitle="Modifica la skill seleccionada sin afectar la creación de una nueva."
+        subtitle="Modifica la skill seleccionada."
         footer={
           <div className="flex flex-wrap justify-end gap-3">
             <button
               type="button"
               onClick={closeEditModal}
-              className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10"
+              className="rounded-2xl border border-[#17364F] px-5 py-3 text-sm font-semibold text-[#C9F7EE] hover:bg-[#17364F]/10 transition"
             >
               Cancelar
             </button>
             <button
               form="edit-skill-form"
               type="submit"
-              className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6]"
+              className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition"
             >
               Guardar cambios
             </button>
           </div>
         }
       >
-        <form id="edit-skill-form" onSubmit={handleSubmitEdit(onUpdateSkill)} className="space-y-5">
+        <form 
+          id="edit-skill-form" 
+          onSubmit={handleSubmitEdit(onUpdateSkill)} 
+          className="space-y-5 max-h-[60vh] overflow-y-auto pr-2"
+        >
           {[
             { name: 'name', label: 'Nombre', hint: 'Mínimo 3 caracteres' },
             { name: 'category', label: 'Categoría', hint: 'Ej: QA, Frontend, Infraestructura' },
@@ -371,6 +436,19 @@ const SkillsManager = () => {
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-semibold text-white">Estado público</label>
+            <select
+              {...registerEdit('status')}
+              className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+            >
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo (Ocultar)</option>
+              <option value="maintenance">En Mantenimiento</option>
+              <option value="learning">En Proceso de Adquisición</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-semibold text-white">Descripción</label>
             <textarea
               {...registerEdit('description')}
@@ -381,6 +459,17 @@ const SkillsManager = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Eliminar Habilidad"
+        description={`¿Estás seguro de que deseas eliminar la habilidad "${skillToDelete?.name || ''}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

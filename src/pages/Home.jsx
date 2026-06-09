@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
-import { ShieldCheck, Award, ArrowRight, ChevronRight, Terminal } from 'lucide-react';
+import { ShieldCheck, Award, ArrowRight, ChevronRight, Terminal, Cpu, Layers, Activity } from 'lucide-react';
 import { GiAlienBug } from "react-icons/gi";
 import SEO from '../components/SEO.jsx';
 
@@ -11,15 +11,39 @@ const Home = () => {
   const { t } = useTranslation();
   const { store } = usePortfolio();
   const personal = store.personal;
-  const getText = (value, key) => value || t(key);
 
   const heroBadge = personal.heroBadge || t('home.hero_badge');
   const heroHeadline = personal.heroHeadline || t('home.hero_title');
-  const heroSubtitle = personal.heroSubtitle || t('home.hero_subtitle');
-  const ctaPrimary = personal.primaryButton || t('cta.view_projects');
-  const ctaSecondary = personal.secondaryButton || t('cta.view_docs');
   const role = personal.role || t(personal.roleKey);
   const tagline = personal.tagline || t(personal.taglineKey);
+
+  // Dynamic metrics calculation
+  const activeProjects = store.projects.filter(
+    (p) => p.status !== 'inactive' && p.status !== 'Inactivo'
+  );
+
+  let bugsVal = "230+";
+  let coverageVal = "94%";
+  let projectsVal = "15+";
+
+  if (activeProjects.length > 0) {
+    const totalBugs = activeProjects.reduce((acc, p) => {
+      const crit = Number(p.metrics?.findingsCritical || 0);
+      const res = Number(p.metrics?.bugsResolved || 0);
+      return acc + crit + (res * 0.3);
+    }, 0);
+    bugsVal = Math.round(totalBugs);
+
+    const totalCoverage = activeProjects.reduce((acc, p) => acc + Number(p.metrics?.coverage || 0), 0);
+    coverageVal = `${Math.round(totalCoverage / activeProjects.length)}%`;
+
+    projectsVal = activeProjects.length;
+  }
+
+  // Active hero cards
+  const activeHeroCards = (store.heroCards || [])
+    .filter((c) => c.status !== 'inactive' && c.status !== 'Inactivo')
+    .sort((a, b) => a.priority - b.priority);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -52,7 +76,7 @@ const Home = () => {
       >
         {/* HERO SECTION */}
         <section className="relative min-h-[70vh] flex flex-col justify-center py-12 md:py-20 overflow-hidden" aria-labelledby="hero-heading">
-          {/* Subtle background decoration (glowing gradients) */}
+          {/* Subtle background decoration */}
           <div className="absolute top-1/4 left-1/10 w-72 h-72 rounded-full bg-brand-electric-500/10 dark:bg-brand-lilac-500/10 blur-3xl -z-10 animate-pulse-subtle" />
           <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-brand-lilac-500/10 blur-3xl -z-10" />
 
@@ -105,6 +129,31 @@ const Home = () => {
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </motion.div>
+
+            {/* Configured Hero Cards */}
+            {activeHeroCards.length > 0 && (
+              <div className="pt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl">
+                {activeHeroCards.map((card) => {
+                  const iconsMap = { ShieldCheck, Terminal, Award, Cpu, Layers, Activity };
+                  const CardIcon = iconsMap[card.icon] || ShieldCheck;
+                  return (
+                    <motion.div
+                      key={card.id}
+                      variants={itemVariants}
+                      className="glass-card p-5 rounded-2xl border border-brand-electric-500/10 flex items-start gap-4 hover:scale-[1.01] transition-transform duration-200 shadow-sm"
+                    >
+                      <div className="p-2.5 bg-brand-electric-500/10 rounded-xl text-brand-electric-500 shrink-0">
+                        <CardIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-brand-navy-950 dark:text-white">{card.title}</h4>
+                        <p className="text-xs text-brand-navy-600 dark:text-brand-ash-400 mt-1.5 leading-relaxed">{card.description}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 
@@ -113,21 +162,21 @@ const Home = () => {
           {[
             { 
               icon: GiAlienBug, 
-              value: "230+", 
+              value: bugsVal, 
               labelKey: "home.stat_bugs", 
               color: "text-brand-electric-500 dark:text-brand-lilac-400",
               bgColor: "bg-brand-electric-500/10 dark:bg-brand-lilac-500/10"
             },
             { 
               icon: ShieldCheck, 
-              value: "94%", 
+              value: coverageVal, 
               labelKey: "home.stat_coverage", 
               color: "text-brand-lilac-500",
               bgColor: "bg-brand-lilac-500/10"
             },
             { 
               icon: Award, 
-              value: "15+", 
+              value: projectsVal, 
               labelKey: "home.stat_projects", 
               color: "text-brand-navy-500 dark:text-brand-lilac-300",
               bgColor: "bg-brand-navy-500/10 dark:bg-brand-lilac-500/10"

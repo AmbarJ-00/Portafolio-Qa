@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import * as LucideIcons from 'lucide-react';
 import SEO from '../components/SEO.jsx';
+import StatusCard from '../components/StatusCard.jsx';
 
 const Skills = () => {
   const { t } = useTranslation();
@@ -29,6 +30,10 @@ const Skills = () => {
     if (!IconComponent) return <LucideIcons.HelpCircle className={className} />;
     return <IconComponent className={className} />;
   };
+
+  const visibleSkills = store.skills.filter(
+    (skill) => skill.status !== 'inactive' && skill.status !== 'Inactivo'
+  );
 
   return (
     <>
@@ -57,41 +62,42 @@ const Skills = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
         >
-          {store.skills.map((skill) => (
-            <motion.button
-              key={skill.id}
-              variants={itemVariants}
-              onClick={() => setSelectedSkill(skill)}
-              className="glass-card glass-card-hover p-6 rounded-xl flex flex-col items-start gap-4 text-left w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden"
-              aria-haspopup="dialog"
-              aria-label={`Show details for ${skill.name}`}
-            >
-              {/* Decorative side accent */}
-              <div className="absolute top-0 left-0 w-1 h-full bg-brand-electric-500 dark:bg-brand-electric-500/80 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-              
-              <div className="p-2.5 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
-                {renderIcon(skill.icon, "w-6 h-6 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
-              </div>
-              
-              <div className="w-full space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-brand-navy-900 dark:text-white text-base">
-                    {skill.name}
-                  </span>
-                  <span className="text-xs font-semibold text-brand-navy-500 dark:text-brand-ash-400">
-                    {skill.level}%
-                  </span>
+          {visibleSkills.map((skill) => (
+            <StatusCard key={skill.id} status={skill.status} type="skill">
+              <motion.button
+                variants={itemVariants}
+                onClick={() => setSelectedSkill(skill)}
+                className="glass-card glass-card-hover p-6 rounded-xl flex flex-col items-start gap-4 text-left w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
+                aria-haspopup="dialog"
+                aria-label={`Show details for ${skill.name}`}
+              >
+                {/* Decorative side accent */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-brand-electric-500 dark:bg-brand-electric-500/80 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                
+                <div className="p-2.5 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
+                  {renderIcon(skill.icon, "w-6 h-6 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
                 </div>
                 
-                {/* Progress bar */}
-                <div className="h-1.5 w-full bg-brand-ash-200 dark:bg-brand-navy-800 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded-full transition-all duration-300"
-                    style={{ width: `${skill.level}%` }}
-                  />
+                <div className="w-full space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-brand-navy-900 dark:text-white text-base">
+                      {skill.name}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-navy-500 dark:text-brand-ash-400">
+                      {skill.level}%
+                    </span>
+                  </div>
+                  
+                  {/* Progress bar */}
+                  <div className="h-1.5 w-full bg-brand-ash-200 dark:bg-brand-navy-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded-full transition-all duration-300"
+                      style={{ width: `${skill.level}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            </motion.button>
+              </motion.button>
+            </StatusCard>
           ))}
         </motion.div>
 
@@ -104,10 +110,10 @@ const Skills = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 15 }}
                 transition={{ duration: 0.3, cubicBezier: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-lg glass-card rounded-2xl shadow-2xl overflow-hidden border border-brand-ash-200 dark:border-brand-navy-800 bg-white dark:bg-brand-navy-950"
+                className="w-full max-w-lg glass-card rounded-2xl shadow-2xl overflow-hidden border border-brand-ash-200 dark:border-brand-navy-800 bg-white dark:bg-brand-navy-950 flex flex-col max-h-[85vh]"
               >
                 {/* Modal Header */}
-                <div className="p-6 bg-brand-ash-100/50 dark:bg-brand-navy-900/50 border-b border-brand-ash-200 dark:border-brand-navy-800 flex items-center justify-between">
+                <div className="p-6 bg-brand-ash-100/50 dark:bg-brand-navy-900/50 border-b border-brand-ash-200 dark:border-brand-navy-800 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white dark:bg-brand-navy-950 rounded-lg border border-brand-ash-200 dark:border-brand-navy-800 shadow-sm">
                       {renderIcon(selectedSkill.icon, "w-6 h-6 text-brand-electric-500")}
@@ -131,7 +137,7 @@ const Skills = () => {
                 </div>
 
                 {/* Modal Content */}
-                <div className="p-6 space-y-6">
+                <div className="p-6 space-y-6 overflow-y-auto flex-1">
                   {/* Skill level indicator */}
                   <div className="flex justify-between items-center text-sm font-bold text-brand-navy-800 dark:text-brand-ash-200">
                     <span>{t('skills.modal_title')}</span>
@@ -145,51 +151,57 @@ const Skills = () => {
                         {t('skills.details_desc')}
                       </h3>
                       <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                        {t(`${selectedSkill.translationKey}.desc`)}
+                        {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.desc`) : selectedSkill.description}
                       </p>
                     </div>
 
                     {/* Experience */}
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                        {t('skills.details_exp')}
-                      </h3>
-                      <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                        {t(`${selectedSkill.translationKey}.exp`)}
-                      </p>
-                    </div>
+                    {(selectedSkill.translationKey || selectedSkill.experience) && (
+                      <div className="space-y-1">
+                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
+                          {t('skills.details_exp')}
+                        </h3>
+                        <p className="text-brand-navy-600 dark:text-brand-ash-400">
+                          {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.exp`) : selectedSkill.experience}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Use Cases */}
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                        {t('skills.details_use_cases')}
-                      </h3>
-                      <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                        {t(`${selectedSkill.translationKey}.use_cases`)}
-                      </p>
-                    </div>
+                    {(selectedSkill.translationKey || selectedSkill.useCases) && (
+                      <div className="space-y-1">
+                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
+                          {t('skills.details_use_cases')}
+                        </h3>
+                        <p className="text-brand-navy-600 dark:text-brand-ash-400">
+                          {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.use_cases`) : selectedSkill.useCases}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Tech details */}
-                    <div className="space-y-2 pt-2">
-                      <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                        {t('skills.details_tools')}
-                      </h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        {selectedSkill.tools.map((tool, idx) => (
-                          <span 
-                            key={idx}
-                            className="px-2 py-0.5 bg-brand-ash-100 dark:bg-brand-navy-900/60 text-brand-navy-700 dark:text-brand-ash-300 text-xs font-semibold rounded border border-brand-ash-200/50 dark:border-brand-navy-800/40"
-                          >
-                            {tool}
-                          </span>
-                        ))}
+                    {selectedSkill.tools && selectedSkill.tools.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
+                          {t('skills.details_tools')}
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedSkill.tools.map((tool, idx) => (
+                            <span 
+                              key={idx}
+                              className="px-2 py-0.5 bg-brand-ash-100 dark:bg-brand-navy-900/60 text-brand-navy-700 dark:text-brand-ash-300 text-xs font-semibold rounded border border-brand-ash-200/50 dark:border-brand-navy-800/40"
+                            >
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Footer action */}
-                <div className="p-4 bg-brand-ash-100/30 dark:bg-brand-navy-900/30 border-t border-brand-ash-200/50 dark:border-brand-navy-800/50 flex justify-end">
+                <div className="p-4 bg-brand-ash-100/30 dark:bg-brand-navy-900/30 border-t border-brand-ash-200/50 dark:border-brand-navy-800/50 flex justify-end shrink-0">
                   <button
                     onClick={() => setSelectedSkill(null)}
                     className="px-4 py-2 bg-brand-navy-800 dark:bg-brand-navy-900 text-white dark:text-brand-ash-100 hover:opacity-90 font-bold text-xs rounded-lg shadow transition-opacity"

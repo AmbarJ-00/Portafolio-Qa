@@ -10,13 +10,20 @@ const Documentation = () => {
   const { store } = usePortfolio();
   const [copiedId, setCopiedId] = useState(null);
 
+  // Resolve display value: prefer direct string, fall back to i18n key
+  const resolveField = (directValue, translationKey) => {
+    if (directValue && typeof directValue === 'string') return directValue;
+    if (translationKey) return t(translationKey);
+    return '';
+  };
+
   const copyToClipboard = (template) => {
     // Generate a clean markdown string representation of the template
-    const title = t(template.titleKey);
-    const desc = t(template.descriptionKey);
-    const method = t(template.methodologyKey);
-    const params = template.parameters.map((p) => `- ${p}`).join('\n');
-    const questions = template.questions.map((q) => `- ${q}`).join('\n');
+    const title = resolveField(template.title, template.titleKey);
+    const desc = resolveField(template.description, template.descriptionKey);
+    const method = resolveField(template.methodology, template.methodologyKey);
+    const params = (template.parameters || []).map((p) => `- ${p}`).join('\n');
+    const questions = (template.questions || []).map((q) => `- ${q}`).join('\n');
 
     const content = `# ${title}\n\n## Description\n${desc}\n\n## Methodology\n${method}\n\n## Structure Parameters\n${params}\n\n## Audit Questions\n${questions}`;
 

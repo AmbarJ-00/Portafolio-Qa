@@ -2,10 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Shield, Zap, MessageSquare, Target, Terminal } from 'lucide-react';
+import { usePortfolio } from '../context/PortfolioContext.jsx';
 import SEO from '../components/SEO.jsx';
 
 const About = () => {
   const { t } = useTranslation();
+  const { store } = usePortfolio();
+  const { aboutItems = [] } = store;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -18,6 +21,70 @@ const About = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
+  };
+
+  // Group and sort about items
+  const activeAboutItems = aboutItems.filter((item) => item.status !== 'inactive');
+  const leftItems = activeAboutItems.filter((item) => item.position === 'left').sort((a, b) => a.priority - b.priority);
+  const rightItems = activeAboutItems.filter((item) => item.position === 'right').sort((a, b) => a.priority - b.priority);
+  const centerItems = activeAboutItems.filter((item) => item.position === 'center' || !item.position).sort((a, b) => a.priority - b.priority);
+
+  const renderAboutItem = (item) => {
+    const icons = {
+      pilar: Shield,
+      mision: Target,
+      filosofia: Zap,
+      trayectoria: Terminal,
+      valor: MessageSquare
+    };
+    const Icon = icons[item.type] || Terminal;
+
+    if (item.behavior === 'badge') {
+      return (
+        <span 
+          key={item.id} 
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-electric-500/10 dark:bg-brand-lilac-500/20 text-brand-electric-600 dark:text-brand-lilac-300 text-xs font-bold uppercase tracking-widest rounded-full border border-brand-electric-500/20"
+        >
+          <Icon className="w-3.5 h-3.5 shrink-0" />
+          <span>{item.title}</span>
+        </span>
+      );
+    }
+
+    if (item.behavior === 'block') {
+      return (
+        <div 
+          key={item.id} 
+          className="p-6 bg-brand-electric-500/5 dark:bg-brand-electric-500/10 border border-brand-electric-500/20 rounded-2xl flex gap-4 items-start"
+        >
+          <Icon className="w-6 h-6 text-brand-electric-500 shrink-0 mt-1" />
+          <div className="space-y-1.5">
+            <span className="text-xs font-bold text-brand-electric-600 dark:text-brand-electric-300 uppercase tracking-widest block">
+              {item.title}
+            </span>
+            <p className="text-sm text-brand-navy-650 dark:text-brand-ash-400 leading-relaxed font-normal">
+              {item.description}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Default 'card' style
+    return (
+      <section 
+        key={item.id}
+        className="glass-card p-5 rounded-xl border-l-4 border-l-brand-electric-500 dark:border-l-brand-lilac-500 space-y-2.5 shadow-sm"
+      >
+        <h3 className="text-sm font-bold text-brand-navy-950 dark:text-white flex items-center gap-2">
+          <Icon className="w-4 h-4 text-brand-electric-500 dark:text-brand-lilac-400 shrink-0" />
+          <span>{item.title}</span>
+        </h3>
+        <p className="text-xs text-brand-navy-600 dark:text-brand-ash-400 leading-relaxed whitespace-pre-wrap">
+          {item.description}
+        </p>
+      </section>
+    );
   };
 
   return (
@@ -48,7 +115,7 @@ const About = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-2 space-y-6 text-base md:text-lg text-brand-navy-700 dark:text-brand-ash-300 leading-relaxed font-medium"
+            className="lg:col-span-2 space-y-8 text-base md:text-lg text-brand-navy-700 dark:text-brand-ash-300 leading-relaxed font-medium"
           >
             <motion.p variants={itemVariants}>
               {t('about.intro_1')}
@@ -67,11 +134,18 @@ const About = () => {
                 <span className="text-xs font-bold text-brand-electric-600 dark:text-brand-electric-300 uppercase tracking-widest">
                   Misión Técnica
                 </span>
-                <p className="text-sm text-brand-navy-600 dark:text-brand-ash-400 leading-relaxed font-normal">
+                <p className="text-sm text-brand-navy-600 dark:text-brand-ash-400 leading-relaxed font-normal mt-1">
                   Reducir la ambigüedad en los requerimientos mediante testing en etapas tempranas (Shift-Left), automatizar regresiones y auditar la accesibilidad para garantizar un producto utilizable por todos.
                 </p>
               </div>
             </motion.div>
+
+            {/* Configured Left Items */}
+            {leftItems.length > 0 && (
+              <motion.div variants={itemVariants} className="space-y-6 pt-4">
+                {leftItems.map((item) => renderAboutItem(item))}
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Quick Pillars Sidebar (Right 1 col) */}
@@ -123,9 +197,38 @@ const About = () => {
                 </motion.section>
               );
             })}
-          </div>
 
+            {/* Configured Right Items */}
+            {rightItems.length > 0 && (
+              <div className="space-y-4 pt-4">
+                {rightItems.map((item) => renderAboutItem(item))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Center/Full-Width Configured Items at the bottom */}
+        {centerItems.length > 0 && (
+          <div className="border-t border-brand-ash-200 dark:border-brand-navy-800 pt-12 space-y-8">
+            <h2 className="text-2xl font-display font-extrabold text-brand-navy-900 dark:text-white">
+              Aspectos Destacados Adicionales
+            </h2>
+            
+            {/* Badges container */}
+            {centerItems.some((item) => item.behavior === 'badge') && (
+              <div className="flex flex-wrap gap-3">
+                {centerItems.filter((item) => item.behavior === 'badge').map((item) => renderAboutItem(item))}
+              </div>
+            )}
+
+            {/* Cards and blocks grid */}
+            {centerItems.some((item) => item.behavior !== 'badge') && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {centerItems.filter((item) => item.behavior !== 'badge').map((item) => renderAboutItem(item))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
