@@ -41,3 +41,6 @@ qa/
 # Private Admin Documentation
 docs/admin-guide.md
 docs/admin-guide.html
+
+#admin manager
+admin/
