@@ -75,3 +75,6 @@ export const ConfirmDialog = ({
     </AnimatePresence>
   );
 };
+
+export default ConfirmDialog;
+
