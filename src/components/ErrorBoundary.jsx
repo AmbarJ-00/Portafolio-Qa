@@ -24,20 +24,20 @@ export class ErrorBoundary extends React.Component {
     window.location.href = '/';
   };
 
-  handleGoPanel = () => {
-    window.location.href = '/backoffice';
-  };
+  // handleGoPanel = () => {
+  //   window.location.href = '/backoffice';
+  // };
 
   getErrorDetails(error) {
     const msg = (error?.message || error?.toString() || '').toLowerCase();
-    
+
     if (
-      msg.includes('auth') || 
-      msg.includes('login') || 
-      msg.includes('token') || 
-      msg.includes('permission') || 
-      msg.includes('unauthorized') || 
-      msg.includes('forbidden') || 
+      msg.includes('auth') ||
+      msg.includes('login') ||
+      msg.includes('token') ||
+      msg.includes('permission') ||
+      msg.includes('unauthorized') ||
+      msg.includes('forbidden') ||
       msg.includes('autenticaci')
     ) {
       return {
@@ -50,11 +50,11 @@ export class ErrorBoundary extends React.Component {
         ]
       };
     }
-    
+
     if (
-      msg.includes('module') || 
-      msg.includes('módulo') || 
-      msg.includes('custommodule') || 
+      msg.includes('module') ||
+      msg.includes('módulo') ||
+      msg.includes('custommodule') ||
       msg.includes('widget')
     ) {
       return {
@@ -67,14 +67,14 @@ export class ErrorBoundary extends React.Component {
         ]
       };
     }
-    
+
     if (
-      msg.includes('load') || 
-      msg.includes('loading') || 
-      msg.includes('chunk') || 
-      msg.includes('fetch') || 
-      msg.includes('import') || 
-      msg.includes('dns') || 
+      msg.includes('load') ||
+      msg.includes('loading') ||
+      msg.includes('chunk') ||
+      msg.includes('fetch') ||
+      msg.includes('import') ||
+      msg.includes('dns') ||
       msg.includes('network')
     ) {
       return {
@@ -87,14 +87,14 @@ export class ErrorBoundary extends React.Component {
         ]
       };
     }
-    
+
     if (
-      msg.includes('integration') || 
-      msg.includes('integración') || 
-      msg.includes('api') || 
-      msg.includes('database') || 
-      msg.includes('storage') || 
-      msg.includes('sync') || 
+      msg.includes('integration') ||
+      msg.includes('integración') ||
+      msg.includes('api') ||
+      msg.includes('database') ||
+      msg.includes('storage') ||
+      msg.includes('sync') ||
       msg.includes('parse')
     ) {
       return {
@@ -107,7 +107,7 @@ export class ErrorBoundary extends React.Component {
         ]
       };
     }
-    
+
     // Default / Generic Error
     return {
       title: 'Error de Ejecución',
