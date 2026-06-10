@@ -102,7 +102,7 @@ const getInitialState = () => {
     ],
     settings: {
       seo: {
-        title: 'Sofia Rodriguez | QA Lead',
+        title: 'Ambar Ramon | QA Lead',
         description: 'QA lead portfolio and quality management system for testing services.',
         openGraph: {
           type: 'website',
