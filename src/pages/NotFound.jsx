@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FileQuestion, Home, ArrowLeft } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
-export const NotFound = () => {
+const NotFound = () => {
   return (
     <>
       <SEO 

@@ -1,10 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
-import * as LucideIcons from 'lucide-react';
+import {
+  HelpCircle, X,
+  Layers, Database, Server, HardDrive, GitBranch, Trello, Cloud,
+  Code, FileCode, Users, Activity, TrendingUp, ShieldAlert, FileCheck,
+  FileSpreadsheet, Cpu, Terminal, ShieldCheck, Award, BookOpen,
+  Wrench, AlertTriangle, BarChart2, Zap, Globe, Lock, Search,
+  CheckCircle, Star, Settings, Monitor, Smartphone, Bug, Clipboard,
+  FileText, Package, Box, Link, Eye, PlayCircle, PauseCircle,
+} from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 import StatusCard from '../components/StatusCard.jsx';
+
+// Mapa de íconos para lookup eficiente — sin importar toda la librería
+const ICON_MAP = {
+  Layers, Database, Server, HardDrive, GitBranch, Trello, Cloud,
+  Code, FileCode, Users, Activity, TrendingUp, ShieldAlert, FileCheck,
+  FileSpreadsheet, Cpu, Terminal, ShieldCheck, Award, BookOpen,
+  Wrench, AlertTriangle, BarChart2, Zap, Globe, Lock, Search,
+  CheckCircle, Star, Settings, Monitor, Smartphone, Bug, Clipboard,
+  FileText, Package, Box, Link, Eye, PlayCircle, PauseCircle, HelpCircle,
+};
 
 const Skills = () => {
   const { t } = useTranslation();
@@ -24,12 +42,12 @@ const Skills = () => {
     visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 100 } }
   };
 
-  // Helper to dynamically render Lucide Icons by name
+  // Helper to dynamically render Lucide Icons by name using the predefined map
   const renderIcon = (iconName, className) => {
-    const IconComponent = LucideIcons[iconName];
-    if (!IconComponent) return <LucideIcons.HelpCircle className={className} />;
+    const IconComponent = ICON_MAP[iconName] || HelpCircle;
     return <IconComponent className={className} />;
   };
+
 
   const visibleSkills = store.skills.filter(
     (skill) => skill.status !== 'inactive' && skill.status !== 'Inactivo'

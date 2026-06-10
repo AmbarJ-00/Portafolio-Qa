@@ -83,8 +83,8 @@ const getInitialState = () => {
       if (!parsed.aboutItems) parsed.aboutItems = [];
       if (!parsed.heroCards) {
         parsed.heroCards = [
-          { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
-          { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
+          { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', type: 'vertical', priority: 1 },
+          { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', type: 'vertical', priority: 2 }
         ];
       }
       return parsed;
@@ -97,13 +97,13 @@ const getInitialState = () => {
     ...defaultPortfolioConfig,
     aboutItems: [],
     heroCards: [
-      { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
-      { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
+      { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', type: 'vertical', priority: 1 },
+      { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', type: 'vertical', priority: 2 }
     ],
     settings: {
       seo: {
-        title: 'Ambar Ramon | QA engineer',
-        description: 'Portafolio Qa.',
+        title: 'Sofia Rodriguez | QA Lead',
+        description: 'QA lead portfolio and quality management system for testing services.',
         openGraph: {
           type: 'website',
           image: 'https://qa-portfolio.vercel.app/og-image.png'
@@ -139,8 +139,8 @@ const splitCsv = (value) =>
   typeof value === 'string'
     ? value.split(',').map((item) => item.trim()).filter(Boolean)
     : Array.isArray(value)
-    ? value
-    : [];
+      ? value
+      : [];
 
 export const PortfolioProvider = ({ children }) => {
   const [store, setStore] = useState(getInitialState);
@@ -308,22 +308,22 @@ export const PortfolioProvider = ({ children }) => {
       projects: prev.projects.map((project) =>
         project.id === projectId
           ? {
-              ...project,
-              ...payload,
-              integrations: splitCsv(payload.integrations || project.integrations),
-              status: payload.status ?? project.status ?? 'active',
-              demoVisibility: payload.demoVisibility ?? project.demoVisibility ?? 'show',
-              metrics: {
-                ...project.metrics,
-                coverage: Number(payload.coverage ?? project.metrics.coverage),
-                improvements: Number(payload.improvements ?? project.metrics.improvements),
-                riskCoverage: Number(payload.riskCoverage ?? project.metrics.riskCoverage),
-                findingsCritical: Number(payload.findingsCritical ?? project.metrics.findingsCritical),
-                bugsResolved: Number(payload.bugsResolved ?? project.metrics.bugsResolved),
-                ambiguitiesFound: Number(payload.ambiguitiesFound ?? project.metrics.ambiguitiesFound),
-                qualityImpact: payload.qualityImpact ?? project.metrics.qualityImpact
-              }
+            ...project,
+            ...payload,
+            integrations: splitCsv(payload.integrations || project.integrations),
+            status: payload.status ?? project.status ?? 'active',
+            demoVisibility: payload.demoVisibility ?? project.demoVisibility ?? 'show',
+            metrics: {
+              ...project.metrics,
+              coverage: Number(payload.coverage ?? project.metrics.coverage),
+              improvements: Number(payload.improvements ?? project.metrics.improvements),
+              riskCoverage: Number(payload.riskCoverage ?? project.metrics.riskCoverage),
+              findingsCritical: Number(payload.findingsCritical ?? project.metrics.findingsCritical),
+              bugsResolved: Number(payload.bugsResolved ?? project.metrics.bugsResolved),
+              ambiguitiesFound: Number(payload.ambiguitiesFound ?? project.metrics.ambiguitiesFound),
+              qualityImpact: payload.qualityImpact ?? project.metrics.qualityImpact
             }
+          }
           : project
       )
     }));
@@ -380,12 +380,12 @@ export const PortfolioProvider = ({ children }) => {
       skills: prev.skills.map((skill) =>
         skill.id === skillId
           ? {
-              ...skill,
-              ...payload,
-              level: Number(payload.level ?? skill.level),
-              tools: splitCsv(payload.tools || skill.tools),
-              relation: splitCsv(payload.relation || skill.relation)
-            }
+            ...skill,
+            ...payload,
+            level: Number(payload.level ?? skill.level),
+            tools: splitCsv(payload.tools || skill.tools),
+            relation: splitCsv(payload.relation || skill.relation)
+          }
           : skill
       )
     }));
@@ -432,11 +432,11 @@ export const PortfolioProvider = ({ children }) => {
       certifications: prev.certifications.map((cert) =>
         cert.id === certId
           ? {
-              ...cert,
-              ...payload,
-              tools: splitCsv(payload.tools || cert.tools),
-              integrations: splitCsv(payload.integrations || cert.integrations)
-            }
+            ...cert,
+            ...payload,
+            tools: splitCsv(payload.tools || cert.tools),
+            integrations: splitCsv(payload.integrations || cert.integrations)
+          }
           : cert
       )
     }));
@@ -488,13 +488,13 @@ export const PortfolioProvider = ({ children }) => {
         templates: prev.documentation.templates.map((template) =>
           template.id === templateId
             ? {
-                ...template,
-                ...payload,
-                questions: splitCsv(payload.questions || template.questions),
-                parameters: splitCsv(payload.parameters || template.parameters),
-                checklist: splitCsv(payload.checklist || template.checklist),
-                strategies: splitCsv(payload.strategies || template.strategies)
-              }
+              ...template,
+              ...payload,
+              questions: splitCsv(payload.questions || template.questions),
+              parameters: splitCsv(payload.parameters || template.parameters),
+              checklist: splitCsv(payload.checklist || template.checklist),
+              strategies: splitCsv(payload.strategies || template.strategies)
+            }
             : template
         )
       }
@@ -543,14 +543,14 @@ export const PortfolioProvider = ({ children }) => {
         modules: prev.settings.modules.map((module) =>
           module.id === moduleId
             ? {
-                ...module,
-                ...payload,
-                cards: splitCsv(payload.cards || module.cards),
-                colors: {
-                  accent: payload.accentColor || module.colors.accent,
-                  surface: payload.surfaceColor || module.colors.surface
-                }
+              ...module,
+              ...payload,
+              cards: splitCsv(payload.cards || module.cards),
+              colors: {
+                accent: payload.accentColor || module.colors.accent,
+                surface: payload.surfaceColor || module.colors.surface
               }
+            }
             : module
         )
       }
