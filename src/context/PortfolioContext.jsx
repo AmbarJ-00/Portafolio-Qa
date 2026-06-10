@@ -102,8 +102,8 @@ const getInitialState = () => {
     ],
     settings: {
       seo: {
-        title: 'Sofia Rodriguez | QA Lead',
-        description: 'QA lead portfolio and quality management system for testing services.',
+        title: 'Ambar Ramon | QA engineer',
+        description: 'Portafolio Qa.',
         openGraph: {
           type: 'website',
           image: 'https://qa-portfolio.vercel.app/og-image.png'

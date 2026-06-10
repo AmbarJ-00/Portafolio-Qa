@@ -8,7 +8,7 @@ export const ThemeProvider = ({ children }) => {
     const saved = localStorage.getItem('portfolio-theme');
     if (saved) return saved;
     
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: light)').matches;
     return systemPrefersDark ? 'dark' : 'light';
   });
 
@@ -23,7 +23,7 @@ export const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'light'));
   };
 
   return (
