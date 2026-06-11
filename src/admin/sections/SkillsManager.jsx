@@ -12,7 +12,6 @@ import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
 import * as LucideIcons from "lucide-react";
 import {
   Plus,
-  container,
   Trash2,
   Edit,
   X,
