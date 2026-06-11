@@ -195,11 +195,14 @@ const AdminLayout = () => {
                   <p className="text-lg font-semibold text-white">{displayName}</p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
+
+  {/* este bloque de accion quedara comentada por que no tiene una vista, acciones ni funcionalidades asignadas, se dejara para 
+  futuras implementaciones de perfil de usuario en el admin */ }
+              {/* <div className="flex flex-wrap items-center gap-3">
                 <button className="rounded-2xl bg-[#09D8C7] px-4 py-3 text-sm font-semibold text-[#0D1A2F] transition hover:bg-[#08c1b6]">
                   Ver perfil
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
 
