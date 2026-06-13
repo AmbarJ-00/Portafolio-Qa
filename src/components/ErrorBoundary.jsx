@@ -24,9 +24,9 @@ export class ErrorBoundary extends React.Component {
     window.location.href = '/';
   };
 
-  // handleGoPanel = () => {
-  //   window.location.href = '/backoffice';
-  // };
+  handleGoPanel = () => {
+    window.location.href = '/backoffice';
+  };
 
   getErrorDetails(error) {
     const msg = (error?.message || error?.toString() || '').toLowerCase();

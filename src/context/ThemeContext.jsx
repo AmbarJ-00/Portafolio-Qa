@@ -8,8 +8,7 @@ export const ThemeProvider = ({ children }) => {
     const saved = localStorage.getItem('portfolio-theme');
     if (saved) return saved;
     
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: light)').matches;
-    return systemPrefersDark ? 'dark' : 'light';
+    return 'light';
   });
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'light'));
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   return (

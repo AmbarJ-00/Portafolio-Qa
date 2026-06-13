@@ -11,6 +11,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { store } = usePortfolio();
   const [isOpen, setIsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const location = useLocation();
 
   const toggleLang = () => {
@@ -20,12 +21,19 @@ const Navbar = () => {
     document.documentElement.lang = nextLang;
   };
 
-  const navLinks = store.settings.navbar.items.filter(
-    (item) =>
-      item.active &&
+  const navLinks = store.settings.navbar.items.filter((item) => {
+    const status = item.status || (item.active ? 'active' : 'inactive');
+    return (
+      status !== 'inactive' &&
+      status !== 'maintenance' &&
       !item.path.startsWith('/admin') &&
       !item.path.startsWith('/backoffice')
-  );
+    );
+  });
+
+  const maxDirectLinks = 5;
+  const directLinks = navLinks.slice(0, maxDirectLinks);
+  const extraLinks = navLinks.slice(maxDirectLinks);
 
   return (
     <header className="sticky top-0 z-50 w-full nav-blur">
@@ -49,8 +57,8 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex space-x-1" aria-label="Desktop Navigation">
-            {navLinks.map((link) => (
+          <nav className="hidden lg:flex items-center space-x-1" aria-label="Desktop Navigation">
+            {directLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
@@ -65,6 +73,47 @@ const Navbar = () => {
                 {link.labelKey ? t(link.labelKey) : link.name}
               </NavLink>
             ))}
+
+            {/* "More" Dropdown Menu */}
+            {extraLinks.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setMoreOpen(!moreOpen)}
+                  className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 text-brand-navy-600 dark:text-brand-ash-300 hover:text-brand-electric-600 hover:bg-brand-ash-100/60 dark:hover:bg-brand-navy-900/60"
+                  aria-expanded={moreOpen}
+                  aria-haspopup="true"
+                >
+                  <span>{t('nav.more') || 'Más'}</span>
+                  <span className="text-[10px]">▼</span>
+                </button>
+                
+                {moreOpen && (
+                  <>
+                    {/* Backdrop cover to click outside */}
+                    <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+                    
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-white dark:bg-brand-navy-950 border border-brand-ash-200 dark:border-brand-navy-800 py-1 z-20">
+                      {extraLinks.map((link) => (
+                        <NavLink
+                          key={link.path}
+                          to={link.path}
+                          onClick={() => setMoreOpen(false)}
+                          className={({ isActive }) =>
+                            `block px-4 py-2 text-sm transition-colors ${
+                              isActive
+                                ? 'text-brand-electric-600 dark:text-brand-electric-300 bg-brand-electric-50/50 dark:bg-brand-electric-500/5 font-semibold'
+                                : 'text-brand-navy-600 dark:text-brand-ash-300 hover:bg-brand-ash-50 dark:hover:bg-brand-navy-900'
+                            }`
+                          }
+                        >
+                          {link.labelKey ? t(link.labelKey) : link.name}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Right Utility Buttons (Socials, Language, Theme) */}
@@ -152,7 +201,7 @@ const Navbar = () => {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden bg-white dark:bg-brand-navy-950 border-b border-brand-ash-200 dark:border-brand-navy-800 overflow-hidden"
           >
-            <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+            <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3 max-h-[70vh] overflow-y-auto">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.path}

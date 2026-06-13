@@ -7,6 +7,7 @@ import { ShieldCheck } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext.jsx';
 
 const schema = z.object({
+  username: z.string().min(3, 'El usuario es obligatorio (mínimo 3 caracteres)'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres')
 });
 
@@ -20,12 +21,12 @@ const AdminLogin = () => {
 
   const onSubmit = async (data) => {
     setErrorMessage('');
-    const success = await login(data.password);
+    const success = await login(data.username, data.password);
     if (success) {
       navigate('/backoffice');
       return;
     }
-    setErrorMessage('Credenciales inválidas. Verifica la frase secreta de administrador.');
+    setErrorMessage('Credenciales inválidas. Verifica tu usuario y contraseña de administrador.');
   };
 
   return (
@@ -45,10 +46,25 @@ const AdminLogin = () => {
           Esta ruta está oculta de la navegación pública y requiere acceso admin.
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <label htmlFor="username" className="block text-sm font-semibold text-[#E2E8F0] mb-2">
+              Usuario
+            </label>
+            <input
+              id="username"
+              type="text"
+              {...register('username')}
+              className="w-full rounded-2xl border border-[#09D8C7]/30 bg-[#0D1A2F] px-4 py-3 text-white focus:border-[#09D8C7] focus:ring-[#09D8C7]/40 outline-none"
+            />
+            {errors.username && (
+              <p className="mt-2 text-xs text-[#BD0927]">{errors.username.message}</p>
+            )}
+          </div>
+
           <div>
             <label htmlFor="password" className="block text-sm font-semibold text-[#E2E8F0] mb-2">
-              Frase de administrador
+              Contraseña
             </label>
             <input
               id="password"

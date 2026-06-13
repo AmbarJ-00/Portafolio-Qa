@@ -14,7 +14,9 @@ import { Plus, Trash2, Edit, GripVertical, Link2, HelpCircle, X } from 'lucide-r
 const navSchema = z.object({
   name: z.string().min(2, 'El nombre es obligatorio'),
   path: z.string().min(2, 'La ruta es obligatoria'),
-  active: z.boolean().optional()
+  active: z.boolean().optional(),
+  status: z.string().optional(),
+  creativeMessage: z.string().optional()
 });
 
 const SortableNavItem = ({ item, onToggle, onEdit, onDelete }) => {
@@ -36,9 +38,16 @@ const SortableNavItem = ({ item, onToggle, onEdit, onDelete }) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={() => onToggle(item.id, !item.active)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition">
-          {item.active ? 'Visible' : 'Oculto'}
-        </button>
+        <span className={`text-xxs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
+          item.status === 'active' || (!item.status && item.active) ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/20' :
+          item.status === 'creative' || item.status === 'creative-process' ? 'bg-indigo-950/80 text-indigo-400 border border-indigo-500/20' :
+          item.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border border-amber-500/20' :
+          'bg-red-950/80 text-red-400 border border-red-500/20'
+        }`}>
+          {item.status === 'active' || (!item.status && item.active) ? 'Activo' :
+           item.status === 'creative' || item.status === 'creative-process' ? 'Creativo' :
+           item.status === 'maintenance' ? 'Mantenimiento' : 'Inactivo'}
+        </span>
         <button onClick={() => onEdit(item)} className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition">
           <Edit className="w-4 h-4" />
         </button>
@@ -60,26 +69,37 @@ const NavbarManager = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [navToDelete, setNavToDelete] = useState(null);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm({
     resolver: zodResolver(navSchema),
     defaultValues: {
       name: '',
       path: '/nuevo-enlace',
-      active: true
+      active: true,
+      status: 'active',
+      creativeMessage: ''
     }
   });
 
+  const watchedStatus = watch('status');
+
   const onSubmit = (data) => {
     try {
+      // Map checkbox visible state to status string to ensure compatibility
+      const finalActive = data.status === 'active' || data.status === 'creative';
+      const payload = {
+        ...data,
+        active: finalActive
+      };
+
       if (activeNav) {
-        actions.updateNavbarItem(activeNav.id, data);
+        actions.updateNavbarItem(activeNav.id, payload);
         toast.success('Enlace de navegación actualizado correctamente');
       } else {
-        actions.addNavbarItem(data);
+        actions.addNavbarItem(payload);
         toast.success('Enlace de navegación creado con éxito');
       }
       setActiveNav(null);
-      reset({ name: '', path: '/nuevo-enlace', active: true });
+      reset({ name: '', path: '/nuevo-enlace', active: true, status: 'active', creativeMessage: '' });
     } catch (e) {
       toast.error('Error al guardar el enlace de navegación');
     }
@@ -90,11 +110,13 @@ const NavbarManager = () => {
     setValue('name', item.name);
     setValue('path', item.path);
     setValue('active', item.active);
+    setValue('status', item.status || (item.active ? 'active' : 'inactive'));
+    setValue('creativeMessage', item.creativeMessage || '');
   };
 
   const handleToggle = (id, newActive) => {
     try {
-      actions.updateNavbarItem(id, { active: newActive });
+      actions.updateNavbarItem(id, { active: newActive, status: newActive ? 'active' : 'inactive' });
       toast.success(newActive ? 'Enlace ahora es visible' : 'Enlace ahora está oculto');
     } catch (e) {
       toast.error('Error al cambiar la visibilidad');
@@ -170,11 +192,11 @@ const NavbarManager = () => {
           <div className="flex items-center justify-between gap-3 pb-4 border-b border-[#09D8C7]/10">
             <div>
               <h2 className="text-xl font-semibold text-white">Elemento de navegación</h2>
-              <p className="text-sm text-[#C9F7EE]/80">Agrega o edita enlaces visibles en el menú.</p>
+              <p className="text-sm text-[#C9F7EE]/80">Agrega o edita enlaces visibles en el menú y sus estados globales.</p>
             </div>
             {activeNav && (
               <button
-                onClick={() => { setActiveNav(null); reset({ name: '', path: '/nuevo-enlace', active: true }); }}
+                onClick={() => { setActiveNav(null); reset({ name: '', path: '/nuevo-enlace', active: true, status: 'active', creativeMessage: '' }); }}
                 className="rounded-2xl border border-[#09D8C7] px-3 py-2 text-sm text-[#09D8C7] hover:bg-[#09D8C7]/10 transition"
               >
                 <X className="w-4 h-4" /> Cancelar
@@ -198,10 +220,32 @@ const NavbarManager = () => {
               />
               {errors.path && <p className="text-xs text-[#BD0927]">{errors.path.message}</p>}
             </div>
-            <div className="flex items-center gap-3">
-              <input id="active" type="checkbox" {...register('active')} className="h-4 w-4 rounded border-[#09D8C7] text-[#09D8C7] focus:ring-[#09D8C7]" />
-              <label htmlFor="active" className="text-sm text-white">Visible</label>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white">Estado público</label>
+              <select
+                {...register('status')}
+                className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7]"
+              >
+                <option value="active">Activo (Visible)</option>
+                <option value="inactive">Inactivo (No visible)</option>
+                <option value="maintenance">En Mantenimiento (No visible)</option>
+                <option value="creative">En Proceso Creativo (Visible con mensaje)</option>
+              </select>
             </div>
+
+            {watchedStatus === 'creative' && (
+              <div className="space-y-2 animate-fadeIn">
+                <label className="text-sm font-semibold text-white">Mensaje de Proceso Creativo</label>
+                <textarea
+                  {...register('creativeMessage')}
+                  rows={3}
+                  placeholder="Sección en proceso creativo. ¡Vuelve pronto!"
+                  className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
+                />
+              </div>
+            )}
+
             <div className="flex justify-end gap-3 pt-4">
               <button type="submit" className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6] transition">
                 {activeNav ? 'Actualizar enlace' : 'Agregar enlace'}

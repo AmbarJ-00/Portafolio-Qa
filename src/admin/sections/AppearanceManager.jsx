@@ -24,6 +24,27 @@ const appearanceSchema = z.object({
   certificationsBorderStyle: z.string().optional(),
   certificationsAnimation: z.string().optional(),
   
+  // Custom theme overrides
+  lightBackground: z.string().optional(),
+  lightCard: z.string().optional(),
+  lightButton: z.string().optional(),
+  lightText: z.string().optional(),
+  lightBorder: z.string().optional(),
+  lightShadow: z.string().optional(),
+  lightGradient: z.string().optional(),
+  lightNavbar: z.string().optional(),
+  lightFooter: z.string().optional(),
+  
+  darkBackground: z.string().optional(),
+  darkCard: z.string().optional(),
+  darkButton: z.string().optional(),
+  darkText: z.string().optional(),
+  darkBorder: z.string().optional(),
+  darkShadow: z.string().optional(),
+  darkGradient: z.string().optional(),
+  darkNavbar: z.string().optional(),
+  darkFooter: z.string().optional(),
+  
   accentColor: z.string().min(3, 'El color de acento es obligatorio'),
   surfaceColor: z.string().min(3, 'El color de superficie es obligatorio'),
   hoverColor: z.string().min(3, 'El color de hover es obligatorio'),
@@ -52,7 +73,25 @@ const presets = {
     hoverColor: '#38bdf8',
     navbarType: 'horizontal',
     navbarLayout: 'wrap',
-    navbarBehavior: 'grid'
+    navbarBehavior: 'grid',
+    lightBackground: '#f8fafc',
+    lightCard: '#ffffff',
+    lightButton: '#7c3aed',
+    lightText: '#0f172a',
+    lightBorder: '#cbd5e1',
+    lightShadow: 'rgba(0,0,0,0.05)',
+    lightGradient: '#7c3aed',
+    lightNavbar: '#ffffff',
+    lightFooter: '#f8fafc',
+    darkBackground: '#020617',
+    darkCard: '#111827',
+    darkButton: '#a78bfa',
+    darkText: '#f8fafc',
+    darkBorder: '#1e293b',
+    darkShadow: 'rgba(0,0,0,0.5)',
+    darkGradient: '#a78bfa',
+    darkNavbar: '#111827',
+    darkFooter: '#020617'
   },
   corporate: {
     homeGradient: 'from-slate-800 via-slate-900 to-slate-950',
@@ -72,7 +111,25 @@ const presets = {
     hoverColor: '#1D4ED8',
     navbarType: 'horizontal',
     navbarLayout: 'fixed',
-    navbarBehavior: 'list'
+    navbarBehavior: 'list',
+    lightBackground: '#f8fafc',
+    lightCard: '#ffffff',
+    lightButton: '#2563EB',
+    lightText: '#0f172a',
+    lightBorder: '#cbd5e1',
+    lightShadow: 'rgba(0,0,0,0.05)',
+    lightGradient: '#2563EB',
+    lightNavbar: '#ffffff',
+    lightFooter: '#f8fafc',
+    darkBackground: '#020617',
+    darkCard: '#1e293b',
+    darkButton: '#3b82f6',
+    darkText: '#f8fafc',
+    darkBorder: '#334155',
+    darkShadow: 'rgba(0,0,0,0.5)',
+    darkGradient: '#3b82f6',
+    darkNavbar: '#1e293b',
+    darkFooter: '#020617'
   },
   glassmorphism: {
     homeGradient: 'from-violet-950/80 via-slate-950 to-fuchsia-950/80',
@@ -92,7 +149,25 @@ const presets = {
     hoverColor: '#F472B6',
     navbarType: 'floating',
     navbarLayout: 'centered',
-    navbarBehavior: 'grid'
+    navbarBehavior: 'grid',
+    lightBackground: '#faf5ff',
+    lightCard: 'rgba(255,255,255,0.7)',
+    lightButton: '#a855f7',
+    lightText: '#1e1b4b',
+    lightBorder: 'rgba(168,85,247,0.2)',
+    lightShadow: 'rgba(168,85,247,0.05)',
+    lightGradient: '#a855f7',
+    lightNavbar: 'rgba(255,255,255,0.8)',
+    lightFooter: '#faf5ff',
+    darkBackground: '#090514',
+    darkCard: 'rgba(30,27,75,0.6)',
+    darkButton: '#c084fc',
+    darkText: '#f3e8ff',
+    darkBorder: 'rgba(192,132,252,0.2)',
+    darkShadow: 'rgba(0,0,0,0.6)',
+    darkGradient: '#c084fc',
+    darkNavbar: 'rgba(30,27,75,0.8)',
+    darkFooter: '#090514'
   },
   softui: {
     homeGradient: 'from-slate-100 via-slate-50 to-white',
@@ -112,7 +187,25 @@ const presets = {
     hoverColor: '#818CF8',
     navbarType: 'horizontal',
     navbarLayout: 'wrap',
-    navbarBehavior: 'grid'
+    navbarBehavior: 'grid',
+    lightBackground: '#f1f5f9',
+    lightCard: '#e2e8f0',
+    lightButton: '#4F46E5',
+    lightText: '#1e293b',
+    lightBorder: '#cbd5e1',
+    lightShadow: 'rgba(0,0,0,0.05)',
+    lightGradient: '#4F46E5',
+    lightNavbar: '#f1f5f9',
+    lightFooter: '#e2e8f0',
+    darkBackground: '#0f172a',
+    darkCard: '#1e293b',
+    darkButton: '#818cf8',
+    darkText: '#f1f5f9',
+    darkBorder: '#334155',
+    darkShadow: 'rgba(0,0,0,0.5)',
+    darkGradient: '#818cf8',
+    darkNavbar: '#0f172a',
+    darkFooter: '#1e293b'
   },
   minimalista: {
     homeGradient: 'from-black via-zinc-950 to-black',
@@ -132,7 +225,25 @@ const presets = {
     hoverColor: '#A1A1AA',
     navbarType: 'horizontal',
     navbarLayout: 'wrap',
-    navbarBehavior: 'list'
+    navbarBehavior: 'list',
+    lightBackground: '#ffffff',
+    lightCard: '#ffffff',
+    lightButton: '#000000',
+    lightText: '#000000',
+    lightBorder: '#000000',
+    lightShadow: 'none',
+    lightGradient: '#000000',
+    lightNavbar: '#ffffff',
+    lightFooter: '#ffffff',
+    darkBackground: '#000000',
+    darkCard: '#000000',
+    darkButton: '#ffffff',
+    darkText: '#ffffff',
+    darkBorder: '#ffffff',
+    darkShadow: 'none',
+    darkGradient: '#ffffff',
+    darkNavbar: '#000000',
+    darkFooter: '#000000'
   },
   futurista: {
     homeGradient: 'from-zinc-950 via-slate-900 to-black',
@@ -152,7 +263,25 @@ const presets = {
     hoverColor: '#34D399',
     navbarType: 'vertical-side',
     navbarLayout: 'compact',
-    navbarBehavior: 'list'
+    navbarBehavior: 'list',
+    lightBackground: '#f0fdf4',
+    lightCard: '#e6f4ea',
+    lightButton: '#10b981',
+    lightText: '#022c22',
+    lightBorder: '#a7f3d0',
+    lightShadow: 'rgba(16,185,129,0.05)',
+    lightGradient: '#10b981',
+    lightNavbar: '#e6f4ea',
+    lightFooter: '#f0fdf4',
+    darkBackground: '#022c22',
+    darkCard: '#064e3b',
+    darkButton: '#34d399',
+    darkText: '#ecfdf5',
+    darkBorder: '#065f46',
+    darkShadow: 'rgba(0,0,0,0.6)',
+    darkGradient: '#34d399',
+    darkNavbar: '#022c22',
+    darkFooter: '#064e3b'
   },
   tecnologico: {
     homeGradient: 'from-[#030712] via-[#0b1528] to-[#020617]',
@@ -172,7 +301,25 @@ const presets = {
     hoverColor: '#4FACFE',
     navbarType: 'horizontal',
     navbarLayout: 'wrap',
-    navbarBehavior: 'grid'
+    navbarBehavior: 'grid',
+    lightBackground: '#ecfeff',
+    lightCard: '#cffafe',
+    lightButton: '#0891b2',
+    lightText: '#083344',
+    lightBorder: '#a5f3fc',
+    lightShadow: 'rgba(8,145,178,0.05)',
+    lightGradient: '#0891b2',
+    lightNavbar: '#cffafe',
+    lightFooter: '#ecfeff',
+    darkBackground: '#020617',
+    darkCard: '#0f172a',
+    darkButton: '#38bdf8',
+    darkText: '#f8fafc',
+    darkBorder: '#1e293b',
+    darkShadow: 'rgba(0,0,0,0.5)',
+    darkGradient: '#38bdf8',
+    darkNavbar: '#020617',
+    darkFooter: '#0f172a'
   }
 };
 
@@ -206,6 +353,26 @@ const AppearanceManager = () => {
       accentColor: appearance.colors?.accent || '#09D8C7',
       surfaceColor: appearance.colors?.surface || '#0F223B',
       hoverColor: appearance.colors?.hover || '#38bdf8',
+      
+      lightBackground: appearance.colors?.light?.background || '#f8fafc',
+      lightCard: appearance.colors?.light?.card || '#ffffff',
+      lightButton: appearance.colors?.light?.button || '#7c3aed',
+      lightText: appearance.colors?.light?.text || '#0f172a',
+      lightBorder: appearance.colors?.light?.border || '#cbd5e1',
+      lightShadow: appearance.colors?.light?.shadow || 'rgba(0,0,0,0.05)',
+      lightGradient: appearance.colors?.light?.gradient || '#7c3aed',
+      lightNavbar: appearance.colors?.light?.navbar || '#ffffff',
+      lightFooter: appearance.colors?.light?.footer || '#f8fafc',
+      
+      darkBackground: appearance.colors?.dark?.background || '#020617',
+      darkCard: appearance.colors?.dark?.card || '#111827',
+      darkButton: appearance.colors?.dark?.button || '#a78bfa',
+      darkText: appearance.colors?.dark?.text || '#f8fafc',
+      darkBorder: appearance.colors?.dark?.border || '#1e293b',
+      darkShadow: appearance.colors?.dark?.shadow || 'rgba(0,0,0,0.5)',
+      darkGradient: appearance.colors?.dark?.gradient || '#a78bfa',
+      darkNavbar: appearance.colors?.dark?.navbar || '#111827',
+      darkFooter: appearance.colors?.dark?.footer || '#020617',
       
       navbarType: appearance.navbar?.type || 'horizontal',
       navbarLayout: appearance.navbar?.layout || 'wrap',
@@ -249,6 +416,30 @@ const AppearanceManager = () => {
         },
         colors: {
           ...appearance.colors,
+          light: {
+            ...appearance.colors?.light,
+            background: data.lightBackground,
+            card: data.lightCard,
+            button: data.lightButton,
+            text: data.lightText,
+            border: data.lightBorder,
+            shadow: data.lightShadow,
+            gradient: data.lightGradient,
+            navbar: data.lightNavbar,
+            footer: data.lightFooter
+          },
+          dark: {
+            ...appearance.colors?.dark,
+            background: data.darkBackground,
+            card: data.darkCard,
+            button: data.darkButton,
+            text: data.darkText,
+            border: data.darkBorder,
+            shadow: data.darkShadow,
+            gradient: data.darkGradient,
+            navbar: data.darkNavbar,
+            footer: data.darkFooter
+          },
           accent: data.accentColor,
           surface: data.surfaceColor,
           hover: data.hoverColor
@@ -346,33 +537,111 @@ const AppearanceManager = () => {
               
               {/* Tab 1: Global Colors */}
               {activeTab === 'global' && (
-                <div className="grid gap-5 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-white">Color de acento</label>
-                    <input
-                      type="color"
-                      {...register('accentColor')}
-                      className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
-                    />
-                    <p className="text-[10px] text-slate-500">Color primario de la app.</p>
+                <div className="space-y-6">
+                  {/* General settings */}
+                  <div className="grid gap-5 md:grid-cols-3 pb-4 border-b border-slate-800">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-white">Color de acento general</label>
+                      <input
+                        type="color"
+                        {...register('accentColor')}
+                        className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
+                      />
+                      <p className="text-[10px] text-slate-500">Color primario de la app.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-white">Color de superficie general</label>
+                      <input
+                        type="color"
+                        {...register('surfaceColor')}
+                        className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
+                      />
+                      <p className="text-[10px] text-slate-500">Fondo de paneles y modales.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-white">Color de hover general</label>
+                      <input
+                        type="color"
+                        {...register('hoverColor')}
+                        className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
+                      />
+                      <p className="text-[10px] text-slate-500">Color interactivo al posar el cursor.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-white">Color de superficie</label>
-                    <input
-                      type="color"
-                      {...register('surfaceColor')}
-                      className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
-                    />
-                    <p className="text-[10px] text-slate-500">Fondo de paneles y modales.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-white">Color de hover</label>
-                    <input
-                      type="color"
-                      {...register('hoverColor')}
-                      className="h-12 w-full rounded-2xl border border-slate-700 bg-slate-800 p-2 outline-none cursor-pointer"
-                    />
-                    <p className="text-[10px] text-slate-500">Color interactivo al posar el cursor.</p>
+
+                  {/* Dual-column for Light and Dark theme configs */}
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Light theme */}
+                    <div className="space-y-4 rounded-3xl border border-slate-800 bg-slate-900/40 p-5">
+                      <h3 className="text-md font-bold text-[#09D8C7] border-b border-slate-800 pb-2">Configuración del Tema Claro</h3>
+                      
+                      <div className="space-y-4">
+                        {[
+                          { name: 'lightBackground', label: 'Background Global (Aplicar al tema claro)' },
+                          { name: 'lightCard', label: 'Tarjetas / Cards (Aplicar al tema claro)' },
+                          { name: 'lightButton', label: 'Botones (Aplicar al tema claro)' },
+                          { name: 'lightText', label: 'Textos (Aplicar al tema claro)' },
+                          { name: 'lightBorder', label: 'Bordes (Aplicar al tema claro)' },
+                          { name: 'lightShadow', label: 'Sombras (Aplicar al tema claro)', isShadow: true },
+                          { name: 'lightGradient', label: 'Gradientes (Aplicar al tema claro)' },
+                          { name: 'lightNavbar', label: 'Navbar (Aplicar al tema claro)' },
+                          { name: 'lightFooter', label: 'Footer (Aplicar al tema claro)' }
+                        ].map((field) => (
+                          <div key={field.name} className="flex items-center justify-between gap-4">
+                            <label className="text-xs font-semibold text-slate-300">{field.label}</label>
+                            {field.isShadow ? (
+                              <input
+                                type="text"
+                                {...register(field.name)}
+                                className="h-10 w-40 rounded-xl border border-slate-700 bg-slate-850 px-3 text-xs text-white outline-none focus:border-[#09D8C7]"
+                              />
+                            ) : (
+                              <input
+                                type="color"
+                                {...register(field.name)}
+                                className="h-10 w-16 rounded-xl border border-slate-700 bg-slate-850 p-1 outline-none cursor-pointer"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Dark theme */}
+                    <div className="space-y-4 rounded-3xl border border-slate-800 bg-slate-900/40 p-5">
+                      <h3 className="text-md font-bold text-[#a78bfa] border-b border-slate-800 pb-2">Configuración del Tema Oscuro</h3>
+                      
+                      <div className="space-y-4">
+                        {[
+                          { name: 'darkBackground', label: 'Background Global (Aplicar al tema oscuro)' },
+                          { name: 'darkCard', label: 'Tarjetas / Cards (Aplicar al tema oscuro)' },
+                          { name: 'darkButton', label: 'Botones (Aplicar al tema oscuro)' },
+                          { name: 'darkText', label: 'Textos (Aplicar al tema oscuro)' },
+                          { name: 'darkBorder', label: 'Bordes (Aplicar al tema oscuro)' },
+                          { name: 'darkShadow', label: 'Sombras (Aplicar al tema oscuro)', isShadow: true },
+                          { name: 'darkGradient', label: 'Gradientes (Aplicar al tema oscuro)' },
+                          { name: 'darkNavbar', label: 'Navbar (Aplicar al tema oscuro)' },
+                          { name: 'darkFooter', label: 'Footer (Aplicar al tema oscuro)' }
+                        ].map((field) => (
+                          <div key={field.name} className="flex items-center justify-between gap-4">
+                            <label className="text-xs font-semibold text-slate-300">{field.label}</label>
+                            {field.isShadow ? (
+                              <input
+                                type="text"
+                                {...register(field.name)}
+                                className="h-10 w-40 rounded-xl border border-slate-700 bg-slate-850 px-3 text-xs text-white outline-none focus:border-[#a78bfa]"
+                              />
+                            ) : (
+                              <input
+                                type="color"
+                                {...register(field.name)}
+                                className="h-10 w-16 rounded-xl border border-slate-700 bg-slate-850 p-1 outline-none cursor-pointer"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -632,25 +901,54 @@ const AppearanceManager = () => {
         <Modal
           isOpen={helpOpen}
           onClose={() => setHelpOpen(false)}
-          title="Ayuda del Appearance Manager"
-          subtitle="Diseño premium al alcance de un clic."
+          title="Manual de Configuración de Apariencia"
+          subtitle="Guía detallada para asegurar consistencia visual y accesibilidad."
           footer={
             <button
               type="button"
               onClick={() => setHelpOpen(false)}
               className="rounded-2xl bg-[#09D8C7] px-5 py-3 text-sm font-semibold text-[#0D1A2F] hover:bg-[#08c1b6]"
             >
-              Cerrar
+              Entendido
             </button>
           }
         >
-          <div className="space-y-4">
-            <p className="text-sm text-[#C9F7EE]">
-              - Puedes aplicar cualquiera de los presets rápidos (SaaS, Glassmorphism, etc.) desde la barra superior.
-            </p>
-            <p className="text-sm text-[#C9F7EE]">
-              - Para ver reflejados los cambios en la sección visual del portafolio público, pulsa "Guardar apariencia".
-            </p>
+          <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 text-xs text-[#C9F7EE] leading-relaxed">
+            <div className="rounded-2xl border border-[#17364F] bg-[#0D1A2F]/80 p-4 space-y-2">
+              <h3 className="font-bold text-white text-sm">🎨 ¿Qué modifica cada opción?</h3>
+              <p>Las propiedades de color configuradas se aplican dinámicamente a toda la web a través de variables CSS globales:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Background Global:</strong> Color base de la página (afecta a <code className="bg-[#11243B] px-1 rounded text-[#09D8C7]">body</code>).</li>
+                <li><strong>Tarjetas / Cards:</strong> Fondo de las cajas de contenido de Skills, Proyectos y Certificaciones.</li>
+                <li><strong>Botones:</strong> Color de los botones y elementos clicables primarios.</li>
+                <li><strong>Textos:</strong> Color de los textos principales (títulos, párrafos, subtítulos).</li>
+                <li><strong>Bordes:</strong> Grosor y tono de las líneas delimitadoras en tarjetas y modales.</li>
+                <li><strong>Sombras:</strong> Profundidad 3D de tarjetas en flotación (soporta valores CSS como <code className="bg-[#11243B] px-1 rounded text-[#09D8C7]">rgba(...)</code> o <code className="bg-[#11243B] px-1 rounded text-[#09D8C7]">none</code>).</li>
+                <li><strong>Gradientes:</strong> Fondos con transiciones de color en banners y barras de carga.</li>
+                <li><strong>Navbar & Footer:</strong> Fondo de la barra de navegación superior y el pie de página inferior.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-[#17364F] bg-[#0D1A2F]/80 p-4 space-y-2">
+              <h3 className="font-bold text-white text-sm">📌 Componentes Afectados y Dependencias</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Dependencia del Tema Activo:</strong> Las configuraciones del Modo Claro se aplican únicamente cuando el usuario tiene activado el tema claro; lo mismo aplica para el Modo Oscuro. Esto garantiza transiciones fluidas.</li>
+                <li><strong>Dependencia de Presets:</strong> Si aplicas un preset de la barra superior, todos los campos se sobrescribirán temporalmente en el formulario para coordinar un estilo conjunto (ej: Neumorfismo o Cyberpunk).</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-[#17364F] bg-[#0D1A2F]/80 p-4 space-y-2">
+              <h3 className="font-bold text-white text-sm">💡 Ejemplos de Uso y Recomendaciones</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Tema Claro Premium:</strong> Fondo Global: <code className="text-[#09D8C7]">#F8FAFC</code> | Cards: <code className="text-[#09D8C7]">#FFFFFF</code> | Texto: <code className="text-[#09D8C7]">#0F172A</code>. Aporta una lectura relajante y limpia.</li>
+                <li><strong>Tema Oscuro Espacial:</strong> Fondo Global: <code className="text-[#09D8C7]">#020617</code> | Cards: <code className="text-[#09D8C7]">#0F172A</code> | Texto: <code className="text-[#09D8C7]">#F8FAFC</code>.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-[#BD0927] bg-[#BD0927]/10 p-4 space-y-2">
+              <h3 className="font-bold text-[#FF7E8B] text-sm">⚠️ Riesgos de Configuración</h3>
+              <p>Evita configurar el color de texto idéntico al color de fondo global o de las tarjetas. Esto anularía el contraste mínimo exigido por las normas de accesibilidad <strong>WCAG 2.1 (A11Y)</strong>, impidiendo leer el portafolio.</p>
+            </div>
           </div>
         </Modal>
       )}

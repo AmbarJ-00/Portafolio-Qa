@@ -20,12 +20,16 @@ const Documentation = () => {
   const copyToClipboard = (template) => {
     // Generate a clean markdown string representation of the template
     const title = resolveField(template.title, template.titleKey);
-    const desc = resolveField(template.description, template.descriptionKey);
+    const desc = resolveField(template.template, template.descriptionKey);
     const method = resolveField(template.methodology, template.methodologyKey);
+    const category = resolveField(template.category, template.categoryKey) || 'QA Template';
+    const type = resolveField(template.type, template.typeKey) || 'Artifact';
     const params = (template.parameters || []).map((p) => `- ${p}`).join('\n');
     const questions = (template.questions || []).map((q) => `- ${q}`).join('\n');
+    const checklistStr = (template.checklist || []).map((c) => `- ${c}`).join('\n');
+    const strategiesStr = (template.strategies || []).map((s) => `- ${s}`).join('\n');
 
-    const content = `# ${title}\n\n## Description\n${desc}\n\n## Methodology\n${method}\n\n## Structure Parameters\n${params}\n\n## Audit Questions\n${questions}`;
+    const content = `# ${title}\n\n## Category: ${category} | Type: ${type}\n\n## Description\n${desc}\n\n## Methodology\n${method}\n\n## Structure Parameters\n${params}\n\n## Strategies\n${strategiesStr}\n\n## Checklist\n${checklistStr}\n\n## Audit Questions\n${questions}`;
 
     navigator.clipboard.writeText(content).then(() => {
       setCopiedId(template.id);
@@ -83,9 +87,15 @@ const Documentation = () => {
           className="space-y-10"
         >
           {store.documentation.templates.map((template) => {
-            const title = t(template.titleKey);
-            const desc = t(template.descriptionKey);
-            const method = t(template.methodologyKey);
+            const title = resolveField(template.title, template.titleKey);
+            const desc = resolveField(template.template, template.descriptionKey);
+            const method = resolveField(template.methodology, template.methodologyKey);
+            const category = resolveField(template.category, template.categoryKey) || 'QA Template';
+            const type = resolveField(template.type, template.typeKey) || 'Artifact';
+            const parameters = template.parameters || [];
+            const questions = template.questions || [];
+            const checklist = template.checklist || [];
+            const strategies = template.strategies || [];
             const isCopied = copiedId === template.id;
 
             return (
@@ -106,7 +116,7 @@ const Documentation = () => {
                         {title}
                       </h2>
                       <span className="text-xxs font-bold text-brand-lilac-500 uppercase tracking-widest block mt-0.5">
-                        QA Artifact Template
+                        {category} {type ? `| ${type}` : ''}
                       </span>
                     </div>
                   </div>
@@ -148,50 +158,92 @@ const Documentation = () => {
                       </p>
                     </div>
 
-                    <div className="space-y-3 bg-brand-ash-100/50 dark:bg-brand-navy-900/30 p-5 rounded-xl border border-brand-ash-200/40 dark:border-brand-navy-800/40">
-                      <h4 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-2 uppercase tracking-wider">
-                        <Layers className="w-4 h-4 text-brand-lilac-500" />
-                        <span>{t('documentation.methodology')}</span>
-                      </h4>
-                      <p className="text-xs text-brand-navy-600 dark:text-brand-ash-300 leading-relaxed">
-                        {method}
-                      </p>
-                    </div>
+                    {method && (
+                      <div className="space-y-3 bg-brand-ash-100/50 dark:bg-brand-navy-900/30 p-5 rounded-xl border border-brand-ash-200/40 dark:border-brand-navy-800/40">
+                        <h4 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-2 uppercase tracking-wider">
+                          <Layers className="w-4 h-4 text-brand-lilac-500" />
+                          <span>{t('documentation.methodology')}</span>
+                        </h4>
+                        <p className="text-xs text-brand-navy-600 dark:text-brand-ash-300 leading-relaxed">
+                          {method}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Schema parameters (Right 1 col) */}
                   <div className="space-y-6">
                     {/* Structure parameters */}
-                    <div className="space-y-3">
-                      <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
-                        <Settings className="w-3.5 h-3.5 text-brand-electric-500" />
-                        <span>{t('documentation.parameters')}</span>
-                      </h3>
-                      <ul className="space-y-1.5 text-xs text-brand-navy-600 dark:text-brand-ash-400">
-                        {template.parameters.map((param, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-electric-500" />
-                            <span>{param}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {parameters.length > 0 && (
+                      <div className="space-y-3">
+                        <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
+                          <Settings className="w-3.5 h-3.5 text-brand-electric-500" />
+                          <span>{t('documentation.parameters')}</span>
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-brand-navy-600 dark:text-brand-ash-400">
+                          {parameters.map((param, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-brand-electric-500" />
+                              <span>{param}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Strategies */}
+                    {strategies.length > 0 && (
+                      <div className="space-y-3 border-t border-brand-ash-200/60 dark:border-brand-navy-800/40 pt-4">
+                        <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
+                          <Layers className="w-3.5 h-3.5 text-brand-lilac-500" />
+                          <span>Estrategias</span>
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-brand-navy-600 dark:text-brand-ash-400">
+                          {strategies.map((strategy, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-brand-lilac-500" />
+                              <span>{strategy}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Checklist */}
+                    {checklist.length > 0 && (
+                      <div className="space-y-3 border-t border-brand-ash-200/60 dark:border-brand-navy-800/40 pt-4">
+                        <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                          <span>Checklist</span>
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-brand-navy-600 dark:text-brand-ash-400">
+                          {checklist.map((item, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
                     {/* Requirement analysis questions */}
-                    <div className="space-y-3 border-t border-brand-ash-200/60 dark:border-brand-navy-800/40 pt-4">
-                      <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
-                        <HelpCircle className="w-3.5 h-3.5 text-brand-lilac-500" />
-                        <span>{t('documentation.questions')}</span>
-                      </h3>
-                      <ul className="space-y-2 text-xs text-brand-navy-600 dark:text-brand-ash-400">
-                        {template.questions.map((question, idx) => (
-                          <li key={idx} className="flex gap-2 items-start">
-                            <span className="text-brand-lilac-500 font-bold shrink-0">?</span>
-                            <span className="italic leading-normal">{question}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {questions.length > 0 && (
+                      <div className="space-y-3 border-t border-brand-ash-200/60 dark:border-brand-navy-800/40 pt-4">
+                        <h3 className="text-xs font-bold text-brand-navy-800 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
+                          <HelpCircle className="w-3.5 h-3.5 text-brand-lilac-500" />
+                          <span>{t('documentation.questions')}</span>
+                        </h3>
+                        <ul className="space-y-2 text-xs text-brand-navy-600 dark:text-brand-ash-400">
+                          {questions.map((question, idx) => (
+                            <li key={idx} className="flex gap-2 items-start">
+                              <span className="text-brand-lilac-500 font-bold shrink-0">?</span>
+                              <span className="italic leading-normal">{question}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.section>

@@ -2,41 +2,89 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminAuthContext = createContext();
-const ADMIN_SESSION_KEY = 'qa-admin-auth';
-const FALLBACK_PASSWORD = 'AdminQA#2026';
-
-const getAdminSecret = () => import.meta.env.VITE_ADMIN_PASSWORD || FALLBACK_PASSWORD;
+const ADMIN_TOKEN_KEY = 'qa-admin-token';
+const ADMIN_USER_KEY = 'qa-admin-user';
 
 export const AdminAuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if (stored === 'true') {
-      setIsAuthenticated(true);
-    }
+    const verifySession = async () => {
+      const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+      if (!token) {
+        setLoadingAuth(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(true);
+          setUser(data.user);
+        } else {
+          // Token expired or invalid
+          sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+          sessionStorage.removeItem(ADMIN_USER_KEY);
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('Auth verification failed:', err);
+      } finally {
+        setLoadingAuth(false);
+      }
+    };
+    
+    verifySession();
   }, []);
 
-  const login = async (enteredPassword) => {
-    const adminSecret = getAdminSecret();
-    if (!enteredPassword || enteredPassword !== adminSecret) {
+  const login = async (username, password) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+      sessionStorage.setItem(ADMIN_USER_KEY, JSON.stringify(data.user));
+      setIsAuthenticated(true);
+      setUser(data.user);
+      return true;
+    } catch (err) {
+      console.error('Login action failed:', err);
       return false;
     }
-
-    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
-    setIsAuthenticated(true);
-    return true;
   };
 
   const logout = () => {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    sessionStorage.removeItem(ADMIN_USER_KEY);
     setIsAuthenticated(false);
+    setUser(null);
     navigate('/backoffice/login');
   };
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AdminAuthContext.Provider value={{ isAuthenticated, user, loadingAuth, login, logout }}>
       {children}
     </AdminAuthContext.Provider>
   );

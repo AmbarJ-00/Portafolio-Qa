@@ -109,8 +109,11 @@ const Skills = () => {
                   {/* Progress bar */}
                   <div className="h-1.5 w-full bg-brand-ash-200 dark:bg-brand-navy-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded-full transition-all duration-300"
-                      style={{ width: `${skill.level}%` }}
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${skill.level}%`,
+                        backgroundColor: skill.color || '#00bfff'
+                      }}
                     />
                   </div>
                 </div>
@@ -150,7 +153,7 @@ const Skills = () => {
                     className="p-1.5 hover:bg-brand-ash-200 dark:hover:bg-brand-navy-800 rounded-lg text-brand-navy-600 dark:text-brand-ash-400 focus-visible:ring-2 focus-visible:ring-brand-electric-500"
                     aria-label={t('cta.close')}
                   >
-                    <LucideIcons.X className="w-5 h-5" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
 

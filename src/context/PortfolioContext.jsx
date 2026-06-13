@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { portfolioConfig as defaultPortfolioConfig } from '../data/portfolioData.js';
 
 const PortfolioContext = createContext();
-const STORAGE_KEY = 'qa-portfolio-admin-store';
 
 const defaultNavbarItems = [
   { id: 'home', name: 'Home', labelKey: 'nav.home', path: '/', active: true },
@@ -15,52 +14,16 @@ const defaultNavbarItems = [
 ];
 
 const defaultAppearance = {
-  home: {
-    gradient: 'from-brand-navy-800 via-brand-electric-500 to-brand-lilac-500',
-    particles: true,
-    heroEffect: 'glow'
-  },
-  projects: {
-    cardStyle: 'glass',
-    shadowStrength: 'medium',
-    highlightColor: 'brand-electric-500'
-  },
-  skills: {
-    modalStyle: 'card',
-    progressStyle: 'gradient',
-    cardAnimation: 'float'
-  },
-  certifications: {
-    cardStyle: 'image-frame',
-    borderStyle: 'rounded',
-    animation: 'fade'
-  },
+  home: { gradient: 'from-brand-navy-800 via-brand-electric-500 to-brand-lilac-500', particles: true, heroEffect: 'glow' },
+  projects: { cardStyle: 'glass', shadowStrength: 'medium', highlightColor: 'brand-electric-500' },
+  skills: { modalStyle: 'card', progressStyle: 'gradient', cardAnimation: 'float' },
+  certifications: { cardStyle: 'image-frame', borderStyle: 'rounded', animation: 'fade' },
   colors: {
-    light: {
-      primary: '#0f172a',
-      secondary: '#7c3aed',
-      accent: '#38bdf8',
-      success: '#10b981',
-      warning: '#f59e0b',
-      danger: '#ef4444'
-    },
-    dark: {
-      background: '#020617',
-      surface: '#111827',
-      text: '#f8fafc',
-      muted: '#94a3b8',
-      accent: '#a78bfa'
-    },
-    hover: '#38bdf8',
-    metrics: '#f97316',
-    icons: '#7c3aed',
-    decorative: '#38bdf8'
+    light: { primary: '#0f172a', secondary: '#7c3aed', accent: '#38bdf8', success: '#10b981', warning: '#f59e0b', danger: '#ef4444' },
+    dark: { background: '#020617', surface: '#111827', text: '#f8fafc', muted: '#94a3b8', accent: '#a78bfa' },
+    hover: '#38bdf8', metrics: '#f97316', icons: '#7c3aed', decorative: '#38bdf8'
   },
-  navbar: {
-    type: 'horizontal',
-    layout: 'wrap',
-    behavior: 'grid'
-  }
+  navbar: { type: 'horizontal', layout: 'wrap', behavior: 'grid' }
 };
 
 const defaultModules = [
@@ -75,64 +38,6 @@ const defaultModules = [
   }
 ];
 
-const getInitialState = () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (!parsed.aboutItems) parsed.aboutItems = [];
-      if (!parsed.heroCards) {
-        parsed.heroCards = [
-          { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', type: 'vertical', priority: 1 },
-          { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', type: 'vertical', priority: 2 }
-        ];
-      }
-      return parsed;
-    } catch (error) {
-      console.warn('Failed to parse local portfolio store', error);
-    }
-  }
-
-  return {
-    ...defaultPortfolioConfig,
-    aboutItems: [],
-    heroCards: [
-      { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', type: 'vertical', priority: 1 },
-      { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', type: 'vertical', priority: 2 }
-    ],
-    settings: {
-      seo: {
-        title: 'Ambar Ramon | QA Lead',
-        description: 'QA lead portfolio and quality management system for testing services.',
-        openGraph: {
-          type: 'website',
-          image: 'https://qa-portfolio.vercel.app/og-image.png'
-        },
-        twitter: {
-          card: 'summary_large_image',
-          creator: '@ambarqa'
-        }
-      },
-      appearance: defaultAppearance,
-      navbar: {
-        items: defaultNavbarItems,
-        type: 'horizontal',
-        layout: 'wrap',
-        behavior: 'grid'
-      },
-      modules: defaultModules,
-      contact: {
-        email: defaultPortfolioConfig.personal.email,
-        linkedin: defaultPortfolioConfig.personal.linkedin,
-        github: defaultPortfolioConfig.personal.github,
-        phone: '',
-        alternativeContact: '',
-        country: defaultPortfolioConfig.personal.location
-      }
-    }
-  };
-};
-
 const createId = (prefix = 'item') => `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 
 const splitCsv = (value) =>
@@ -142,132 +47,204 @@ const splitCsv = (value) =>
       ? value
       : [];
 
+const getInitialState = () => ({
+  personal: {},
+  aboutItems: [],
+  heroCards: [],
+  projects: [],
+  skills: [],
+  certifications: [],
+  documentation: { templates: [] },
+  settings: {
+    seo: { title: 'Ambar Ramon | QA Lead', description: 'QA lead portfolio and quality management system.' },
+    appearance: defaultAppearance,
+    navbar: {
+      items: defaultNavbarItems,
+      type: 'horizontal',
+      layout: 'wrap',
+      behavior: 'grid'
+    },
+    modules: defaultModules,
+    contact: {}
+  }
+});
+
 export const PortfolioProvider = ({ children }) => {
   const [store, setStore] = useState(getInitialState);
+  const [loading, setLoading] = useState(true);
+  const [dbError, setDbError] = useState(null);
+
+  // Authenticated fetch helper
+  const apiCall = async (url, options = {}) => {
+    const token = sessionStorage.getItem('qa-admin-token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    };
+    
+    try {
+      const response = await fetch(url, { ...options, headers });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        
+        // Handle specific DB-500 error code
+        if (response.status === 500 && errData.code === 'DB-500') {
+          setDbError('DB-500');
+        }
+        
+        const error = new Error(errData.error || `HTTP error ${response.status}`);
+        error.code = errData.code || 'Server-500';
+        throw error;
+      }
+      return response.json();
+    } catch (err) {
+      console.error(`API Call failed to: ${url}`, err);
+      // Trigger error log endpoint on backend (non-blocking)
+      if (url !== '/api/errors' && token) {
+        fetch('/api/errors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: err.code || 'Server-500',
+            user: 'admin',
+            module: url.split('/')[2] || 'context',
+            action: options.method || 'GET',
+            details: err.message
+          })
+        }).catch(() => {});
+      }
+      throw err;
+    }
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    setDbError(null);
+    try {
+      const data = await apiCall('/api/portfolio');
+      setStore(data);
+    } catch (err) {
+      if (err.code === 'DB-500') {
+        setDbError('DB-500');
+      } else {
+        setDbError('Server-500');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-  }, [store]);
+    loadData();
+  }, []);
 
-  const updatePersonal = (payload) => {
-    setStore((prev) => ({
-      ...prev,
-      personal: {
-        ...prev.personal,
-        ...payload
-      }
-    }));
+  const updatePersonal = async (payload) => {
+    try {
+      await apiCall('/api/admin/personal', { method: 'PUT', body: JSON.stringify(payload) });
+      setStore((prev) => ({
+        ...prev,
+        personal: { ...prev.personal, ...payload }
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const updateSEO = (payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        seo: {
-          ...prev.settings.seo,
-          ...payload
+  const updateSEO = async (payload) => {
+    try {
+      await apiCall('/api/admin/settings/seo', { method: 'PUT', body: JSON.stringify(payload) });
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          seo: { ...prev.settings.seo, ...payload }
         }
-      }
-    }));
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const updateContact = (payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        contact: {
-          ...prev.settings.contact,
-          ...payload
+  const updateContact = async (payload) => {
+    try {
+      await apiCall('/api/admin/settings/contact', { method: 'PUT', body: JSON.stringify(payload) });
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          contact: { ...prev.settings.contact, ...payload }
         }
-      }
-    }));
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const updateAppearance = (payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        appearance: {
-          ...prev.settings.appearance,
-          ...payload
+  const updateAppearance = async (payload) => {
+    try {
+      await apiCall('/api/admin/settings/appearance', { method: 'PUT', body: JSON.stringify(payload) });
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          appearance: { ...prev.settings.appearance, ...payload }
         }
-      }
-    }));
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const setNavbar = (payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        navbar: {
-          ...prev.settings.navbar,
-          ...payload
+  const saveNavbarState = async (items, navbarConfig = {}) => {
+    try {
+      const payload = {
+        items,
+        type: navbarConfig.type || store.settings.navbar.type,
+        layout: navbarConfig.layout || store.settings.navbar.layout,
+        behavior: navbarConfig.behavior || store.settings.navbar.behavior
+      };
+      await apiCall('/api/admin/settings/navbar', { method: 'PUT', body: JSON.stringify(payload) });
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          navbar: { ...prev.settings.navbar, ...payload }
         }
-      }
-    }));
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const addNavbarItem = (item) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        navbar: {
-          ...prev.settings.navbar,
-          items: [...prev.settings.navbar.items, { id: createId('nav'), active: true, ...item }]
-        }
-      }
-    }));
+  const setNavbar = async (payload) => {
+    await saveNavbarState(store.settings.navbar.items, payload);
   };
 
-  const updateNavbarItem = (itemId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        navbar: {
-          ...prev.settings.navbar,
-          items: prev.settings.navbar.items.map((item) =>
-            item.id === itemId ? { ...item, ...payload } : item
-          )
-        }
-      }
-    }));
+  const addNavbarItem = async (item) => {
+    const newItem = { id: createId('nav'), active: true, ...item };
+    const nextItems = [...store.settings.navbar.items, newItem];
+    await saveNavbarState(nextItems);
   };
 
-  const deleteNavbarItem = (itemId) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        navbar: {
-          ...prev.settings.navbar,
-          items: prev.settings.navbar.items.filter((item) => item.id !== itemId)
-        }
-      }
-    }));
+  const updateNavbarItem = async (itemId, payload) => {
+    const nextItems = store.settings.navbar.items.map((item) =>
+      item.id === itemId ? { ...item, ...payload } : item
+    );
+    await saveNavbarState(nextItems);
   };
 
-  const reorderNavbarItems = (items) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        navbar: {
-          ...prev.settings.navbar,
-          items
-        }
-      }
-    }));
+  const deleteNavbarItem = async (itemId) => {
+    const nextItems = store.settings.navbar.items.filter((item) => item.id !== itemId);
+    await saveNavbarState(nextItems);
   };
 
-  const addProject = (project) => {
+  const reorderNavbarItems = async (items) => {
+    await saveNavbarState(items);
+  };
+
+  const addProject = async (project) => {
     const nextProject = {
-      id: createId('project'),
       title: project.title,
       description: project.description,
       titleKey: project.titleKey || null,
@@ -296,383 +273,524 @@ export const PortfolioProvider = ({ children }) => {
       enableMetrics: project.enableMetrics || true
     };
 
-    setStore((prev) => ({
-      ...prev,
-      projects: [nextProject, ...prev.projects]
-    }));
-  };
-
-  const updateProject = (projectId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      projects: prev.projects.map((project) =>
-        project.id === projectId
-          ? {
-            ...project,
-            ...payload,
-            integrations: splitCsv(payload.integrations || project.integrations),
-            status: payload.status ?? project.status ?? 'active',
-            demoVisibility: payload.demoVisibility ?? project.demoVisibility ?? 'show',
-            metrics: {
-              ...project.metrics,
-              coverage: Number(payload.coverage ?? project.metrics.coverage),
-              improvements: Number(payload.improvements ?? project.metrics.improvements),
-              riskCoverage: Number(payload.riskCoverage ?? project.metrics.riskCoverage),
-              findingsCritical: Number(payload.findingsCritical ?? project.metrics.findingsCritical),
-              bugsResolved: Number(payload.bugsResolved ?? project.metrics.bugsResolved),
-              ambiguitiesFound: Number(payload.ambiguitiesFound ?? project.metrics.ambiguitiesFound),
-              qualityImpact: payload.qualityImpact ?? project.metrics.qualityImpact
-            }
-          }
-          : project
-      )
-    }));
-  };
-
-  const deleteProject = (projectId) => {
-    setStore((prev) => ({
-      ...prev,
-      projects: prev.projects.filter((project) => project.id !== projectId)
-    }));
-  };
-
-  const duplicateProject = (projectId) => {
-    setStore((prev) => {
-      const project = prev.projects.find((item) => item.id === projectId);
-      if (!project) return prev;
-      const copy = {
-        ...project,
-        id: createId('project'),
-        title: `${project.title} (Copy)`,
-        demo: project.demo,
-        repository: project.repository
-      };
-      return {
+    try {
+      const res = await apiCall('/api/admin/projects', { method: 'POST', body: JSON.stringify(nextProject) });
+      nextProject.id = res.id;
+      setStore((prev) => ({
         ...prev,
-        projects: [copy, ...prev.projects]
-      };
-    });
+        projects: [nextProject, ...prev.projects]
+      }));
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const addSkill = (skill) => {
-    setStore((prev) => ({
-      ...prev,
-      skills: [
-        {
-          id: createId('skill'),
-          name: skill.name,
-          icon: skill.icon,
-          level: Number(skill.level) || 0,
-          category: skill.category,
-          tools: splitCsv(skill.tools),
-          relation: splitCsv(skill.relation),
-          description: skill.description,
-          color: skill.color || '#7c3aed'
-        },
-        ...prev.skills
-      ]
-    }));
-  };
-
-  const updateSkill = (skillId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      skills: prev.skills.map((skill) =>
-        skill.id === skillId
-          ? {
-            ...skill,
-            ...payload,
-            level: Number(payload.level ?? skill.level),
-            tools: splitCsv(payload.tools || skill.tools),
-            relation: splitCsv(payload.relation || skill.relation)
-          }
-          : skill
-      )
-    }));
-  };
-
-  const deleteSkill = (skillId) => {
-    setStore((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((skill) => skill.id !== skillId)
-    }));
-  };
-
-  const reorderSkills = (newOrder) => {
-    setStore((prev) => ({
-      ...prev,
-      skills: newOrder
-    }));
-  };
-
-  const addCertification = (cert) => {
-    setStore((prev) => ({
-      ...prev,
-      certifications: [
-        {
-          id: createId('cert'),
-          title: cert.title,
-          authority: cert.authority,
-          image: cert.image,
-          date: cert.date,
-          tools: splitCsv(cert.tools),
-          integrations: splitCsv(cert.integrations),
-          summary: cert.summary,
-          url: cert.url,
-          status: cert.status || 'Active'
-        },
-        ...prev.certifications
-      ]
-    }));
-  };
-
-  const updateCertification = (certId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      certifications: prev.certifications.map((cert) =>
-        cert.id === certId
-          ? {
-            ...cert,
-            ...payload,
-            tools: splitCsv(payload.tools || cert.tools),
-            integrations: splitCsv(payload.integrations || cert.integrations)
-          }
-          : cert
-      )
-    }));
-  };
-
-  const deleteCertification = (certId) => {
-    setStore((prev) => ({
-      ...prev,
-      certifications: prev.certifications.filter((cert) => cert.id !== certId)
-    }));
-  };
-
-  const reorderCertifications = (newOrder) => {
-    setStore((prev) => ({
-      ...prev,
-      certifications: newOrder
-    }));
-  };
-
-  const addDocumentationTemplate = (template) => {
-    setStore((prev) => ({
-      ...prev,
-      documentation: {
-        ...prev.documentation,
-        templates: [
-          {
-            id: createId('doc'),
-            title: template.title,
-            category: template.category,
-            type: template.type,
-            template: template.template,
-            questions: splitCsv(template.questions),
-            parameters: splitCsv(template.parameters),
-            methodology: template.methodology,
-            checklist: splitCsv(template.checklist),
-            strategies: splitCsv(template.strategies)
-          },
-          ...prev.documentation.templates
-        ]
+  const updateProject = async (projectId, payload) => {
+    const updatedProject = {
+      ...payload,
+      integrations: splitCsv(payload.integrations),
+      metrics: {
+        coverage: Number(payload.coverage),
+        improvements: Number(payload.improvements),
+        riskCoverage: Number(payload.riskCoverage),
+        findingsCritical: Number(payload.findingsCritical),
+        bugsResolved: Number(payload.bugsResolved),
+        ambiguitiesFound: Number(payload.ambiguitiesFound),
+        qualityImpact: payload.qualityImpact
       }
-    }));
-  };
-
-  const updateDocumentationTemplate = (templateId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      documentation: {
-        ...prev.documentation,
-        templates: prev.documentation.templates.map((template) =>
-          template.id === templateId
-            ? {
-              ...template,
-              ...payload,
-              questions: splitCsv(payload.questions || template.questions),
-              parameters: splitCsv(payload.parameters || template.parameters),
-              checklist: splitCsv(payload.checklist || template.checklist),
-              strategies: splitCsv(payload.strategies || template.strategies)
-            }
-            : template
-        )
-      }
-    }));
-  };
-
-  const deleteDocumentationTemplate = (templateId) => {
-    setStore((prev) => ({
-      ...prev,
-      documentation: {
-        ...prev.documentation,
-        templates: prev.documentation.templates.filter((template) => template.id !== templateId)
-      }
-    }));
-  };
-
-  const addModule = (module) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        modules: [
-          {
-            id: createId('module'),
-            name: module.name,
-            icon: module.icon,
-            description: module.description,
-            cards: splitCsv(module.cards),
-            colors: {
-              accent: module.accentColor || '#38bdf8',
-              surface: module.surfaceColor || '#0f172a'
-            },
-            animation: module.animation || 'fade-in'
-          },
-          ...prev.settings.modules
-        ]
-      }
-    }));
-  };
-
-  const updateModule = (moduleId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        modules: prev.settings.modules.map((module) =>
-          module.id === moduleId
-            ? {
-              ...module,
-              ...payload,
-              cards: splitCsv(payload.cards || module.cards),
-              colors: {
-                accent: payload.accentColor || module.colors.accent,
-                surface: payload.surfaceColor || module.colors.surface
-              }
-            }
-            : module
-        )
-      }
-    }));
-  };
-
-  const deleteModule = (moduleId) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        modules: prev.settings.modules.filter((module) => module.id !== moduleId)
-      }
-    }));
-  };
-
-  const reorderModules = (newOrder) => {
-    setStore((prev) => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        modules: newOrder
-      }
-    }));
-  };
-
-  const addAboutItem = (item) => {
-    setStore((prev) => ({
-      ...prev,
-      aboutItems: [
-        {
-          id: createId('about'),
-          type: item.type || 'pilar',
-          title: item.title,
-          description: item.description,
-          position: item.position || 'center',
-          priority: Number(item.priority) || 0,
-          status: item.status || 'active',
-          behavior: item.behavior || 'card'
-        },
-        ...prev.aboutItems
-      ]
-    }));
-  };
-
-  const updateAboutItem = (itemId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      aboutItems: prev.aboutItems.map((item) =>
-        item.id === itemId ? { ...item, ...payload, priority: Number(payload.priority ?? item.priority) } : item
-      )
-    }));
-  };
-
-  const deleteAboutItem = (itemId) => {
-    setStore((prev) => ({
-      ...prev,
-      aboutItems: prev.aboutItems.filter((item) => item.id !== itemId)
-    }));
-  };
-
-  const reorderAboutItems = (newOrder) => {
-    setStore((prev) => ({
-      ...prev,
-      aboutItems: newOrder
-    }));
-  };
-
-  const addHeroCard = (card) => {
-    setStore((prev) => ({
-      ...prev,
-      heroCards: [
-        {
-          id: createId('hero-card'),
-          title: card.title,
-          description: card.description,
-          icon: card.icon || 'ShieldCheck',
-          status: card.status || 'active',
-          priority: Number(card.priority) || 0
-        },
-        ...prev.heroCards
-      ]
-    }));
-  };
-
-  const updateHeroCard = (cardId, payload) => {
-    setStore((prev) => ({
-      ...prev,
-      heroCards: prev.heroCards.map((card) =>
-        card.id === cardId ? { ...card, ...payload, priority: Number(payload.priority ?? card.priority) } : card
-      )
-    }));
-  };
-
-  const deleteHeroCard = (cardId) => {
-    setStore((prev) => ({
-      ...prev,
-      heroCards: prev.heroCards.filter((card) => card.id !== cardId)
-    }));
-  };
-
-  const reorderHeroCards = (newOrder) => {
-    setStore((prev) => ({
-      ...prev,
-      heroCards: newOrder
-    }));
-  };
-
-  const duplicateHeroCard = (cardId) => {
-    setStore((prev) => {
-      const card = prev.heroCards.find((item) => item.id === cardId);
-      if (!card) return prev;
-      const copy = {
-        ...card,
-        id: createId('hero-card'),
-        title: `${card.title} (Copy)`,
-      };
-      return {
+    };
+    try {
+      await apiCall(`/api/admin/projects/${projectId}`, { method: 'PUT', body: JSON.stringify(updatedProject) });
+      setStore((prev) => ({
         ...prev,
-        heroCards: [copy, ...prev.heroCards]
-      };
-    });
+        projects: prev.projects.map((project) =>
+          project.id === projectId ? { ...project, ...updatedProject } : project
+        )
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteProject = async (projectId) => {
+    try {
+      await apiCall(`/api/admin/projects/${projectId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        projects: prev.projects.filter((project) => project.id !== projectId)
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const duplicateProject = async (projectId) => {
+    const project = store.projects.find((item) => item.id === projectId);
+    if (!project) return;
+    const copy = {
+      ...project,
+      title: `${project.title} (Copy)`
+    };
+    await addProject(copy);
+  };
+
+  const addSkill = async (skill) => {
+    const nextSkill = {
+      name: skill.name,
+      icon: skill.icon,
+      level: Number(skill.level) || 0,
+      category: skill.category,
+      tools: splitCsv(skill.tools),
+      relation: splitCsv(skill.relation),
+      description: skill.description,
+      color: skill.color || '#7c3aed',
+      status: skill.status || 'active'
+    };
+    try {
+      const res = await apiCall('/api/admin/skills', { method: 'POST', body: JSON.stringify(nextSkill) });
+      nextSkill.id = res.id;
+      setStore((prev) => ({
+        ...prev,
+        skills: [...prev.skills, nextSkill]
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateSkill = async (skillId, payload) => {
+    const updatedSkill = {
+      ...payload,
+      level: Number(payload.level),
+      tools: splitCsv(payload.tools),
+      relation: splitCsv(payload.relation)
+    };
+    try {
+      await apiCall(`/api/admin/skills/${skillId}`, { method: 'PUT', body: JSON.stringify(updatedSkill) });
+      setStore((prev) => ({
+        ...prev,
+        skills: prev.skills.map((skill) =>
+          skill.id === skillId ? { ...skill, ...updatedSkill } : skill
+        )
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteSkill = async (skillId) => {
+    try {
+      await apiCall(`/api/admin/skills/${skillId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        skills: prev.skills.filter((skill) => skill.id !== skillId)
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const reorderSkills = async (newOrder) => {
+    try {
+      const ids = newOrder.map((s) => s.id);
+      await apiCall('/api/admin/skills/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
+      setStore((prev) => ({
+        ...prev,
+        skills: newOrder
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addCertification = async (cert) => {
+    const nextCert = {
+      title: cert.title,
+      authority: cert.authority,
+      image: cert.image,
+      date: cert.date,
+      tools: splitCsv(cert.tools),
+      integrations: splitCsv(cert.integrations),
+      summary: cert.summary,
+      url: cert.url,
+      status: cert.status || 'Active'
+    };
+    try {
+      const res = await apiCall('/api/admin/certifications', { method: 'POST', body: JSON.stringify(nextCert) });
+      nextCert.id = res.id;
+      setStore((prev) => ({
+        ...prev,
+        certifications: [...prev.certifications, nextCert]
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateCertification = async (certId, payload) => {
+    const updatedCert = {
+      ...payload,
+      tools: splitCsv(payload.tools),
+      integrations: splitCsv(payload.integrations)
+    };
+    try {
+      await apiCall(`/api/admin/certifications/${certId}`, { method: 'PUT', body: JSON.stringify(updatedCert) });
+      setStore((prev) => ({
+        ...prev,
+        certifications: prev.certifications.map((cert) =>
+          cert.id === certId ? { ...cert, ...updatedCert } : cert
+        )
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteCertification = async (certId) => {
+    try {
+      await apiCall(`/api/admin/certifications/${certId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        certifications: prev.certifications.filter((cert) => cert.id !== certId)
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const reorderCertifications = async (newOrder) => {
+    try {
+      const ids = newOrder.map((c) => c.id);
+      await apiCall('/api/admin/certifications/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
+      setStore((prev) => ({
+        ...prev,
+        certifications: newOrder
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addDocumentationTemplate = async (template) => {
+    const nextTpl = {
+      title: template.title,
+      category: template.category,
+      type: template.type,
+      template: template.template,
+      questions: splitCsv(template.questions),
+      parameters: splitCsv(template.parameters),
+      methodology: template.methodology,
+      checklist: splitCsv(template.checklist),
+      strategies: splitCsv(template.strategies)
+    };
+    try {
+      const res = await apiCall('/api/admin/documentation', { method: 'POST', body: JSON.stringify(nextTpl) });
+      nextTpl.id = res.id;
+      setStore((prev) => ({
+        ...prev,
+        documentation: {
+          ...prev.documentation,
+          templates: [nextTpl, ...prev.documentation.templates]
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateDocumentationTemplate = async (templateId, payload) => {
+    const updatedTpl = {
+      ...payload,
+      questions: splitCsv(payload.questions),
+      parameters: splitCsv(payload.parameters),
+      checklist: splitCsv(payload.checklist),
+      strategies: splitCsv(payload.strategies)
+    };
+    try {
+      await apiCall(`/api/admin/documentation/${templateId}`, { method: 'PUT', body: JSON.stringify(updatedTpl) });
+      setStore((prev) => ({
+        ...prev,
+        documentation: {
+          ...prev.documentation,
+          templates: prev.documentation.templates.map((template) =>
+            template.id === templateId ? { ...template, ...updatedTpl } : template
+          )
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteDocumentationTemplate = async (templateId) => {
+    try {
+      await apiCall(`/api/admin/documentation/${templateId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        documentation: {
+          ...prev.documentation,
+          templates: prev.documentation.templates.filter((template) => template.id !== templateId)
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addModule = async (module) => {
+    const moduleId = module.id || `module-${Math.random().toString(36).slice(2, 9)}`;
+    const nextNavbarItem = {
+      id: `nav-${moduleId}`,
+      name: module.name,
+      path: `/modules/${moduleId}`,
+      active: module.status === 'active' || module.status === 'creative' || module.active !== false,
+      status: module.status || 'active',
+      creativeMessage: module.creativeMessage || ''
+    };
+
+    const nextModule = {
+      id: moduleId,
+      name: module.name,
+      icon: module.icon,
+      description: module.description,
+      status: module.status || 'active',
+      creativeMessage: module.creativeMessage || '',
+      visible: module.visible !== false,
+      configurado: module.configurado === true || module.configurado === 1,
+      elementsType: module.elementsType || 'cards',
+      elements: module.elements || [],
+      accentColor: module.accentColor || '#38bdf8',
+      surfaceColor: module.surfaceColor || '#0f172a',
+      animation: module.animation || 'fade-in'
+    };
+
+    try {
+      await apiCall('/api/admin/modules', { method: 'POST', body: JSON.stringify(nextModule) });
+      
+      const nextNavbarItems = [...store.settings.navbar.items, nextNavbarItem];
+      await saveNavbarState(nextNavbarItems);
+
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          modules: [nextModule, ...prev.settings.modules]
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateModule = async (moduleId, payload) => {
+    const nextModule = {
+      ...payload,
+      configurado: payload.configurado === true || payload.configurado === 1
+    };
+
+    try {
+      await apiCall(`/api/admin/modules/${moduleId}`, { method: 'PUT', body: JSON.stringify(nextModule) });
+
+      const nextNavbarItems = store.settings.navbar.items.map((item) =>
+        item.id === `nav-${moduleId}` || item.path === `/modules/${moduleId}`
+          ? {
+              ...item,
+              name: payload.name || item.name,
+              active: payload.status === 'active' || payload.status === 'creative' || payload.active !== false,
+              status: payload.status || item.status || 'active',
+              creativeMessage: payload.creativeMessage || item.creativeMessage || ''
+            }
+          : item
+      );
+      await saveNavbarState(nextNavbarItems);
+
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          modules: prev.settings.modules.map((module) =>
+            module.id === moduleId ? { ...module, ...nextModule } : module
+          )
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteModule = async (moduleId) => {
+    try {
+      await apiCall(`/api/admin/modules/${moduleId}`, { method: 'DELETE' });
+
+      const nextNavbarItems = store.settings.navbar.items.filter(
+        (item) => item.id !== `nav-${moduleId}` && item.path !== `/modules/${moduleId}`
+      );
+      await saveNavbarState(nextNavbarItems);
+
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          modules: prev.settings.modules.filter((module) => module.id !== moduleId)
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const reorderModules = async (newOrder) => {
+    try {
+      const ids = newOrder.map((m) => m.id);
+      await apiCall('/api/admin/modules/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
+      setStore((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          modules: newOrder
+        }
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addAboutItem = async (item) => {
+    const nextItem = {
+      type: item.type || 'pilar',
+      title: item.title,
+      description: item.description,
+      position: item.position || 'center',
+      priority: Number(item.priority) || 0,
+      status: item.status || 'active',
+      behavior: item.behavior || 'card'
+    };
+    try {
+      const res = await apiCall('/api/admin/about-items', { method: 'POST', body: JSON.stringify(nextItem) });
+      nextItem.id = res.id;
+      setStore((prev) => ({
+        ...prev,
+        aboutItems: [nextItem, ...prev.aboutItems]
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateAboutItem = async (itemId, payload) => {
+    const updatedItem = {
+      ...payload,
+      priority: Number(payload.priority)
+    };
+    try {
+      await apiCall(`/api/admin/about-items/${itemId}`, { method: 'PUT', body: JSON.stringify(updatedItem) });
+      setStore((prev) => ({
+        ...prev,
+        aboutItems: prev.aboutItems.map((item) =>
+          item.id === itemId ? { ...item, ...updatedItem } : item
+        )
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteAboutItem = async (itemId) => {
+    try {
+      await apiCall(`/api/admin/about-items/${itemId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        aboutItems: prev.aboutItems.filter((item) => item.id !== itemId)
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const reorderAboutItems = async (newOrder) => {
+    try {
+      const ids = newOrder.map((a) => a.id);
+      await apiCall('/api/admin/about-items/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
+      setStore((prev) => ({
+        ...prev,
+        aboutItems: newOrder
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addHeroCard = async (card) => {
+    const nextCard = {
+      title: card.title,
+      description: card.description,
+      icon: card.icon || 'ShieldCheck',
+      status: card.status || 'active',
+      priority: Number(card.priority) || 0
+    };
+    try {
+      const res = await apiCall('/api/admin/hero-cards', { method: 'POST', body: JSON.stringify(nextCard) });
+      nextCard.id = res.id;
+      setStore((prev) => ({
+        ...prev,
+        heroCards: [nextCard, ...prev.heroCards]
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateHeroCard = async (cardId, payload) => {
+    const updatedCard = {
+      ...payload,
+      priority: Number(payload.priority)
+    };
+    try {
+      await apiCall(`/api/admin/hero-cards/${cardId}`, { method: 'PUT', body: JSON.stringify(updatedCard) });
+      setStore((prev) => ({
+        ...prev,
+        heroCards: prev.heroCards.map((card) =>
+          card.id === cardId ? { ...card, ...updatedCard } : card
+        )
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteHeroCard = async (cardId) => {
+    try {
+      await apiCall(`/api/admin/hero-cards/${cardId}`, { method: 'DELETE' });
+      setStore((prev) => ({
+        ...prev,
+        heroCards: prev.heroCards.filter((card) => card.id !== cardId)
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const reorderHeroCards = async (newOrder) => {
+    try {
+      const ids = newOrder.map((h) => h.id);
+      await apiCall('/api/admin/hero-cards/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
+      setStore((prev) => ({
+        ...prev,
+        heroCards: newOrder
+      }));
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const duplicateHeroCard = async (cardId) => {
+    const card = store.heroCards.find((item) => item.id === cardId);
+    if (!card) return;
+    const copy = {
+      ...card,
+      title: `${card.title} (Copy)`
+    };
+    await addHeroCard(copy);
   };
 
   const actions = {
@@ -712,11 +830,12 @@ export const PortfolioProvider = ({ children }) => {
     updateHeroCard,
     deleteHeroCard,
     reorderHeroCards,
-    duplicateHeroCard
+    duplicateHeroCard,
+    reload: loadData
   };
 
   return (
-    <PortfolioContext.Provider value={{ store, actions }}>
+    <PortfolioContext.Provider value={{ store, loading, dbError, actions }}>
       {children}
     </PortfolioContext.Provider>
   );

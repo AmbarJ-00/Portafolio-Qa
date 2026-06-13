@@ -8,7 +8,10 @@
   }
 
   body {
+    background-color: var(--bg-global, #f8fafc);
+    color: var(--color-text, #0f172a);
     @apply antialiased selection:bg-brand-electric-500 dark:selection:bg-brand-lilac-500 selection:text-white;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Custom high-contrast focus rings for accessibility compliance */
@@ -18,17 +21,30 @@
 }
 
 @layer components {
-  /* Premium Glassmorphism styling variables */
+  /* Premium Glassmorphism styling variables using dynamic CSS properties */
   .glass-card {
-    @apply bg-white/70 dark:bg-brand-navy-900/60 backdrop-blur-md border border-brand-ash-200/50 dark:border-brand-navy-800/40 shadow-sm transition-all duration-300;
+    background-color: var(--bg-card, rgba(255, 255, 255, 0.7));
+    border: 1px solid var(--color-border, rgba(226, 232, 240, 0.5));
+    box-shadow: 0 4px 6px -1px var(--color-shadow, rgba(0, 0, 0, 0.05));
+    backdrop-filter: blur(12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .glass-card-hover {
-    @apply hover:bg-white/90 hover:dark:bg-brand-navy-900/80 hover:border-brand-electric-500/30 hover:dark:border-brand-lilac-500/20 hover:shadow-md hover:shadow-brand-electric-500/5 dark:hover:shadow-brand-lilac-500/5;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card-hover:hover {
+    border-color: var(--color-button, #7c3aed);
+    box-shadow: 0 10px 15px -3px var(--color-shadow, rgba(0, 0, 0, 0.1));
+    transform: translateY(-2px);
   }
 
   .nav-blur {
-    @apply bg-white/80 dark:bg-brand-navy-950/80 backdrop-blur-md border-b border-brand-ash-200/30 dark:border-brand-navy-800/20;
+    background-color: var(--color-navbar, rgba(255, 255, 255, 0.8));
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border, rgba(226, 232, 240, 0.3));
+    transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
   }
 
   /* Beautiful glowing indicators */
