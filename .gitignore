@@ -39,5 +39,10 @@ qa/
 .env.staging
 
 # Private Admin Documentation
-docs/admin-guide.md
-docs/admin-guide.html
+docs/
+
+# vista del admin completo
+admin/
+
+# configuracion y detalles de la BD
+config/
