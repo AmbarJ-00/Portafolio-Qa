@@ -41,8 +41,8 @@ qa/
 # Private Admin Documentation
 docs/
 
-# vista del admin completo
-admin/
+# vista del admin completo (do not ignore src/admin)
+# admin/
 
-# configuracion y detalles de la BD
-config/
+# configuracion y detalles de la BD (do not ignore src/config)
+# config/
