@@ -9,9 +9,9 @@ import { Plus, Trash2, Copy, Edit, X, HelpCircle } from 'lucide-react';
 import Modal from '../../components/Modal.jsx';
 
 const projectSchema = z.object({
-  title: z.string().min(3, 'El título es obligatorio'),
-  description: z.string().min(15, 'La descripción es obligatoria'),
-  category: z.string().min(3, 'La categoría es obligatoria'),
+  title: z.string().min(3, 'El título es obligatorio, minimo 3 caracteres'),
+  description: z.string().min(15, 'La descripción es obligatoria, minimo 15 caracteres'),
+  category: z.string().min(3, 'La categoría es obligatoria, minimo 3 caracteres'),
   demo: z.string().url('La URL de demo debe ser válida').optional().or(z.literal('')),
   repository: z.string().url('La URL del repositorio debe ser válida').optional().or(z.literal('')),
   image: z.string().url('La URL de imagen debe ser válida').optional().or(z.literal('')),
@@ -190,13 +190,13 @@ const ProjectsManager = () => {
             >
               <HelpCircle className="w-4 h-4" /> Ayuda
             </button>
-            <button
+            {/* <button
               onClick={() => { closeEditor(); setIsEditing(false); }}
               className="inline-flex items-center gap-2 rounded-2xl border border-[#09D8C7] bg-[#09D8C7]/10 px-4 py-3 text-sm font-semibold text-[#09D8C7] hover:bg-[#09D8C7]/20 transition"
             >
               <Plus className="w-4 h-4" />
               Nuevo proyecto
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

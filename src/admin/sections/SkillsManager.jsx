@@ -9,6 +9,7 @@ import * as z from 'zod';
 import { usePortfolio } from '../../context/PortfolioContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { ConfirmDialog } from '../../components/ConfirmDialog.jsx';
+import * as LucideIcons from "lucide-react";
 import {
   Plus,
   Trash2,
@@ -27,6 +28,8 @@ import {
   GitBranch
 } from 'lucide-react';
 import Modal from '../../components/Modal.jsx';
+
+
 
 const skillSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -56,6 +59,7 @@ const helpIcons = [
   { name: 'Code', Icon: Code },
   { name: 'Bug', Icon: Bug },
   { name: 'Database', Icon: Database },
+  { name: 'container', Icon: container },
   { name: 'Shield', Icon: Shield },
   { name: 'Globe', Icon: Globe },
   { name: 'Monitor', Icon: Monitor },

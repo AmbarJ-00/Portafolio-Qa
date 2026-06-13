@@ -23,7 +23,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Social Icons */}
+          {/* Social Icons
           <div className="flex space-x-4">
             <a
               href={store.settings.contact.github || store.personal.github}
@@ -43,7 +43,7 @@ const Footer = () => {
             >
               <Linkedin className="w-4 h-4" />
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

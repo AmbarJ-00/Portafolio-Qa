@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
+import * as LucideIcons from 'lucide-react';
 import {
   HelpCircle, X,
   Layers, Database, Server, HardDrive, GitBranch, Trello, Cloud,
@@ -123,15 +124,15 @@ const Skills = () => {
         </motion.div>
 
         {/* Dynamic Details Modal Overlay */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {selectedSkill && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-navy-950/80 backdrop-blur-sm" role="dialog" aria-modal="true">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                transition={{ duration: 0.3, cubicBezier: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-lg glass-card rounded-2xl shadow-2xl overflow-hidden border border-brand-ash-200 dark:border-brand-navy-800 bg-white dark:bg-brand-navy-950 flex flex-col max-h-[85vh]"
+                transition={{ duration: 0.45, cubicBezier: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-lg glass-card rounded-2xl shadow-2xl overflow-hidden border border-brand-ash-200 dark:border-brand-navy-800 bg-white dark:bg-brand-navy-950 flex flex-col  max-h-[85vh]"
               >
                 {/* Modal Header */}
                 <div className="p-6 bg-brand-ash-100/50 dark:bg-brand-navy-900/50 border-b border-brand-ash-200 dark:border-brand-navy-800 flex items-center justify-between shrink-0">

@@ -88,9 +88,9 @@ const AdminLogin = () => {
           </button>
         </form>
 
-        <p className="text-xs text-[#9CA3AF] mt-5">
+        {/* <p className="text-xs text-[#9CA3AF] mt-5">
           Define <code className="rounded bg-[#0D1A2F] px-1 py-0.5">VITE_ADMIN_PASSWORD</code> en tu entorno para acceso seguro.
-        </p>
+        </p> */}
       </div>
     </div>
   );

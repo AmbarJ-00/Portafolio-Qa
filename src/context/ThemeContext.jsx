@@ -7,7 +7,7 @@ export const ThemeProvider = ({ children }) => {
     // Check local storage or defaults to system theme
     const saved = localStorage.getItem('portfolio-theme');
     if (saved) return saved;
-    
+
     return 'light';
   });
 

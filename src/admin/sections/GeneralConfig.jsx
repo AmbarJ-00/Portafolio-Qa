@@ -193,11 +193,11 @@ const GeneralConfig = () => {
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
             {[
               { name: 'name', label: 'Nombre', placeholder: 'Ambar Ramon' },
-              { name: 'role', label: 'Rol profesional', placeholder: 'QA Lead' },
+              { name: 'role', label: 'Rol profesional', placeholder: 'QA Engineer' },
               { name: 'tagline', label: 'Frase descriptiva', placeholder: 'Automatización y pruebas con foco en calidad.' },
               { name: 'location', label: 'Ubicación', placeholder: 'Rep. Dominicana, Santo Domingo' },
-              { name: 'availability', label: 'Disponibilidad', placeholder: 'Disponible para proyectos remotos o presenciales' },
-              { name: 'workMode', label: 'Modalidad', placeholder: 'Remoto / Híbrido / Presencial' }
+              { name: 'availability', label: 'Disponibilidad', placeholder: 'Disponible para proyectos remotos o hibridos' },
+              { name: 'workMode', label: 'Modalidad', placeholder: 'Remoto / Híbrido' }
             ].map((field) => (
               <div key={field.name} className="space-y-2">
                 <label htmlFor={field.name} className="text-sm font-semibold text-white">{field.label}</label>
@@ -248,7 +248,7 @@ const GeneralConfig = () => {
               <input
                 id="seoTitle"
                 type="text"
-                placeholder="Sofía Rodríguez | QA Lead"
+                placeholder="Ambar Ramon | QA Engineer "
                 {...register('seoTitle')}
                 className="w-full rounded-2xl border border-[#09D8C7]/20 bg-[#0D1A2F] px-4 py-3 text-white outline-none transition focus:border-[#09D8C7] focus:ring-[#09D8C7]/30"
               />
