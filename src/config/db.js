@@ -289,6 +289,10 @@ export async function initDb() {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         ['personal-default', p.name, p.title, p.subtitle, p.bio, p.email, p.linkedin, p.github, p.location, p.cv || '']
       );
+    } else {
+      // Self-healing migration to correct identity in existing DB records
+      await conn.query(`UPDATE personal_info SET name = 'Ambar Ramon' WHERE name = 'Sofia Rodriguez'`);
+      await conn.query(`UPDATE projects SET repository = REPLACE(repository, 'sofiarodriguez-qa', 'AmbarJ-00') WHERE repository LIKE '%sofiarodriguez-qa%'`);
     }
 
     const [heroCount] = await conn.query('SELECT COUNT(*) as count FROM hero_cards');

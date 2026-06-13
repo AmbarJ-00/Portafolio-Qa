@@ -15,7 +15,7 @@ const Footer = () => {
           {/* Brand/Rights */}
           <div className="text-center md:text-left">
             <p className="text-sm font-semibold text-brand-navy-800 dark:text-white">
-              © {currentYear} {store.personal.name}. {t('footer.rights')}
+              © {currentYear} {store?.personal?.name || "Ambar Ramon"}. {t('footer.rights')}
             </p>
             <p className="text-xs text-brand-navy-500 dark:text-brand-ash-400 mt-1 flex items-center gap-1 justify-center md:justify-start">
               <ShieldAlert className="w-3.5 h-3.5 text-brand-electric-500" />

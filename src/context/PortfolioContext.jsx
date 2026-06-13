@@ -47,6 +47,48 @@ const splitCsv = (value) =>
       ? value
       : [];
 
+const getFallbackState = () => ({
+  personal: defaultPortfolioConfig.personal || {
+    name: "Ambar Ramon",
+    roleKey: "personal.role",
+    taglineKey: "personal.tagline",
+    location: "Republica dominicana, Santo domingo",
+    email: "ambarJob007@gmail.com",
+    github: "https://github.com/AmbarJ-00",
+    linkedin: "https://www.linkedin.com/in/ambarrq/"
+  },
+  aboutItems: [
+    { id: 'about-1', type: 'mision', title: 'Misión Profesional', description: 'Asegurar la calidad del software mediante metodologías ágiles y automatización eficiente.', position: 'center', priority: 1, status: 'active', behavior: 'card' }
+  ],
+  heroCards: [
+    { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
+    { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
+  ],
+  projects: defaultPortfolioConfig.projects || [],
+  skills: defaultPortfolioConfig.skills || [],
+  certifications: defaultPortfolioConfig.certifications || [],
+  documentation: defaultPortfolioConfig.documentation || { templates: [] },
+  settings: {
+    seo: defaultPortfolioConfig.settings?.seo || { title: 'Ambar Ramon | QA Lead', description: 'QA lead portfolio and quality management system.' },
+    appearance: defaultAppearance,
+    navbar: {
+      items: defaultNavbarItems,
+      type: 'horizontal',
+      layout: 'wrap',
+      behavior: 'grid'
+    },
+    modules: defaultModules,
+    contact: {
+      email: defaultPortfolioConfig.personal?.email || '',
+      linkedin: defaultPortfolioConfig.personal?.linkedin || '',
+      github: defaultPortfolioConfig.personal?.github || '',
+      phone: '',
+      alternativeContact: '',
+      country: defaultPortfolioConfig.personal?.location || ''
+    }
+  }
+});
+
 const getInitialState = () => ({
   personal: {},
   aboutItems: [],
@@ -125,11 +167,13 @@ export const PortfolioProvider = ({ children }) => {
       const data = await apiCall('/api/portfolio');
       setStore(data);
     } catch (err) {
+      console.warn("Using fallback portfolio data due to connection failure:", err.message);
       if (err.code === 'DB-500') {
         setDbError('DB-500');
       } else {
         setDbError('Server-500');
       }
+      setStore(getFallbackState());
     } finally {
       setLoading(false);
     }

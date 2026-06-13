@@ -6,7 +6,7 @@ const SEO = ({ title, description, path = "" }) => {
   
   useEffect(() => {
     // 1. Update Title tag
-    const baseTitle = "Sofia Rodriguez | QA Lead";
+    const baseTitle = "Ambar Ramon | QA Lead";
     document.title = title ? `${title} | ${baseTitle}` : baseTitle;
 
     // 2. Update Meta Description

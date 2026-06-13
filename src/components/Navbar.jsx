@@ -21,7 +21,7 @@ const Navbar = () => {
     document.documentElement.lang = nextLang;
   };
 
-  const navLinks = store.settings.navbar.items.filter((item) => {
+  const navLinks = store?.settings?.navbar?.items?.filter((item) => {
     const status = item.status || (item.active ? 'active' : 'inactive');
     return (
       status !== 'inactive' &&
@@ -29,7 +29,7 @@ const Navbar = () => {
       !item.path.startsWith('/admin') &&
       !item.path.startsWith('/backoffice')
     );
-  });
+  }) || [];
 
   const maxDirectLinks = 5;
   const directLinks = navLinks.slice(0, maxDirectLinks);
@@ -44,12 +44,12 @@ const Navbar = () => {
             <Link 
               to="/" 
               className="font-display font-bold text-xl tracking-tight text-brand-navy-800 dark:text-white flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand-electric-500 rounded"
-              aria-label="Sofia Rodriguez QA Lead Home"
+              aria-label="Ambar Ramon QA Lead Home"
             >
               <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-navy-800 to-brand-electric-500 dark:from-brand-electric-500 dark:to-brand-lilac-500 flex items-center justify-center text-white text-sm font-extrabold shadow-sm">
-                SR
+                AR
               </span>
-              <span className="hidden sm:inline">Sofia Rodriguez</span>
+              <span className="hidden sm:inline">Ambar Ramon</span>
               <span className="text-brand-electric-500 text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-electric-100/50 dark:bg-brand-electric-500/10 border border-brand-electric-500/25 hidden md:inline">
                 QA
               </span>
@@ -120,7 +120,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center space-x-3">
             {/* Social Links */}
             <a
-              href={store.settings.contact.github || store.personal.github}
+              href={store?.settings?.contact?.github || store?.personal?.github || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-brand-navy-600 dark:text-brand-ash-300 hover:text-brand-electric-600 hover:dark:text-brand-electric-300 rounded-md transition-colors"
@@ -129,7 +129,7 @@ const Navbar = () => {
               <Github className="w-5 h-5" />
             </a>
             <a
-              href={store.settings.contact.linkedin || store.personal.linkedin}
+              href={store?.settings?.contact?.linkedin || store?.personal?.linkedin || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-brand-navy-600 dark:text-brand-ash-300 hover:text-brand-electric-600 hover:dark:text-brand-electric-300 rounded-md transition-colors"
@@ -223,7 +223,7 @@ const Navbar = () => {
 
               <div className="flex items-center justify-around py-2">
                 <a
-                  href={store.settings.contact.github || store.personal.github}
+                  href={store?.settings?.contact?.github || store?.personal?.github || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-brand-navy-600 dark:text-brand-ash-300 font-medium py-1.5 px-3 hover:bg-brand-ash-50 rounded"
@@ -233,7 +233,7 @@ const Navbar = () => {
                   <span>GitHub</span>
                 </a>
                 <a
-                  href={store.settings.contact.linkedin || store.personal.linkedin}
+                  href={store?.settings?.contact?.linkedin || store?.personal?.linkedin || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-brand-navy-600 dark:text-brand-ash-300 font-medium py-1.5 px-3 hover:bg-brand-ash-50 rounded"

@@ -96,3 +96,11 @@ vercel
 ```bash
 vercel --prod
 ```
+
+---
+
+## 🔑 Acceso al Backoffice / Panel de Administración
+
+El portafolio cuenta con un panel de administración (Backoffice) centralizado para gestionar proyectos, habilidades, certificaciones, configuraciones de apariencia, SEO y enrutado.
+
+Para detalles técnicos sobre cómo acceder localmente o en un despliegue de producción en Vercel, consulte la documentación en el [Manual del Administrador](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/docs/admin-guide.md).

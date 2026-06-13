@@ -178,7 +178,7 @@ export const portfolioConfig = {
       category: "Web Automation & Performance",
       descriptionKey: "projects.ecommerce.description",
       demo: "https://ecommerce-demo.vercel.app",
-      repository: "https://github.com/sofiarodriguez-qa/ecommerce-test-automation",
+      repository: "https://github.com/AmbarJ-00/ecommerce-test-automation",
       integrations: ["Playwright", "GitHub Actions", "Allure Reports", "Postman", "Slack Notifications"],
       metrics: {
         coverage: 94,
@@ -198,7 +198,7 @@ export const portfolioConfig = {
       category: "API Testing & Security",
       descriptionKey: "projects.fintech.description",
       demo: "https://fintech-api-demo.vercel.app",
-      repository: "https://github.com/sofiarodriguez-qa/fintech-api-automation",
+      repository: "https://github.com/AmbarJ-00/fintech-api-automation",
       integrations: ["Postman", "Newman", "NodeJS", "OWASP ZAP", "DBeaver", "SQL Server"],
       metrics: {
         coverage: 100,
@@ -218,7 +218,7 @@ export const portfolioConfig = {
       category: "Mobile & Accessibility QA",
       descriptionKey: "projects.healthcare.description",
       demo: "https://healthcare-app-demo.vercel.app",
-      repository: "https://github.com/sofiarodriguez-qa/healthcare-mobile-qa",
+      repository: "https://github.com/AmbarJ-00/healthcare-mobile-qa",
       integrations: ["Appium", "BrowserStack", "Axe Core Accessibility", "Jira", "Xray"],
       metrics: {
         coverage: 88,

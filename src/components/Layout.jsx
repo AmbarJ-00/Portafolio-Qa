@@ -10,7 +10,7 @@ import ErrorScreen from './ErrorScreen.jsx';
 
 const Layout = ({ children }) => {
   const { theme } = useTheme();
-  const { store, loading, dbError } = usePortfolio();
+  const { store, loading, dbError, actions } = usePortfolio();
   const location = useLocation();
 
   if (loading) {
@@ -22,36 +22,24 @@ const Layout = ({ children }) => {
     );
   }
 
-  if (dbError) {
-    return (
-      <div className="flex flex-col min-h-screen bg-slate-950">
-        <Navbar />
-        <div className="flex-grow flex items-center justify-center">
-          <ErrorScreen code={dbError} />
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   const colors = store.settings?.appearance?.colors || {};
   const currentColors = theme === 'dark' ? (colors.dark || {}) : (colors.light || {});
 
   useEffect(() => {
     const root = document.documentElement;
-    // Set custom properties dynamically on document root
-    root.style.setProperty('--bg-global', currentColors.background || (theme === 'dark' ? '#020617' : '#f8fafc'));
-    root.style.setProperty('--bg-card', currentColors.card || (theme === 'dark' ? '#111827' : '#ffffff'));
+    // Set custom properties dynamically on document root using original brand palette colors
+    root.style.setProperty('--bg-global', currentColors.background || (theme === 'dark' ? '#030d16' : '#f8fafc'));
+    root.style.setProperty('--bg-card', currentColors.card || (theme === 'dark' ? '#091c2c' : '#ffffff'));
     root.style.setProperty('--color-button', currentColors.button || (theme === 'dark' ? '#a78bfa' : '#7c3aed'));
     root.style.setProperty('--color-text', currentColors.text || (theme === 'dark' ? '#f8fafc' : '#0f172a'));
     root.style.setProperty('--color-border', currentColors.border || (theme === 'dark' ? '#1e293b' : '#cbd5e1'));
     root.style.setProperty('--color-shadow', currentColors.shadow || (theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)'));
     root.style.setProperty('--color-gradient', currentColors.gradient || (theme === 'dark' ? '#a78bfa' : '#7c3aed'));
-    root.style.setProperty('--color-navbar', currentColors.navbar || (theme === 'dark' ? '#111827' : '#ffffff'));
-    root.style.setProperty('--color-footer', currentColors.footer || (theme === 'dark' ? '#020617' : '#f8fafc'));
+    root.style.setProperty('--color-navbar', currentColors.navbar || (theme === 'dark' ? 'rgba(3, 13, 22, 0.8)' : 'rgba(255, 255, 255, 0.8)'));
+    root.style.setProperty('--color-footer', currentColors.footer || (theme === 'dark' ? '#030d16' : '#ffffff'));
     
     // Apply body style background color dynamically
-    document.body.style.backgroundColor = currentColors.background || (theme === 'dark' ? '#020617' : '#f8fafc');
+    document.body.style.backgroundColor = currentColors.background || (theme === 'dark' ? '#030d16' : '#f8fafc');
     document.body.style.color = currentColors.text || (theme === 'dark' ? '#f8fafc' : '#0f172a');
   }, [theme, currentColors]);
 
@@ -101,6 +89,31 @@ const Layout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
+      {/* If database is down, show a user-friendly error banner with retry option */}
+      {dbError && (
+        <div className="mt-4 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-600 dark:text-red-400 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <p className="font-bold text-sm">
+                  Error de conexión ({dbError === 'DB-500' ? 'Error #DB-500' : 'Error #Server-500'})
+                </p>
+                <p className="text-xs opacity-90">
+                  No se pudo establecer comunicación con el servidor de base de datos. Se están mostrando datos locales de respaldo.
+                </p>
+              </div>
+            </div>
+            <button 
+              onClick={() => actions?.reload()}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap shadow-md"
+            >
+              Reintentar conexión
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area with elegant fade and slide motion */}
       <motion.main 
         initial={{ opacity: 0, y: 15 }}
