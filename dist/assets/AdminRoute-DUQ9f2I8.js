@@ -1,0 +1,1 @@
+import{h as t,j as a,N as s}from"./index-DvWEcCud.js";const o=({children:e})=>{const{isAuthenticated:i}=t();return i?e:a.jsxDEV(s,{to:"/backoffice/login",replace:!0},void 0,!1,{fileName:"C:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/admin/AdminRoute.jsx",lineNumber:7,columnNumber:39},void 0)};export{o as default};
