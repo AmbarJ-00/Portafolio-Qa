@@ -158,7 +158,37 @@ app.post('/api/auth/login', async (req, res) => {
     const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
-    await logErrorToDb('Server-500', 'anonymous', 'auth', 'login', err.message);
+    // --- Fallback: validate against env vars if the DB is unavailable ---
+    const fallbackUser = process.env.ADMIN_FALLBACK_USER;
+    const fallbackPass = process.env.ADMIN_FALLBACK_PASS;
+    const isDbError = err.code === 'DB-500' ||
+      (err.message && (
+        err.message.includes('ECONNREFUSED') ||
+        err.message.includes('ETIMEDOUT') ||
+        err.message.includes('ER_ACCESS_DENIED') ||
+        err.message.includes('connection') ||
+        err.message.includes('connect')
+      ));
+
+    if (isDbError && fallbackUser && fallbackPass) {
+      if (username === fallbackUser && password === fallbackPass) {
+        console.warn('[AUTH] DB unavailable — authenticated via env fallback credentials.');
+        const token = jwt.sign(
+          { id: 'fallback-admin', username: fallbackUser, role: 'admin' },
+          JWT_SECRET,
+          { expiresIn: '8h' }
+        );
+        return res.json({
+          token,
+          user: { id: 'fallback-admin', username: fallbackUser, role: 'admin' },
+          warning: 'Authenticated via fallback credentials. Database is offline.'
+        });
+      }
+      return res.status(401).json({ code: 'Auth-401', error: 'Credenciales inválidas' });
+    }
+    // --- End fallback ---
+
+    console.error('[AUTH] Login error:', err.message);
     res.status(500).json({ code: 'Server-500', error: err.message });
   }
 });
