@@ -3,10 +3,7 @@ import mysql from 'mysql2/promise';
 const host = '127.0.0.1';
 const ports = [3306, 3307, 3308, 3309, 3310, 3311, 3312, 3313, 3314, 3315];
 const credentials = [
-  { user: 'root', password: '' },
-  { user: 'root', password: 'root' },
-  { user: 'root', password: 'password' },
-  { user: 'root', password: 'admin' },
+  { user: 'admin', password: 'admin' },
   { user: 'root', password: 'AdminQA#2026' }
 ];
 

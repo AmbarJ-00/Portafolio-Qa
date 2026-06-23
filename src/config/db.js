@@ -8,20 +8,20 @@ dotenv.config();
 let pool = null;
 
 // Default admin credentials
-const DEFAULT_ADMIN_USER = 'admin';
-const DEFAULT_ADMIN_PASS = 'AdminQA#2026';
+const DEFAULT_ADMIN_USER = 'MGadmin07';
+const DEFAULT_ADMIN_PASS = 'Secu00@!!73846212093breack009';
 
 export function getPoolConfig() {
   return {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'qa_portfolio',
-    port: Number(process.env.DB_PORT) || 3306,
+    database: process.env.DB_NAME || 'potfolio_bd_v1',
+    port: Number(process.env.DB_PORT) || 1610,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 5000
+    connectTimeout: 10000
   };
 }
 
