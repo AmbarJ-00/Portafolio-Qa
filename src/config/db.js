@@ -8,20 +8,20 @@ dotenv.config();
 let pool = null;
 
 // Default admin credentials
-const DEFAULT_ADMIN_USER = 'admin';
-const DEFAULT_ADMIN_PASS = 'AdminQA#2026';
+const DEFAULT_ADMIN_USER = 'MGadmin07';
+const DEFAULT_ADMIN_PASS = 'Secu00@!!73846212093breack009';
 
 export function getPoolConfig() {
   return {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'qa_portfolio',
-    port: Number(process.env.DB_PORT) || 3306,
+    database: process.env.DB_NAME || 'potfolio_bd_v1',
+    port: Number(process.env.DB_PORT) || 1610,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 5000
+    connectTimeout: 10000
   };
 }
 
@@ -260,6 +260,19 @@ export async function initDb() {
         modulo VARCHAR(100),
         accion VARCHAR(100),
         detalles TEXT
+      )
+    `);
+
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS contact_messages (
+        id VARCHAR(36) PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        query_type VARCHAR(50) NOT NULL,
+        phone VARCHAR(50),
+        alternative_contact VARCHAR(100),
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
