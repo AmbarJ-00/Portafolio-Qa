@@ -263,7 +263,9 @@ export const en = {
     
     // Feedback
     success_title: "Message Sent Successfully",
-    success_desc: "Thank you for reaching out! I will get back to you as soon as possible."
+    success_desc: "Thank you for reaching out! I will get back to you as soon as possible.",
+    error_title: "Sending Error",
+    error_desc: "No se pudo enviar el mensaje. Inténtalo nuevamente más tarde."
   },
   footer: {
     rights: "All rights reserved.",
