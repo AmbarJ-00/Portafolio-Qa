@@ -8,8 +8,10 @@ import { GiAlienBug } from "react-icons/gi";
 import SEO from '../components/SEO.jsx';
 import StatusCard from '../components/StatusCard.jsx';
 
+const MotionLink = motion(Link);
+
 const Projects = () => {
-  const { t } = useTranslation();
+  const t = useTranslation().t;
   const { store } = usePortfolio();
 
   const containerVariants = {
@@ -66,9 +68,10 @@ const Projects = () => {
 
             return (
               <StatusCard key={project.id} status={project.status} type="project">
-                <motion.div
+                <MotionLink
+                  to={`/projects/${project.id}`}
                   variants={cardVariants}
-                  className="glass-card glass-card-hover rounded-2xl flex flex-col justify-between overflow-hidden relative group h-full"
+                  className="glass-card glass-card-hover rounded-2xl flex flex-col justify-between overflow-hidden relative group h-full text-left no-underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-brand-electric-500 dark:focus:ring-brand-lilac-500"
                 >
                   {/* Visual Top Bar decoration */}
                   <div className="h-1.5 w-full bg-gradient-to-r from-brand-navy-800 to-brand-electric-500 dark:from-brand-lilac-700 dark:to-brand-lilac-400" />
@@ -131,15 +134,14 @@ const Projects = () => {
 
                   {/* Footer Action */}
                   <div className="px-6 py-4 bg-brand-ash-55/50 dark:bg-brand-navy-900/30 border-t border-brand-ash-200/30 dark:border-brand-navy-800/20">
-                    <Link
-                      to={`/projects/${project.id}`}
+                    <div
                       className="inline-flex items-center justify-between w-full text-sm font-bold text-brand-navy-800 dark:text-brand-ash-200 hover:text-brand-electric-600 hover:dark:text-brand-lilac-300 transition-colors"
                     >
                       <span>{t('cta.view_details')}</span>
                       <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-                    </Link>
+                    </div>
                   </div>
-                </motion.div>
+                </MotionLink>
               </StatusCard>
             );
           })}
