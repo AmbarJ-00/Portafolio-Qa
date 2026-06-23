@@ -263,6 +263,19 @@ export async function initDb() {
       )
     `);
 
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS contact_messages (
+        id VARCHAR(36) PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        query_type VARCHAR(50) NOT NULL,
+        phone VARCHAR(50),
+        alternative_contact VARCHAR(100),
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Self-healing: Check and add priority column to pre-existing tables if needed
     await addColumnIfNotExists(conn, 'skills', 'priority', 'INT DEFAULT 0');
     await addColumnIfNotExists(conn, 'certifications', 'priority', 'INT DEFAULT 0');

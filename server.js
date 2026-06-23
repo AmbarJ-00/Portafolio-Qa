@@ -7,6 +7,9 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { query, checkDatabaseConnection, initDb } from './src/config/db.js';
+import nodemailer from 'nodemailer';
+import { mailConfig } from './src/config/mail.js';
+
 
 dotenv.config();
 
@@ -798,6 +801,117 @@ app.post('/api/create-module', async (req, res) => {
   }
 });
 
+// Rate limiting map for contacts in memory
+const contactRateLimit = {};
+
+// Contact form endpoint
+app.post('/api/contact', async (req, res) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const now = Date.now();
+  const limitWindow = 60 * 1000; // 1 minute
+  const maxRequests = 3;
+
+  // Initialize/clean IP rate limit timestamps
+  if (!contactRateLimit[ip]) {
+    contactRateLimit[ip] = [];
+  }
+  contactRateLimit[ip] = contactRateLimit[ip].filter(t => now - t < limitWindow);
+
+  // Rate Limit Check
+  if (contactRateLimit[ip].length >= maxRequests) {
+    return res.status(429).json({ 
+      error: 'Demasiadas solicitudes de contacto. Por favor, inténtalo de nuevo más tarde.' 
+    });
+  }
+  contactRateLimit[ip].push(now);
+
+  // 1. Honeypot check for spam
+  if (req.body.honeypot) {
+    console.warn(`[SPAM DETECTED] Honeypot field filled by IP ${ip}`);
+    // Return success to trick the bot, but do not send email or save in DB
+    return res.json({ success: true, message: 'Mensaje procesado' });
+  }
+
+  // 2. Extract and Sanitize Inputs
+  const name = sanitizeString(req.body.name);
+  const email = sanitizeString(req.body.email);
+  const queryType = sanitizeString(req.body.queryType);
+  const phone = sanitizeString(req.body.phone || '');
+  const alternativeContact = sanitizeString(req.body.alternativeContact || '');
+  const message = sanitizeString(req.body.message);
+
+  // 3. Validation Checks
+  if (!name || !email || !queryType || !message) {
+    return res.status(400).json({ error: 'Todos los campos obligatorios (*) son requeridos.' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Dirección de correo electrónico inválida.' });
+  }
+
+  const messageId = `msg-${Math.random().toString(36).slice(2, 9)}`;
+
+  try {
+    // 4. Persistence: save to contact_messages DB table
+    let dbSaved = false;
+    try {
+      await query(
+        `INSERT INTO contact_messages (id, name, email, query_type, phone, alternative_contact, message) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [messageId, name, email, queryType, phone, alternativeContact, message]
+      );
+      dbSaved = true;
+    } catch (dbErr) {
+      console.warn(`[DB Persist Failed] Could not save contact message: ${dbErr.message}`);
+    }
+
+    // 5. Send Email via Nodemailer
+    const { smtp, targetEmail } = mailConfig;
+    const emailBody = `
+      <h3>Nuevo mensaje de contacto</h3>
+      <p><strong>Nombre:</strong> ${name}</p>
+      <p><strong>Correo electrónico:</strong> ${email}</p>
+      <p><strong>Tipo de consulta:</strong> ${queryType}</p>
+      <p><strong>Número de contacto:</strong> ${phone || 'N/A'}</p>
+      <p><strong>Contacto alternativo:</strong> ${alternativeContact || 'N/A'}</p>
+      <p><strong>Mensaje:</strong></p>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+    `;
+
+    if (smtp.auth.user && smtp.auth.pass) {
+      const transporter = nodemailer.createTransport({
+        host: smtp.host,
+        port: smtp.smtpPort || smtp.port,
+        secure: smtp.secure,
+        auth: {
+          user: smtp.auth.user,
+          pass: smtp.auth.pass
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"${name}" <${smtp.auth.user}>`,
+        to: targetEmail,
+        replyTo: email,
+        subject: `Contacto QA Portfolio: ${queryType} - de ${name}`,
+        html: emailBody
+      });
+      
+      console.log(`[EMAIL SENT] Contact message sent successfully to ${targetEmail}`);
+    } else {
+      console.warn(`[EMAIL NOT SENT - SMTP MISSING] Mail content:\nRecipient: ${targetEmail}\nContent:`, {
+        name, email, queryType, phone, alternativeContact, message
+      });
+    }
+
+    res.json({ success: true, messageId, dbSaved });
+  } catch (err) {
+    console.error('[CONTACT SEND ERROR]', err.message);
+    res.status(500).json({ error: 'No se pudo enviar el mensaje. Inténtalo nuevamente más tarde.' });
+  }
+});
+
 // Log custom runtime errors from client-side
 app.post('/api/errors', async (req, res) => {
   const { code, user, module, action, details } = req.body;
@@ -813,10 +927,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
 console.log({
   host: process.env.DB_HOST,
@@ -824,3 +939,5 @@ console.log({
   user: process.env.DB_USER,
   database: process.env.DB_NAME
 });
+
+export default app;

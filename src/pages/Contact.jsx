@@ -13,6 +13,7 @@ const Contact = () => {
   const { store } = usePortfolio();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Zod Validation Schema
   const contactSchema = z.object({
@@ -21,7 +22,8 @@ const Contact = () => {
     queryType: z.string().min(1, { message: t('contact.val_query_req') }),
     message: z.string().min(10, { message: t('contact.val_message_min') }),
     phone: z.string().optional(),
-    alternativeContact: z.string().optional()
+    alternativeContact: z.string().optional(),
+    honeypot: z.string().optional()
   });
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -32,19 +34,37 @@ const Contact = () => {
       queryType: '',
       message: '',
       phone: '',
-      alternativeContact: ''
+      alternativeContact: '',
+      honeypot: ''
     }
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
-    // Simulate API request to backend/Vercel serverless function
-    setTimeout(() => {
-      console.log('Submitted contact payload:', data);
-      setIsSubmitting(false);
+    setSubmitError(null);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await response.json().catch(() => ({}));
+      
+      if (!response.ok) {
+        throw new Error(result.error || t('contact.error_desc'));
+      }
+      
       setIsSubmitted(true);
       reset();
-    }, 1500);
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      setSubmitError(err.message || t('contact.error_desc'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -160,6 +180,23 @@ const Contact = () => {
                   <h2 id="form-heading" className="text-xl font-bold text-brand-navy-900 dark:text-white uppercase tracking-wider mb-2">
                     {t('contact.form_title')}
                   </h2>
+
+                  {submitError && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-sm font-semibold">
+                      {submitError}
+                    </div>
+                  )}
+
+                  {/* Honeypot anti-spam hidden field */}
+                  <div className="hidden" aria-hidden="true">
+                    <input
+                      type="text"
+                      name="honeypot"
+                      {...register('honeypot')}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
 
                   {/* Name field */}
                   <div className="space-y-1.5">
