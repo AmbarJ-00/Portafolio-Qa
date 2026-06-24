@@ -3,7 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
-import { Menu, X, Sun, Moon, Globe, Github, Linkedin } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, Github, Linkedin, Radar } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Navbar = () => {
@@ -37,17 +37,17 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full nav-blur">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-14">
         <div className="flex items-center justify-between h-16">
           {/* Logo / Brand */}
           <div className="flex-shrink-0">
             <Link 
               to="/" 
-              className="font-display font-bold text-xl tracking-tight text-brand-navy-800 dark:text-white flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand-electric-500 rounded"
+              className="font-sans font-bold text-base tracking-tight text-brand-navy-800 dark:text-white flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand-electric-500 rounded"
               aria-label="Ambar Ramon QA Lead Home"
             >
-              <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-navy-800 to-brand-electric-500 dark:from-brand-electric-500 dark:to-brand-lilac-500 flex items-center justify-center text-white text-sm font-extrabold shadow-sm">
-                AR
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-navy-800 to-brand-electric-500 dark:from-brand-electric-500 dark:to-brand-lilac-500 flex items-center justify-center text-white shadow-sm">
+                <Radar className="w-4 h-4" />
               </span>
               <span className="hidden sm:inline">Ambar Ramon</span>
               <span className="text-brand-electric-500 text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-electric-100/50 dark:bg-brand-electric-500/10 border border-brand-electric-500/25 hidden md:inline">

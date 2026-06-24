@@ -63,7 +63,7 @@ const Layout = ({ children }) => {
           <motion.main 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 flex items-center justify-center"
+            className="flex-grow max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-14 py-16 flex items-center justify-center"
           >
             <div className="glass-card rounded-[2rem] border border-brand-electric-500/20 bg-brand-electric-500/5 p-8 max-w-2xl text-center space-y-6 shadow-xl">
               <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-brand-electric-500/10 text-brand-electric-500 animate-pulse">
@@ -120,7 +120,7 @@ const Layout = ({ children }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ duration: 0.4, cubicBezier: [0.16, 1, 0.3, 1] }}
-        className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="flex-grow max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-14 py-10"
       >
         {children}
       </motion.main>
