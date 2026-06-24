@@ -24,10 +24,6 @@ export class ErrorBoundary extends React.Component {
     window.location.href = '/';
   };
 
-  handleGoPanel = () => {
-    window.location.href = '/backoffice';
-  };
-
   getErrorDetails(error) {
     const msg = (error?.message || error?.toString() || '').toLowerCase();
 
@@ -180,13 +176,6 @@ export class ErrorBoundary extends React.Component {
               >
                 <Home className="w-4 h-4" />
                 <span>Volver al inicio</span>
-              </button>
-              <button
-                onClick={this.handleGoPanel}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-755 text-slate-250 font-semibold rounded-xl border border-slate-700/55 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
-              >
-                <Layout className="w-4 h-4 text-[#09D8C7]" />
-                <span>Volver al panel</span>
               </button>
             </div>
           </div>

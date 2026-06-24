@@ -64,14 +64,14 @@ const Skills = () => {
 
       <div className="space-y-12">
         {/* Title Block */}
-        <div className="space-y-4 max-w-3xl">
-          <h1 className="text-4xl font-display font-extrabold text-brand-navy-900 dark:text-white">
+        <div className="space-y-3 max-w-3xl">
+          <h1 className="text-3xl font-sans font-extrabold text-brand-navy-900 dark:text-white">
             {t('skills.title')}
           </h1>
-          <p className="text-lg text-brand-navy-600 dark:text-brand-ash-400">
+          <p className="text-sm text-brand-navy-600 dark:text-brand-ash-400">
             {t('skills.subtitle')}
           </p>
-          <div className="h-1 w-20 bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded" />
+          <div className="h-1 w-16 bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded" />
         </div>
 
         {/* Skills Cards Grid */}
@@ -79,44 +79,36 @@ const Skills = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         >
           {visibleSkills.map((skill) => (
             <StatusCard key={skill.id} status={skill.status} type="skill">
               <motion.button
                 variants={itemVariants}
                 onClick={() => setSelectedSkill(skill)}
-                className="glass-card glass-card-hover p-6 rounded-xl flex flex-col items-start gap-4 text-left w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
+                className="glass-card glass-card-hover p-4 rounded-xl flex flex-col items-start gap-3 text-left w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
                 aria-haspopup="dialog"
                 aria-label={`Show details for ${skill.name}`}
               >
                 {/* Decorative side accent */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-brand-electric-500 dark:bg-brand-electric-500/80 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 
-                <div className="p-2.5 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
-                  {renderIcon(skill.icon, "w-6 h-6 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
+                <div className="p-2 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
+                  {renderIcon(skill.icon, "w-5 h-5 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
                 </div>
                 
-                <div className="w-full space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-brand-navy-900 dark:text-white text-base">
+                <div className="w-full">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="font-semibold text-brand-navy-900 dark:text-white text-sm leading-snug">
                       {skill.name}
                     </span>
-                    <span className="text-xs font-semibold text-brand-navy-500 dark:text-brand-ash-400">
+                    <span className="shrink-0 text-[11px] font-bold text-brand-electric-600 dark:text-brand-electric-300 bg-brand-electric-100/60 dark:bg-brand-electric-500/10 px-1.5 py-0.5 rounded-md border border-brand-electric-500/20">
                       {skill.level}%
                     </span>
                   </div>
-                  
-                  {/* Progress bar */}
-                  <div className="h-1.5 w-full bg-brand-ash-200 dark:bg-brand-navy-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${skill.level}%`,
-                        backgroundColor: skill.color || '#00bfff'
-                      }}
-                    />
-                  </div>
+                  {skill.category && (
+                    <p className="text-[11px] text-brand-navy-500 dark:text-brand-ash-500 mt-0.5 truncate">{skill.category}</p>
+                  )}
                 </div>
               </motion.button>
             </StatusCard>
@@ -141,10 +133,10 @@ const Skills = () => {
                       {renderIcon(selectedSkill.icon, "w-6 h-6 text-brand-electric-500")}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-brand-navy-900 dark:text-white">
+                      <h2 className="text-lg font-bold text-brand-navy-900 dark:text-white">
                         {selectedSkill.name}
                       </h2>
-                      <span className="text-xxs font-semibold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest block mt-0.5">
+                      <span className="text-[11px] font-semibold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest block mt-0.5">
                         {selectedSkill.category}
                       </span>
                     </div>
