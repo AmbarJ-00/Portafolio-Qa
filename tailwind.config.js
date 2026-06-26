@@ -8,49 +8,62 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand color palette: Ash Gray, Navy, Electric Blue, Lilac, White, Black
-        brand: {
-          ash: {
-            50: '#f8fafc',
-            100: '#f1f5f9',
-            200: '#e2e8f0', // Ash Gray light boundary
-            300: '#cbd5e1', // Ash Gray base
-            400: '#94a3b8',
-            500: '#64748b',
-            600: '#475569',
-            700: '#334155',
-            800: '#1e293b',
-            900: '#0f172a',
-          },
-          navy: {
-            50: '#f0f4f8',
-            100: '#d9e2ec',
-            200: '#bcccdc',
-            300: '#9fb3c8',
-            400: '#829ab1',
-            500: '#627d98',
-            600: '#486581',
-            700: '#334e68',
-            800: '#102a43', // Deep Navy base
-            900: '#091c2c', // Super Dark Navy
-            950: '#030d16',
-          },
-          electric: {
-            100: '#e0f7ff',
-            300: '#82e1ff',
-            500: '#00bfff', // Electric Blue base
-            600: '#0099cc',
-            700: '#007399',
-            800: '#005266',
-          },
-          lilac: {
-            100: '#f3e8ff',
-            300: '#d8b4fe',
-            500: '#a855f7', // Lilac base
-            600: '#9333ea',
-            700: '#7e22ce',
-            800: '#581c87',
-          }
+        // ─── Light Mode Semantic Tokens ─────────────────────────
+        surface: 'var(--bg-global)',
+        card: 'var(--bg-card)',
+        foreground: 'var(--color-text)',
+        border: 'var(--color-border)',
+        primary: 'var(--color-button)',
+        accent: 'var(--color-accent)',
+        muted: 'var(--color-muted)',
+
+        // ─── Light Mode Named Palette (QA Portfolio) ─────────────
+        burlywood: {
+          DEFAULT: '#D68880',
+          light: '#E5ABA5',
+          dark: '#A56560',
+        },
+        yankees: {
+          DEFAULT: '#182A3A',
+          light: '#24415A',
+          dark: '#0F1E2A',
+        },
+        deepspace: {
+          DEFAULT: '#425B6F',
+          light: '#597588',
+          dark: '#2E4254',
+        },
+        darktan: {
+          DEFAULT: '#A08348',
+          light: '#C4A461',
+          dark: '#7A6430',
+        },
+        smoke: {
+          DEFAULT: '#7A7E74',
+          light: '#9EA29A',
+          dark: '#565950',
+        },
+
+        // ─── Dark Mode Named Palette (Royal Purple) ───────────────
+        royalpurple: {
+          DEFAULT: '#4F3179',
+          light: '#6A4B9E',
+          dark: '#3B2358',
+        },
+        royaldark: {
+          DEFAULT: '#231537',
+          light: '#341F50',
+          dark: '#16102B',
+        },
+        darkgold: {
+          DEFAULT: '#966D33',
+          light: '#B5884A',
+          dark: '#725027',
+        },
+        brightgold: {
+          DEFAULT: '#CAA46E',
+          light: '#DBBF90',
+          dark: '#A07D4A',
         },
       },
       fontFamily: {
@@ -62,6 +75,8 @@ export default {
         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-down': 'slideDown 0.4s ease-out forwards',
         'pulse-subtle': 'pulseSubtle 2.5s infinite ease-in-out',
+        'spin-slow': 'spin 4s linear infinite',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -79,8 +94,12 @@ export default {
         pulseSubtle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.85', transform: 'scale(1.01)' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 8px var(--color-button)' },
+          '50%': { boxShadow: '0 0 20px var(--color-button)' },
         }
-      }
+      },
     },
   },
   plugins: [],

@@ -10,7 +10,7 @@ import SEO from '../components/SEO.jsx';
 
 const Contact = () => {
   const { t } = useTranslation();
-  const { store } = usePortfolio();
+  const { store, actions } = usePortfolio();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -43,25 +43,18 @@ const Contact = () => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-      
-      const result = await response.json().catch(() => ({}));
-      
-      if (!response.ok) {
-        throw new Error(result.error || t('contact.error_desc'));
+      if (!actions || !actions.submitContactForm) {
+        throw new Error("Contact actions not initialized");
       }
-      
+      const result = await actions.submitContactForm(data);
+      if (!result || !result.success) {
+        throw new Error(t('contact.error_desc'));
+      }
       setIsSubmitted(true);
       reset();
     } catch (err) {
       console.error('Contact submission error:', err);
-      setSubmitError(err.message || t('contact.error_desc'));
+      setSubmitError(t('contact.error_desc'));
     } finally {
       setIsSubmitting(false);
     }

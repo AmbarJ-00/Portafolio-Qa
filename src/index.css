@@ -2,71 +2,176 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   LIGHT MODE — Premium Palette
+   Primary accent:    Burlywood   #D68880
+   Dark contrast:     Yankees Blue #182A3A
+   Secondary:         Deep Space Sparkle #425B6F
+   Premium accent:    Dark Tan    #A08348
+   Text secondary:    Smoke       #7A7E74
+   Background:        Off-white warm  #FAF9F6
+   ============================================================ */
+:root {
+  --bg-global:      #FAF9F6;
+  --bg-card:        rgba(66, 91, 111, 0.07);
+  --color-text:     #182A3A;
+  --color-border:   #A08348;
+  --color-button:   #D68880;
+  --color-accent:   #D68880;
+  --color-muted:    #7A7E74;
+  --color-shadow:   rgba(24, 42, 58, 0.08);
+  --color-gradient: #D68880;
+  --color-navbar:   rgba(250, 249, 246, 0.85);
+  --color-footer:   #FAF9F6;
+}
+
+/* ============================================================
+   DARK MODE — Premium Royal Purple Palette
+   Background:        Dark Royal Purple  #231537
+   Cards:             Royal Purple       #4F3179
+   Premium details:   Dark Gold          #966D33
+   Hover/Focus:       Bright Gold        #CAA46E
+   Text secondary:    Light Purple Gray  #ADB0BC
+   ============================================================ */
+.dark {
+  --bg-global:      #231537;
+  --bg-card:        #4F3179;
+  --color-text:     #ffffff;
+  --color-border:   #966D33;
+  --color-button:   #CAA46E;
+  --color-accent:   #CAA46E;
+  --color-muted:    #ADB0BC;
+  --color-shadow:   rgba(0, 0, 0, 0.5);
+  --color-gradient: #CAA46E;
+  --color-navbar:   rgba(35, 21, 55, 0.88);
+  --color-footer:   #1a0e29;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    background-color: var(--bg-global, #f8fafc);
-    color: var(--color-text, #0f172a);
-    @apply antialiased selection:bg-brand-electric-500 dark:selection:bg-brand-lilac-500 selection:text-white;
+    background-color: var(--bg-global) !important;
+    color: var(--color-text) !important;
+    @apply antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: 'Inter', sans-serif;
   }
 
-  /* Custom high-contrast focus rings for accessibility compliance */
+  /* Selection */
+  ::selection {
+    background-color: var(--color-button);
+    color: #fff;
+  }
+
+  /* Accessible focus rings */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-electric-500 dark:ring-brand-lilac-500 ring-offset-2 ring-offset-white dark:ring-offset-brand-navy-950;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-global), 0 0 0 4px var(--color-button);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text);
+  }
+
+  p {
+    color: var(--color-muted);
   }
 }
 
 @layer components {
-  /* Premium Glassmorphism styling variables using dynamic CSS properties */
+  /* ── Glass card ─────────────────────────────────────────── */
   .glass-card {
-    background-color: var(--bg-card, rgba(255, 255, 255, 0.7));
-    border: 1px solid var(--color-border, rgba(226, 232, 240, 0.5));
-    box-shadow: 0 4px 6px -1px var(--color-shadow, rgba(0, 0, 0, 0.05));
-    backdrop-filter: blur(12px);
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: 0 4px 6px -1px var(--color-shadow) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--color-text) !important;
   }
-  
+
   .glass-card-hover {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .glass-card-hover:hover {
-    border-color: var(--color-button, #7c3aed);
-    box-shadow: 0 10px 15px -3px var(--color-shadow, rgba(0, 0, 0, 0.1));
+    border-color: var(--color-button) !important;
+    box-shadow: 0 10px 24px -4px var(--color-shadow) !important;
     transform: translateY(-2px);
   }
 
+  /* ── Navbar blur ─────────────────────────────────────────── */
   .nav-blur {
-    background-color: var(--color-navbar, rgba(255, 255, 255, 0.8));
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--color-border, rgba(226, 232, 240, 0.3));
+    background-color: var(--color-navbar) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-border) !important;
     transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
   }
 
-  /* Beautiful glowing indicators */
+  /* ── Glow effects ────────────────────────────────────────── */
   .glow-blue {
-    @apply shadow-[0_0_20px_-3px_rgba(0,191,255,0.2)] dark:shadow-[0_0_20px_-3px_rgba(168,85,247,0.2)];
+    box-shadow: 0 0 24px -4px var(--color-button) !important;
   }
 
   .glow-lilac {
-    @apply shadow-[0_0_20px_-3px_rgba(168,85,247,0.2)];
+    box-shadow: 0 0 24px -4px var(--color-accent) !important;
+  }
+
+  /* ── Primary button ──────────────────────────────────────── */
+  .btn-primary {
+    background-color: var(--color-button);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: scale(1.01); }
+  .btn-primary:active { transform: scale(0.99); }
+
+  /* ── Badge / tag ─────────────────────────────────────────── */
+  .badge-accent {
+    background-color: var(--color-button);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Form inputs ─────────────────────────────────────────── */
+  .form-input {
+    background-color: var(--bg-global);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: 0.5rem;
+    padding: 0.625rem 1rem;
+    width: 100%;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--color-button);
+    box-shadow: 0 0 0 3px rgba(214, 136, 128, 0.2);
+  }
+  .dark .form-input:focus {
+    box-shadow: 0 0 0 3px rgba(202, 164, 110, 0.2);
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-brand-ash-100 dark:bg-brand-navy-900;
-}
-
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-global) !important; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-brand-ash-300 dark:bg-brand-navy-800 rounded-full hover:bg-brand-ash-400 dark:hover:bg-brand-navy-700;
+  background: var(--color-border) !important;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-button) !important;
 }
