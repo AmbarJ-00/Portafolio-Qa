@@ -28,19 +28,19 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const root = document.documentElement;
     // Set custom properties dynamically on document root using original brand palette colors
-    root.style.setProperty('--bg-global', currentColors.background || (theme === 'dark' ? '#030d16' : '#f8fafc'));
-    root.style.setProperty('--bg-card', currentColors.card || (theme === 'dark' ? '#091c2c' : '#ffffff'));
-    root.style.setProperty('--color-button', currentColors.button || (theme === 'dark' ? '#a78bfa' : '#7c3aed'));
-    root.style.setProperty('--color-text', currentColors.text || (theme === 'dark' ? '#f8fafc' : '#0f172a'));
-    root.style.setProperty('--color-border', currentColors.border || (theme === 'dark' ? '#1e293b' : '#cbd5e1'));
+    root.style.setProperty('--bg-global', currentColors.background || (theme === 'dark' ? '#231537' : '#E8ECEF'));
+    root.style.setProperty('--bg-card', currentColors.card || (theme === 'dark' ? '#4F3179' : '#A7C7E7'));
+    root.style.setProperty('--color-button', currentColors.button || (theme === 'dark' ? '#CAA46E' : '#09D8C7'));
+    root.style.setProperty('--color-text', currentColors.text || (theme === 'dark' ? '#ffffff' : '#1C2B48'));
+    root.style.setProperty('--color-border', currentColors.border || (theme === 'dark' ? '#966D33' : '#1C2B48'));
     root.style.setProperty('--color-shadow', currentColors.shadow || (theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)'));
-    root.style.setProperty('--color-gradient', currentColors.gradient || (theme === 'dark' ? '#a78bfa' : '#7c3aed'));
-    root.style.setProperty('--color-navbar', currentColors.navbar || (theme === 'dark' ? 'rgba(3, 13, 22, 0.8)' : 'rgba(255, 255, 255, 0.8)'));
-    root.style.setProperty('--color-footer', currentColors.footer || (theme === 'dark' ? '#030d16' : '#ffffff'));
+    root.style.setProperty('--color-gradient', currentColors.gradient || (theme === 'dark' ? '#CAA46E' : '#09D8C7'));
+    root.style.setProperty('--color-navbar', currentColors.navbar || (theme === 'dark' ? 'rgba(35, 21, 55, 0.8)' : 'rgba(232, 236, 239, 0.8)'));
+    root.style.setProperty('--color-footer', currentColors.footer || (theme === 'dark' ? '#231537' : '#E8ECEF'));
     
     // Apply body style background color dynamically
-    document.body.style.backgroundColor = currentColors.background || (theme === 'dark' ? '#030d16' : '#f8fafc');
-    document.body.style.color = currentColors.text || (theme === 'dark' ? '#f8fafc' : '#0f172a');
+    document.body.style.backgroundColor = currentColors.background || (theme === 'dark' ? '#231537' : '#E8ECEF');
+    document.body.style.color = currentColors.text || (theme === 'dark' ? '#ffffff' : '#1C2B48');
   }, [theme, currentColors]);
 
   // Find if this path corresponds to any of our registered pages
