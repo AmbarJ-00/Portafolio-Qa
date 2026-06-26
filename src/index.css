@@ -1,15 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ============================================================
    LIGHT MODE — Premium Palette
-   Primary accent:    Burlywood   #D68880
-   Dark contrast:     Yankees Blue #182A3A
-   Secondary:         Deep Space Sparkle #425B6F
-   Premium accent:    Dark Tan    #A08348
-   Text secondary:    Smoke       #7A7E74
-   Background:        Off-white warm  #FAF9F6
+   Primary accent:    Burlywood        #D68880
+   Dark contrast:     Yankees Blue     #182A3A
+   Secondary:         Deep Space       #425B6F
+   Premium accent:    Dark Tan         #A08348
+   Text secondary:    Smoke            #7A7E74
+   Background:        Off-white warm   #FAF9F6
    ============================================================ */
 :root {
   --bg-global:      #FAF9F6;
@@ -23,6 +19,7 @@
   --color-gradient: #D68880;
   --color-navbar:   rgba(250, 249, 246, 0.85);
   --color-footer:   #FAF9F6;
+  --color-button-glow: rgba(214, 136, 128, 0.25);
 }
 
 /* ============================================================
@@ -45,7 +42,12 @@
   --color-gradient: #CAA46E;
   --color-navbar:   rgba(35, 21, 55, 0.88);
   --color-footer:   #1a0e29;
+  --color-button-glow: rgba(202, 164, 110, 0.25);
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   html {
@@ -53,8 +55,8 @@
   }
 
   body {
-    background-color: var(--bg-global) !important;
-    color: var(--color-text) !important;
+    background-color: var(--bg-global);
+    color: var(--color-text);
     @apply antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: 'Inter', sans-serif;
@@ -75,22 +77,18 @@
   h1, h2, h3, h4, h5, h6 {
     color: var(--color-text);
   }
-
-  p {
-    color: var(--color-muted);
-  }
 }
 
 @layer components {
   /* ── Glass card ─────────────────────────────────────────── */
   .glass-card {
-    background-color: var(--bg-card) !important;
-    border: 1px solid var(--color-border) !important;
-    box-shadow: 0 4px 6px -1px var(--color-shadow) !important;
+    background-color: var(--bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px -1px var(--color-shadow);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--color-text) !important;
+    color: var(--color-text);
   }
 
   .glass-card-hover {
@@ -98,27 +96,27 @@
   }
 
   .glass-card-hover:hover {
-    border-color: var(--color-button) !important;
-    box-shadow: 0 10px 24px -4px var(--color-shadow) !important;
+    border-color: var(--color-button);
+    box-shadow: 0 10px 24px -4px var(--color-shadow);
     transform: translateY(-2px);
   }
 
   /* ── Navbar blur ─────────────────────────────────────────── */
   .nav-blur {
-    background-color: var(--color-navbar) !important;
+    background-color: var(--color-navbar);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--color-border) !important;
+    border-bottom: 1px solid var(--color-border);
     transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
   }
 
   /* ── Glow effects ────────────────────────────────────────── */
   .glow-blue {
-    box-shadow: 0 0 24px -4px var(--color-button) !important;
+    box-shadow: 0 0 24px -4px var(--color-button);
   }
 
   .glow-lilac {
-    box-shadow: 0 0 24px -4px var(--color-accent) !important;
+    box-shadow: 0 0 24px -4px var(--color-accent);
   }
 
   /* ── Primary button ──────────────────────────────────────── */
@@ -130,7 +128,7 @@
     padding: 0.75rem 1.5rem;
     transition: opacity 0.2s, transform 0.1s;
   }
-  .btn-primary:hover { opacity: 0.9; transform: scale(1.01); }
+  .btn-primary:hover  { opacity: 0.9; transform: scale(1.01); }
   .btn-primary:active { transform: scale(0.99); }
 
   /* ── Badge / tag ─────────────────────────────────────────── */
@@ -158,20 +156,13 @@
   .form-input:focus {
     outline: none;
     border-color: var(--color-button);
-    box-shadow: 0 0 0 3px rgba(214, 136, 128, 0.2);
-  }
-  .dark .form-input:focus {
-    box-shadow: 0 0 0 3px rgba(202, 164, 110, 0.2);
+    /* Uses theme-aware variable instead of hardcoded rgba */
+    box-shadow: 0 0 0 3px var(--color-button-glow);
   }
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-global) !important; }
-::-webkit-scrollbar-thumb {
-  background: var(--color-border) !important;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-button) !important;
-}
+::-webkit-scrollbar          { width: 6px; height: 6px; }
+::-webkit-scrollbar-track    { background: var(--bg-global); }
+::-webkit-scrollbar-thumb    { background: var(--color-border); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-button); }
