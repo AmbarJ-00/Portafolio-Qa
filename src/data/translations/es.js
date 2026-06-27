@@ -9,7 +9,7 @@ export const es = {
     contact: "Contacto"
   },
   personal: {
-    role: "Lead QA Engineer & Quality Advocate",
+    role: "Analista Qa & Qa Automatizado",
     tagline: "Garantizando la excelencia del software mediante metodologías de pruebas rigurosas, automatización y análisis de riesgos.",
     availability_status: "Disponible para Relocalización / Remoto",
     work_mode_status: "Híbrido / Remoto a tiempo completo"
@@ -21,7 +21,7 @@ export const es = {
     sending: "Enviando...",
     view_details: "Detalles del Proyecto",
     back_to_projects: "Volver a Proyectos",
-    visit_demo: "Ver Demo En Vivo",
+    visit_demo: "Ver Demo",
     visit_repo: "Ver Repositorio",
     close: "Cerrar",
     copy_template: "Copiar Plantilla",
@@ -29,22 +29,22 @@ export const es = {
   },
   home: {
     hero_title: "Hola, soy",
-    hero_badge: "Especialista en QA & Control de Calidad",
+    hero_badge: "Especialista en QA & QA Automatizado",
     philosophy_title: "Mi Enfoque de Calidad",
     philosophy_desc: "La calidad no es una fase al final del desarrollo; es una mentalidad que guía todo el ciclo de vida del producto. Mi objetivo es mitigar riesgos de forma temprana, optimizar la cobertura y garantizar lanzamientos confiables.",
     stat_bugs: "Bugs Críticos Detectados",
     stat_coverage: "Cobertura de Pruebas Promedio",
-    stat_projects: "Proyectos Asegurados",
+    stat_projects: "Proyectos Aprobados",
     highlight_title: "Actividades de Liderazgo QA",
     highlight_desc_1: "Diseño de estrategias de pruebas de punta a punta para aplicaciones financieras y de salud.",
     highlight_desc_2: "Mentoría de equipos de desarrollo en la escritura de pruebas unitarias y de integración efectivas.",
     highlight_desc_3: "Reducción de tiempos de regresión mediante la automatización inteligente del flujo de pruebas."
   },
   projects: {
-    title: "Proyectos de Ingeniería QA",
-    subtitle: "Casos de estudio prácticos que demuestran la mitigación de riesgos, análisis de fallos y métricas de mejora.",
+    title: "Proyectos Realizados",
+    subtitle: "Estos casos de estudio reúnen experiencias reales donde el análisis de fallos, la mitigación de riesgos y la medición de resultados jugaron un papel clave para fortalecer la calidad, reducir incidencias y mejorar la experiencia del usuario.",
     metrics_title: "Métricas de Calidad de Software",
-    improvement: "Reducción de Bugs en Prod",
+    improvement: "Reducción de Bugs en Produccion",
     coverage: "Cobertura de Código/Rutas",
     risk_coverage: "Cobertura de Riesgos",
     critical_findings: "Hallazgos Críticos",
@@ -76,7 +76,7 @@ export const es = {
   },
   skills: {
     title: "Stack Tecnológico QA",
-    subtitle: "Herramientas y metodologías utilizadas para asegurar la resiliencia, seguridad y usabilidad del software.",
+    subtitle: "Explora cada skill para conocer las herramientas, metodologías y enfoques utilizados en la construcción de software robusto, seguro y centrado en el usuario. Haz clic en cualquier habilidad para ver más detalles.",
     modal_title: "Detalles de Competencia QA",
     details_desc: "Descripción de la Habilidad",
     details_exp: "Años de Experiencia / Aplicación",
@@ -171,8 +171,8 @@ export const es = {
   },
   documentation: {
     title: "Documentación QA & Plantillas",
-    subtitle: "Plantillas estandarizadas de artefactos que utilizo para garantizar la coherencia, exhaustividad y transparencia del proceso de pruebas.",
-    intro_methodologies: "La consistencia documental es crucial para el análisis de requerimientos y el reporte de calidad. A continuación se presentan las estructuras interactivas que utilizo frecuentemente en mis asignaciones profesionales.",
+    subtitle: "Plantillas estandarizadas de artefactos que utilizo para garantizar la coherencia, exhaustividad y transparencia del proceso de pruebas.  A continuación se presentan las estructuras interactivas que utilizo frecuentemente en mis asignaciones profesionales.",
+    intro_methodologies: "",
     methodology: "Metodología de Aplicación",
     parameters: "Parámetros Estándar de Entrada",
     questions: "Preguntas de Análisis Clave",
@@ -244,11 +244,11 @@ export const es = {
     field_message: "Mensaje detallado",
     field_query_type: "Tipo de Consulta",
     field_phone: "Número de Contacto (Opcional)",
-    field_alt_contact: "Contacto Alternativo (Skype/Telegram/etc. Opcional)",
+    field_alt_contact: "Contacto Alternativo (Opcional)",
     
     query_placeholder: "Selecciona una opción",
     query_recruitment: "Reclutamiento / Empleo",
-    query_consulting: "Consultoría / Auditoría QA",
+    query_consulting: "Consultoría / servicios independientes",
     query_project: "Desarrollo de Proyecto",
     query_other: "Otro asunto profesional",
     

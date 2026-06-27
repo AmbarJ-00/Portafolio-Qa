@@ -9,7 +9,7 @@ export const en = {
     contact: "Contact"
   },
   personal: {
-    role: "Lead QA Engineer & Quality Advocate",
+    role: "QA Analyst & Quality automation Engineer",
     tagline: "Ensuring software excellence through rigorous testing methodologies, automation, and proactive risk analysis.",
     availability_status: "Available for Relocation / Remote",
     work_mode_status: "Hybrid / Remote Full-time"
