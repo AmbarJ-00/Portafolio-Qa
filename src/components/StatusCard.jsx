@@ -56,7 +56,7 @@ export const StatusCard = ({ status, type = 'project', children }) => {
             </div>
             <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-indigo-500 to-brand-electric-500 h-full rounded-full animate-pulse" 
+                className="bg-gradient-to-r from-indigo-500 to-violet-400 h-full rounded-full animate-pulse" 
                 style={{ width: '65%' }}
               />
             </div>

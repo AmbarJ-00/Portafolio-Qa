@@ -35,7 +35,7 @@ export const ConfirmDialog = ({
           >
             {/* Header */}
             <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-xl shrink-0 ${isDangerous ? 'bg-red-500/10 text-red-500' : 'bg-brand-electric-500/10 text-brand-electric-500'}`}>
+              <div className={`p-3 rounded-xl shrink-0 ${isDangerous ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-400'}`}>
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div className="flex-1">
