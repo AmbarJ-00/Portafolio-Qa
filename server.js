@@ -9,6 +9,10 @@ import { fileURLToPath } from 'url';
 import { query, checkDatabaseConnection, initDb } from './src/config/db.js';
 import nodemailer from 'nodemailer';
 import { mailConfig } from './src/config/mail.js';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
 
 dotenv.config();
 
@@ -932,4 +936,15 @@ if (process.env.VERCEL !== '1') {
   });
 }
 
+<<<<<<< HEAD
 export default app;
+=======
+console.log({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  database: process.env.DB_NAME
+});
+
+export default app;
+>>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa

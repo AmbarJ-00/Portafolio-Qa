@@ -8,8 +8,8 @@ dotenv.config();
 let pool = null;
 
 // Default admin credentials
-const DEFAULT_ADMIN_USER = 'admin';
-const DEFAULT_ADMIN_PASS = 'AdminQA#2026';
+const DEFAULT_ADMIN_USER = 'MGadmin07';
+const DEFAULT_ADMIN_PASS = 'Secu00@!!73846212093breack009';
 
 export function getPoolConfig() {
   return {
@@ -21,7 +21,7 @@ export function getPoolConfig() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 5000
+    connectTimeout: 10000
   };
 }
 

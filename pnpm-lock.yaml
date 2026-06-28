@@ -48,8 +48,13 @@ importers:
         specifier: ^3.22.5
         version: 3.22.5(@types/node@25.9.3)
       nodemailer:
+<<<<<<< HEAD
         specifier: ^9.0.1
         version: 9.0.1
+=======
+        specifier: ^6.9.13
+        version: 6.10.1
+>>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1523,8 +1528,13 @@ packages:
     resolution: {integrity: sha512-Uzmd6LXpouKo8EUK68IjH4+E01w/hXyV3R3g/geCJo+rXLNfh1xucB+LOzYEOQPSiUK3h/xZf0cQGcSsmyL2Og==}
     engines: {node: '>=18'}
 
+<<<<<<< HEAD
   nodemailer@9.0.1:
     resolution: {integrity: sha512-Gwv8SQewT616ZM/URn0H54b8PWo/Wum7md3EW2aWy1lO27+WZCX+Xyak3J+NlmHUjDh5ME+uesJUDRbR3Ye8Bw==}
+=======
+  nodemailer@6.10.1:
+    resolution: {integrity: sha512-Z+iLaBGVaSjbIzQ4pX6XV41HrooLsQ10ZWPUehGmuantvzWoDVBnmsdUcOIDM1t+yPor5pDhVlDESgOMEGxhHA==}
+>>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
     engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
@@ -3589,7 +3599,11 @@ snapshots:
 
   node-releases@2.0.47: {}
 
+<<<<<<< HEAD
   nodemailer@9.0.1: {}
+=======
+  nodemailer@6.10.1: {}
+>>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
 
   normalize-path@3.0.0: {}
 
