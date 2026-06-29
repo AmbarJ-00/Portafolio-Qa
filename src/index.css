@@ -8,7 +8,7 @@
   }
 
   body {
-    background-color: var(--bg-global, #f8fafc);
+    background-color: var(--bg-global, #89b7e6);
     color: var(--color-text, #0f172a);
     @apply antialiased selection:bg-brand-electric-500 dark:selection:bg-brand-lilac-500 selection:text-white;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -21,6 +21,7 @@
 }
 
 @layer components {
+
   /* Premium Glassmorphism styling variables using dynamic CSS properties */
   .glass-card {
     background-color: var(--bg-card, rgba(255, 255, 255, 0.7));
@@ -29,11 +30,11 @@
     backdrop-filter: blur(12px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .glass-card-hover {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .glass-card-hover:hover {
     border-color: var(--color-button, #7c3aed);
     box-shadow: 0 10px 15px -3px var(--color-shadow, rgba(0, 0, 0, 0.1));
@@ -49,11 +50,11 @@
 
   /* Beautiful glowing indicators */
   .glow-blue {
-    @apply shadow-[0_0_20px_-3px_rgba(0,191,255,0.2)] dark:shadow-[0_0_20px_-3px_rgba(168,85,247,0.2)];
+    @apply shadow-[0_0_20px_-3px_rgba(0, 191, 255, 0.2)] dark:shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
   }
 
   .glow-lilac {
-    @apply shadow-[0_0_20px_-3px_rgba(168,85,247,0.2)];
+    @apply shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
   }
 }
 

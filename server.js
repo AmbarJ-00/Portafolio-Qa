@@ -9,10 +9,6 @@ import { fileURLToPath } from 'url';
 import { query, checkDatabaseConnection, initDb } from './src/config/db.js';
 import nodemailer from 'nodemailer';
 import { mailConfig } from './src/config/mail.js';
-<<<<<<< HEAD
-=======
-
->>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
 
 dotenv.config();
 
@@ -56,8 +52,8 @@ app.use((req, res, next) => {
 });
 
 // Explicit CORS Config (No wildcard in production)
-const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? [process.env.APP_URL || 'https://qa-portfolio.vercel.app'] 
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.APP_URL || 'https://qa-portfolio.vercel.app']
   : ['http://localhost:3000', 'http://localhost:3001'];
 
 app.use(cors({
@@ -225,7 +221,7 @@ app.get('/api/portfolio', async (req, res) => {
     const personal = personalRows[0] || {};
     const heroCards = heroRows;
     const aboutItems = aboutRows;
-    
+
     const projects = projectRows.map(p => ({
       ...p,
       integrations: JSON.parse(p.integrations || '[]'),
@@ -383,7 +379,7 @@ app.post('/api/admin/projects', async (req, res) => {
       `INSERT INTO projects (id, title, description, category, demo, repository, image, integrations, objectives, testingStrategy, testPlan, risks, bugs, status, demoVisibility, enableMetrics, metrics) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, p.title, p.description || '', p.category || '', p.demo || '', p.repository || '', p.image || '', 
+        id, p.title, p.description || '', p.category || '', p.demo || '', p.repository || '', p.image || '',
         JSON.stringify(p.integrations || []), JSON.stringify(p.objectives || []), p.testingStrategy || '', p.testPlan || '',
         JSON.stringify(p.risks || []), JSON.stringify(p.bugs || []), p.status || 'active', p.demoVisibility || 'show',
         p.enableMetrics !== false, JSON.stringify(p.metrics || {})
@@ -402,7 +398,7 @@ app.put('/api/admin/projects/:id', async (req, res) => {
     await query(
       `UPDATE projects SET title=?, description=?, category=?, demo=?, repository=?, image=?, integrations=?, objectives=?, testingStrategy=?, testPlan=?, risks=?, bugs=?, status=?, demoVisibility=?, enableMetrics=?, metrics=? WHERE id=?`,
       [
-        p.title, p.description || '', p.category || '', p.demo || '', p.repository || '', p.image || '', 
+        p.title, p.description || '', p.category || '', p.demo || '', p.repository || '', p.image || '',
         JSON.stringify(p.integrations || []), JSON.stringify(p.objectives || []), p.testingStrategy || '', p.testPlan || '',
         JSON.stringify(p.risks || []), JSON.stringify(p.bugs || []), p.status || 'active', p.demoVisibility || 'show',
         p.enableMetrics !== false, JSON.stringify(p.metrics || {}), req.params.id
@@ -702,7 +698,7 @@ app.post('/api/admin/modules', async (req, res) => {
   const m = sanitizeObject(req.body);
   const id = m.id || `module-${Math.random().toString(36).slice(2, 9)}`;
   const configurado = m.configurado === true || m.configurado === 1;
-  
+
   try {
     // 1. Insert module metadata
     await query(
@@ -822,8 +818,8 @@ app.post('/api/contact', async (req, res) => {
 
   // Rate Limit Check
   if (contactRateLimit[ip].length >= maxRequests) {
-    return res.status(429).json({ 
-      error: 'Demasiadas solicitudes de contacto. Por favor, inténtalo de nuevo más tarde.' 
+    return res.status(429).json({
+      error: 'Demasiadas solicitudes de contacto. Por favor, inténtalo de nuevo más tarde.'
     });
   }
   contactRateLimit[ip].push(now);
@@ -900,7 +896,7 @@ app.post('/api/contact', async (req, res) => {
         subject: `Contacto QA Portfolio: ${queryType} - de ${name}`,
         html: emailBody
       });
-      
+
       console.log(`[EMAIL SENT] Contact message sent successfully to ${targetEmail}`);
     } else {
       console.warn(`[EMAIL NOT SENT - SMTP MISSING] Mail content:\nRecipient: ${targetEmail}\nContent:`, {
@@ -936,9 +932,9 @@ if (process.env.VERCEL !== '1') {
   });
 }
 
-<<<<<<< HEAD
+
 export default app;
-=======
+
 console.log({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -946,5 +942,3 @@ console.log({
   database: process.env.DB_NAME
 });
 
-export default app;
->>>>>>> 050be57643d1e1beb92feea08ae3c00eaef2c2fa
