@@ -55,9 +55,15 @@
   }
 
   body {
+<<<<<<< HEAD
     background-color: var(--bg-global);
     color: var(--color-text);
     @apply antialiased;
+=======
+    background-color: var(--bg-global, #89b7e6);
+    color: var(--color-text, #0f172a);
+    @apply antialiased selection:bg-brand-electric-500 dark:selection:bg-brand-lilac-500 selection:text-white;
+>>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: 'Inter', sans-serif;
   }
@@ -80,7 +86,12 @@
 }
 
 @layer components {
+<<<<<<< HEAD
   /* ── Glass card ─────────────────────────────────────────── */
+=======
+
+  /* Premium Glassmorphism styling variables using dynamic CSS properties */
+>>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
   .glass-card {
     background-color: var(--bg-card);
     border: 1px solid var(--color-border);
@@ -112,6 +123,7 @@
 
   /* ── Glow effects ────────────────────────────────────────── */
   .glow-blue {
+<<<<<<< HEAD
     box-shadow: 0 0 24px -4px var(--color-button);
   }
 
@@ -166,3 +178,26 @@
 ::-webkit-scrollbar-track    { background: var(--bg-global); }
 ::-webkit-scrollbar-thumb    { background: var(--color-border); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-button); }
+=======
+    @apply shadow-[0_0_20px_-3px_rgba(0, 191, 255, 0.2)] dark:shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
+  }
+
+  .glow-lilac {
+    @apply shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-brand-ash-100 dark:bg-brand-navy-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-ash-300 dark:bg-brand-navy-800 rounded-full hover:bg-brand-ash-400 dark:hover:bg-brand-navy-700;
+}
+>>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b

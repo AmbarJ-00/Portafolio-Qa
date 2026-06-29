@@ -59,7 +59,6 @@ const helpIcons = [
   { name: 'Code', Icon: Code },
   { name: 'Bug', Icon: Bug },
   { name: 'Database', Icon: Database },
-  { name: 'container', Icon: container },
   { name: 'Shield', Icon: Shield },
   { name: 'Globe', Icon: Globe },
   { name: 'Monitor', Icon: Monitor },
@@ -82,11 +81,10 @@ const SortableItem = ({ skill, onEdit, onDelete, listeners, attributes, setNodeR
         <h3 className="font-semibold text-[#E2E8F0] flex items-center gap-2">
           {skill.name}
           {skill.status && skill.status !== 'active' && (
-            <span className={`text-[9px] border px-2 py-0.5 rounded-full font-semibold uppercase ${
-              skill.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' : 
-              skill.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' : 
-              'bg-red-950/80 text-red-400 border-red-500/20'
-            }`}>
+            <span className={`text-[9px] border px-2 py-0.5 rounded-full font-semibold uppercase ${skill.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' :
+                skill.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' :
+                  'bg-red-950/80 text-red-400 border-red-500/20'
+              }`}>
               {skill.status === 'maintenance' ? 'Mantenimiento' : skill.status === 'learning' ? 'En proceso' : 'Inactivo'}
             </span>
           )}
@@ -394,9 +392,9 @@ const SkillsManager = () => {
           </div>
         }
       >
-        <form 
-          id="edit-skill-form" 
-          onSubmit={handleSubmitEdit(onUpdateSkill)} 
+        <form
+          id="edit-skill-form"
+          onSubmit={handleSubmitEdit(onUpdateSkill)}
           className="space-y-5 max-h-[60vh] overflow-y-auto pr-2"
         >
           {[

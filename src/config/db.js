@@ -16,8 +16,8 @@ export function getPoolConfig() {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'potfolio_bd_v1',
-    port: Number(process.env.DB_PORT) || 1610,
+    database: process.env.DB_NAME || 'qa_portfolio',
+    port: Number(process.env.DB_PORT) || 3006,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -39,7 +39,7 @@ async function addColumnIfNotExists(conn, table, column, definition) {
 
 export async function initDb() {
   const config = getPoolConfig();
-  
+
   // 1. Try connecting without database first to ensure DB exists
   let tempConn;
   try {
@@ -54,7 +54,7 @@ export async function initDb() {
     await tempConn.end();
   } catch (err) {
     if (tempConn) await tempConn.end();
-    
+
     // Categorize standard MySQL error codes
     const errorObj = new Error(`Database connection failed: ${err.message}`);
     errorObj.code = 'DB-500';
@@ -330,8 +330,8 @@ export async function initDb() {
           `INSERT INTO skills (id, name, icon, level, category, tools, relation, description, color, status, priority) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            s.id, s.name, s.icon, s.level, s.category, 
-            JSON.stringify(s.tools || []), JSON.stringify(s.relation || []), 
+            s.id, s.name, s.icon, s.level, s.category,
+            JSON.stringify(s.tools || []), JSON.stringify(s.relation || []),
             s.description || '', s.color || '#7c3aed', s.status || 'active', priority++
           ]
         );
@@ -346,9 +346,9 @@ export async function initDb() {
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             p.id, p.title, p.description || '', p.titleKey || null, p.descriptionKey || null, p.translationKey || null,
-            p.category || '', p.demo || '', p.repository || '', p.image || '', 
-            JSON.stringify(p.integrations || []), JSON.stringify(p.objectives || []), 
-            p.testingStrategy || '', p.testPlan || '', JSON.stringify(p.risks || []), 
+            p.category || '', p.demo || '', p.repository || '', p.image || '',
+            JSON.stringify(p.integrations || []), JSON.stringify(p.objectives || []),
+            p.testingStrategy || '', p.testPlan || '', JSON.stringify(p.risks || []),
             JSON.stringify(p.bugs || []), p.status || 'active', p.demoVisibility || 'show',
             p.enableMetrics !== false, JSON.stringify(p.metrics || {})
           ]
@@ -364,8 +364,8 @@ export async function initDb() {
           `INSERT INTO certifications (id, title, authority, image, date, tools, integrations, summary, url, status, priority) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            c.id, c.title, c.authority || '', c.image || '', c.date || '', 
-            JSON.stringify(c.tools || []), JSON.stringify(c.integrations || []), 
+            c.id, c.title, c.authority || '', c.image || '', c.date || '',
+            JSON.stringify(c.tools || []), JSON.stringify(c.integrations || []),
             c.summary || '', c.url || '', c.status || 'Active', priority++
           ]
         );
@@ -380,8 +380,8 @@ export async function initDb() {
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             t.id, t.title, t.titleKey || null, t.descriptionKey || null, t.methodologyKey || null,
-            t.category || '', t.type || '', t.template || '', JSON.stringify(t.questions || []), 
-            JSON.stringify(t.parameters || []), t.methodology || '', 
+            t.category || '', t.type || '', t.template || '', JSON.stringify(t.questions || []),
+            JSON.stringify(t.parameters || []), t.methodology || '',
             JSON.stringify(t.checklist || []), JSON.stringify(t.strategies || [])
           ]
         );
@@ -435,7 +435,7 @@ export async function initDb() {
         `INSERT INTO modules (id, nombre, descripcion, tipo, estado, mensaje_creativo, visible, configurado, priority) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          'portfolio-overview', 'Portfolio', 'Showcase projects, skills and certifications in a modular experience.', 
+          'portfolio-overview', 'Portfolio', 'Showcase projects, skills and certifications in a modular experience.',
           'cards', 'active', '', true, true, 0
         ]
       );
