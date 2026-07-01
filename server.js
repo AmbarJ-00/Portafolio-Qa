@@ -163,13 +163,18 @@ app.post('/api/auth/login', async (req, res) => {
     // --- Fallback: validate against env vars if the DB is unavailable ---
     const fallbackUser = process.env.ADMIN_FALLBACK_USER;
     const fallbackPass = process.env.ADMIN_FALLBACK_PASS;
-    const isDbError = err.code === 'DB-500' ||
+    const DB_ERROR_CODES = ['DB-500', 'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND', 'ER_ACCESS_DENIED_ERROR', 'PROTOCOL_CONNECTION_LOST'];
+    const isDbError = DB_ERROR_CODES.includes(err.code) ||
       (err.message && (
         err.message.includes('ECONNREFUSED') ||
         err.message.includes('ETIMEDOUT') ||
+        err.message.includes('ENOTFOUND') ||
         err.message.includes('ER_ACCESS_DENIED') ||
+        err.message.includes('Database') ||
+        err.message.includes('database') ||
         err.message.includes('connection') ||
-        err.message.includes('connect')
+        err.message.includes('connect') ||
+        err.message.includes('Migration')
       ));
 
     if (isDbError && fallbackUser && fallbackPass) {
