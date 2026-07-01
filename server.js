@@ -865,41 +865,32 @@ app.post('/api/contact', async (req, res) => {
       console.warn(`[DB Persist Failed] Could not save contact message: ${dbErr.message}`);
     }
 
-    // 5. Send Email via Nodemailer
-    const { smtp, targetEmail } = mailConfig;
-    const emailBody = `
-      <h3>Nuevo mensaje de contacto</h3>
-      <p><strong>Nombre:</strong> ${name}</p>
-      <p><strong>Correo electrónico:</strong> ${email}</p>
-      <p><strong>Tipo de consulta:</strong> ${queryType}</p>
-      <p><strong>Número de contacto:</strong> ${phone || 'N/A'}</p>
-      <p><strong>Contacto alternativo:</strong> ${alternativeContact || 'N/A'}</p>
-      <p><strong>Mensaje:</strong></p>
-      <p>${message.replace(/\n/g, '<br>')}</p>
-    `;
-
-    if (smtp.auth.user && smtp.auth.pass) {
-      const transporter = nodemailer.createTransport({
-        host: smtp.host,
-        port: smtp.smtpPort || smtp.port,
-        secure: smtp.secure,
-        auth: {
-          user: smtp.auth.user,
-          pass: smtp.auth.pass
-        }
+    if (targetEmail) {
+      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          Nombre: name,
+          Email: email,
+          'Tipo de Consulta': queryType,
+          'Contacto Principal': phone || 'N/A',
+          'Contacto Alternativo': alternativeContact || 'N/A',
+          Mensaje: message,
+          _subject: `Contacto QA Portfolio: ${queryType} - de ${name}`
+        })
       });
 
-      await transporter.sendMail({
-        from: `"${name}" <${smtp.auth.user}>`,
-        to: targetEmail,
-        replyTo: email,
-        subject: `Contacto QA Portfolio: ${queryType} - de ${name}`,
-        html: emailBody
-      });
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`FormSubmit respondió con estado ${response.status}: ${errText}`);
+      }
 
-      console.log(`[EMAIL SENT] Contact message sent successfully to ${targetEmail}`);
+      console.log(`[EMAIL SENT VIA FORMSUBMIT] Contact message sent successfully to ${targetEmail}`);
     } else {
-      console.warn(`[EMAIL NOT SENT - SMTP MISSING] Mail content:\nRecipient: ${targetEmail}\nContent:`, {
+      console.warn(`[EMAIL NOT SENT - TARGET EMAIL MISSING] Mail content:`, {
         name, email, queryType, phone, alternativeContact, message
       });
     }

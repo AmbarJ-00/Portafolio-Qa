@@ -72,51 +72,33 @@ const Skills = () => {
             {t('skills.subtitle')}
           </p>
           <div className="h-1 w-20 bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded" />
-        </div>
-
-        {/* Skills Cards Grid */}
+        </div>        {/* Skills Cards Grid */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
         >
           {visibleSkills.map((skill) => (
             <StatusCard key={skill.id} status={skill.status} type="skill">
               <motion.button
                 variants={itemVariants}
                 onClick={() => setSelectedSkill(skill)}
-                className="glass-card glass-card-hover p-6 rounded-xl flex flex-col items-start gap-4 text-left w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
+                className="glass-card glass-card-hover p-4 rounded-xl flex flex-col items-center gap-3 text-center w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
                 aria-haspopup="dialog"
                 aria-label={`Show details for ${skill.name}`}
               >
                 {/* Decorative side accent */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-brand-electric-500 dark:bg-brand-electric-500/80 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 
-                <div className="p-2.5 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
-                  {renderIcon(skill.icon, "w-6 h-6 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
+                <div className="p-2 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
+                  {renderIcon(skill.icon, "w-5 h-5 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
                 </div>
                 
-                <div className="w-full space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-brand-navy-900 dark:text-white text-base">
-                      {skill.name}
-                    </span>
-                    <span className="text-xs font-semibold text-brand-navy-500 dark:text-brand-ash-400">
-                      {skill.level}%
-                    </span>
-                  </div>
-                  
-                  {/* Progress bar */}
-                  <div className="h-1.5 w-full bg-brand-ash-200 dark:bg-brand-navy-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${skill.level}%`,
-                        backgroundColor: skill.color || '#00bfff'
-                      }}
-                    />
-                  </div>
+                <div className="w-full">
+                  <span className="font-bold text-brand-navy-900 dark:text-white text-xs block truncate">
+                    {skill.name}
+                  </span>
                 </div>
               </motion.button>
             </StatusCard>
@@ -160,12 +142,6 @@ const Skills = () => {
 
                 {/* Modal Content */}
                 <div className="p-6 space-y-6 overflow-y-auto flex-1">
-                  {/* Skill level indicator */}
-                  <div className="flex justify-between items-center text-sm font-bold text-brand-navy-800 dark:text-brand-ash-200">
-                    <span>{t('skills.modal_title')}</span>
-                    <span className="text-brand-electric-500">{selectedSkill.level}%</span>
-                  </div>
-
                   <div className="space-y-4 text-sm leading-relaxed">
                     {/* Desc */}
                     <div className="space-y-1">

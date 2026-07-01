@@ -34,7 +34,7 @@ import Modal from '../../components/Modal.jsx';
 const skillSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   category: z.string().min(3, 'La categoría es obligatoria'),
-  level: z.number().min(0, 'El nivel debe ser al menos 0').max(100, 'El nivel no puede superar 100'),
+  level: z.number().optional().default(100),
   icon: z.string().min(2, 'El icono es obligatorio'),
   color: z.string().min(3, 'El color es obligatorio'),
   tools: z.string().optional(),
@@ -272,25 +272,13 @@ const SkillsManager = () => {
               </div>
             ))}
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-white">Nivel (%)</label>
-                <input
-                  type="number"
-                  {...register('level', { valueAsNumber: true })}
-                  className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
-                />
-                <p className="text-xs text-[#C9F7EE]">Valor entre 0 y 100</p>
-                {errors.level && <p className="text-xs text-[#FCA5A5]">{errors.level.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-white">Color</label>
-                <input
-                  type="color"
-                  {...register('color')}
-                  className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white">Color</label>
+              <input
+                type="color"
+                {...register('color')}
+                className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+              />
             </div>
 
             <div className="space-y-2">
@@ -416,25 +404,13 @@ const SkillsManager = () => {
             </div>
           ))}
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white">Nivel (%)</label>
-              <input
-                type="number"
-                {...registerEdit('level', { valueAsNumber: true })}
-                className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
-              />
-              <p className="text-xs text-[#C9F7EE]">Valor entre 0 y 100</p>
-              {editErrors.level && <p className="text-xs text-[#FCA5A5]">{editErrors.level.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white">Color</label>
-              <input
-                type="color"
-                {...registerEdit('color')}
-                className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-white">Color</label>
+            <input
+              type="color"
+              {...registerEdit('color')}
+              className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+            />
           </div>
 
           <div className="space-y-2">

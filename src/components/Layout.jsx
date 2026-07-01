@@ -49,22 +49,22 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty('--bg-global',      currentColors.background || defaults.background);
-    root.style.setProperty('--bg-card',        currentColors.card       || defaults.card);
-    root.style.setProperty('--color-button',   currentColors.button     || defaults.button);
-    root.style.setProperty('--color-accent',   currentColors.accent     || currentColors.button || defaults.button);
-    root.style.setProperty('--color-text',     currentColors.text       || defaults.text);
-    root.style.setProperty('--color-border',   currentColors.border     || defaults.border);
-    root.style.setProperty('--color-shadow',   currentColors.shadow     || defaults.shadow);
-    root.style.setProperty('--color-gradient', currentColors.gradient   || defaults.gradient);
-    root.style.setProperty('--color-navbar',   currentColors.navbar     || defaults.navbar);
-    root.style.setProperty('--color-footer',   currentColors.footer     || defaults.footer);
-    root.style.setProperty('--color-muted',    currentColors.muted      || defaults.muted);
+    root.style.setProperty('--bg-global', currentColors.background || defaults.background);
+    root.style.setProperty('--bg-card', currentColors.card || defaults.card);
+    root.style.setProperty('--color-button', currentColors.button || defaults.button);
+    root.style.setProperty('--color-accent', currentColors.accent || currentColors.button || defaults.button);
+    root.style.setProperty('--color-text', currentColors.text || defaults.text);
+    root.style.setProperty('--color-border', currentColors.border || defaults.border);
+    root.style.setProperty('--color-shadow', currentColors.shadow || defaults.shadow);
+    root.style.setProperty('--color-gradient', currentColors.gradient || defaults.gradient);
+    root.style.setProperty('--color-navbar', currentColors.navbar || defaults.navbar);
+    root.style.setProperty('--color-footer', currentColors.footer || defaults.footer);
+    root.style.setProperty('--color-muted', currentColors.muted || defaults.muted);
     root.style.setProperty('--color-button-glow',
       theme === 'dark' ? 'rgba(202,164,110,0.25)' : 'rgba(214,136,128,0.25)'
     );
     document.body.style.backgroundColor = currentColors.background || defaults.background;
-    document.body.style.color           = currentColors.text       || defaults.text;
+    document.body.style.color = currentColors.text || defaults.text;
   }, [theme, currentColors]);
 
   // Status routing
