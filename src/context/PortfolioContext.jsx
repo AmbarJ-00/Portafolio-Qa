@@ -22,7 +22,7 @@ const getInitialState = () => ({
   certifications: [],
   documentation: { templates: [] },
   settings: {
-    seo: { title: 'Ambar Ramon | QA Lead', description: 'QA lead portfolio and quality management system.' },
+    seo: { title: 'Ambar Ramon | Analista Qa & Qa Automatizado', description: 'Qa Engineer' },
     appearance: getFallbackState().settings.appearance,
     navbar: {
       items: getFallbackState().settings.navbar.items,
