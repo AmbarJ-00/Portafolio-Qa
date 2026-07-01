@@ -125,6 +125,58 @@ function sanitizeObject(obj) {
   return result;
 }
 
+// Helper to determine if an error is database-related (connection issues, query/schema issues, driver drops, auth failures, etc.)
+export function isDatabaseError(err) {
+  if (!err) return false;
+
+  // 1. Check code (case-insensitive)
+  const code = String(err.code || '').toUpperCase();
+  const dbCodes = [
+    'DB-500',
+    'ECONNREFUSED',
+    'ETIMEDOUT',
+    'ENOTFOUND',
+    'ECONNRESET',
+    'EPIPE',
+    'EADDRNOTAVAIL',
+    'PROTOCOL_CONNECTION_LOST',
+    'PROTOCOL_SEQUENCE_TIMEOUT',
+    'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR',
+    'ER_ACCESS_DENIED_ERROR',
+    'ER_BAD_DB_ERROR',
+    'ER_NO_SUCH_TABLE',
+    'ER_PARSE_ERROR',
+    'ER_NO_DB_ERROR'
+  ];
+
+  if (dbCodes.includes(code) || code.startsWith('ER_')) {
+    return true;
+  }
+
+  // 2. Check message content (case-insensitive keywords)
+  const message = String(err.message || '').toLowerCase();
+  const dbKeywords = [
+    'connection',
+    'connect',
+    'database',
+    'db-',
+    'mysql',
+    'dial',
+    'refused',
+    'timeout',
+    'lost',
+    'handshake',
+    'pool',
+    'access denied',
+    'no such table',
+    'exist',
+    'address',
+    'socket'
+  ];
+
+  return dbKeywords.some(keyword => message.includes(keyword));
+}
+
 // Database Connection Check Endpoint
 app.get('/api/db-check', async (req, res) => {
   try {

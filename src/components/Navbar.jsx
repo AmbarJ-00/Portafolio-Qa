@@ -3,7 +3,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
-import { Menu, X, Sun, Moon, Globe, Github, Linkedin } from 'lucide-react';
+import { Menu, X, Sun, Moon, Globe, Github, Linkedin, Radar } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Navbar = () => {
@@ -49,7 +49,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full nav-blur">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-14">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}

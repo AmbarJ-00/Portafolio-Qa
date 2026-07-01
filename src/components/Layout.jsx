@@ -84,7 +84,7 @@ const Layout = ({ children }) => {
           <motion.main
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 flex items-center justify-center"
+            className="flex-grow max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-14 py-16 flex items-center justify-center"
           >
             <div
               className="glass-card rounded-[2rem] p-8 max-w-2xl text-center space-y-6 shadow-xl"

@@ -1,42 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { portfolioConfig as defaultPortfolioConfig } from '../data/portfolioData.js';
+import { storageService } from '../services/storage/storage.service.js';
+import { localStorageService, getFallbackState } from '../services/storage/localStorage.service.js';
 
 const PortfolioContext = createContext();
-
-const defaultNavbarItems = [
-  { id: 'home', name: 'Home', labelKey: 'nav.home', path: '/', active: true },
-  { id: 'projects', name: 'Projects', labelKey: 'nav.projects', path: '/projects', active: true },
-  { id: 'skills', name: 'Skills', labelKey: 'nav.skills', path: '/skills', active: true },
-  { id: 'documentation', name: 'Documentation', labelKey: 'nav.documentation', path: '/documentation', active: true },
-  { id: 'certifications', name: 'Certifications', labelKey: 'nav.certifications', path: '/certifications', active: true },
-  { id: 'about', name: 'About', labelKey: 'nav.about', path: '/about', active: true },
-  { id: 'contact', name: 'Contact', labelKey: 'nav.contact', path: '/contact', active: true }
-];
-
-const defaultAppearance = {
-  home: { gradient: 'from-brand-navy-800 via-brand-electric-500 to-brand-lilac-500', particles: true, heroEffect: 'glow' },
-  projects: { cardStyle: 'glass', shadowStrength: 'medium', highlightColor: 'brand-electric-500' },
-  skills: { modalStyle: 'card', progressStyle: 'gradient', cardAnimation: 'float' },
-  certifications: { cardStyle: 'image-frame', borderStyle: 'rounded', animation: 'fade' },
-  colors: {
-    light: { primary: '#0f172a', secondary: '#7c3aed', accent: '#38bdf8', success: '#10b981', warning: '#f59e0b', danger: '#ef4444' },
-    dark: { background: '#020617', surface: '#111827', text: '#f8fafc', muted: '#94a3b8', accent: '#a78bfa' },
-    hover: '#38bdf8', metrics: '#f97316', icons: '#7c3aed', decorative: '#38bdf8'
-  },
-  navbar: { type: 'horizontal', layout: 'wrap', behavior: 'grid' }
-};
-
-const defaultModules = [
-  {
-    id: 'portfolio-overview',
-    name: 'Portfolio',
-    icon: 'Layers',
-    description: 'Showcase projects, skills and certifications in a modular experience.',
-    cards: ['Featured projects', 'Top skills', 'Certifications summary'],
-    colors: { accent: '#38bdf8', surface: '#0f172a' },
-    animation: 'fade-in'
-  }
-];
 
 const createId = (prefix = 'item') => `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -46,48 +12,6 @@ const splitCsv = (value) =>
     : Array.isArray(value)
       ? value
       : [];
-
-const getFallbackState = () => ({
-  personal: defaultPortfolioConfig.personal || {
-    name: "Ambar Ramon",
-    roleKey: "personal.role",
-    taglineKey: "personal.tagline",
-    location: "Republica dominicana, Santo domingo",
-    email: "ambarJob007@gmail.com",
-    github: "https://github.com/AmbarJ-00",
-    linkedin: "https://www.linkedin.com/in/ambarrq/"
-  },
-  aboutItems: [
-    { id: 'about-1', type: 'mision', title: 'Misión Profesional', description: 'Asegurar la calidad del software mediante metodologías ágiles y automatización eficiente.', position: 'center', priority: 1, status: 'active', behavior: 'card' }
-  ],
-  heroCards: [
-    { id: 'hero-1', title: 'Liderazgo de Calidad', description: 'Garantizando la excelencia en cada sprint', icon: 'ShieldCheck', status: 'active', priority: 1 },
-    { id: 'hero-2', title: 'Automatización Eficiente', description: 'Reduciendo tiempos de ejecución con scripts estables', icon: 'Terminal', status: 'active', priority: 2 }
-  ],
-  projects: defaultPortfolioConfig.projects || [],
-  skills: defaultPortfolioConfig.skills || [],
-  certifications: defaultPortfolioConfig.certifications || [],
-  documentation: defaultPortfolioConfig.documentation || { templates: [] },
-  settings: {
-    seo: defaultPortfolioConfig.settings?.seo || { title: 'Ambar Ramon | QA Lead', description: 'QA lead portfolio and quality management system.' },
-    appearance: defaultAppearance,
-    navbar: {
-      items: defaultNavbarItems,
-      type: 'horizontal',
-      layout: 'wrap',
-      behavior: 'grid'
-    },
-    modules: defaultModules,
-    contact: {
-      email: defaultPortfolioConfig.personal?.email || '',
-      linkedin: defaultPortfolioConfig.personal?.linkedin || '',
-      github: defaultPortfolioConfig.personal?.github || '',
-      phone: '',
-      alternativeContact: '',
-      country: defaultPortfolioConfig.personal?.location || ''
-    }
-  }
-});
 
 const getInitialState = () => ({
   personal: {},
@@ -99,14 +23,14 @@ const getInitialState = () => ({
   documentation: { templates: [] },
   settings: {
     seo: { title: 'Ambar Ramon | QA Lead', description: 'QA lead portfolio and quality management system.' },
-    appearance: defaultAppearance,
+    appearance: getFallbackState().settings.appearance,
     navbar: {
-      items: defaultNavbarItems,
+      items: getFallbackState().settings.navbar.items,
       type: 'horizontal',
       layout: 'wrap',
       behavior: 'grid'
     },
-    modules: defaultModules,
+    modules: getFallbackState().settings.modules,
     contact: {}
   }
 });
@@ -116,64 +40,22 @@ export const PortfolioProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [dbError, setDbError] = useState(null);
 
-  // Authenticated fetch helper
-  const apiCall = async (url, options = {}) => {
-    const token = sessionStorage.getItem('qa-admin-token');
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...(options.headers || {})
-    };
-    
-    try {
-      const response = await fetch(url, { ...options, headers });
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        
-        // Handle specific DB-500 error code
-        if (response.status === 500 && errData.code === 'DB-500') {
-          setDbError('DB-500');
-        }
-        
-        const error = new Error(errData.error || `HTTP error ${response.status}`);
-        error.code = errData.code || 'Server-500';
-        throw error;
-      }
-      return response.json();
-    } catch (err) {
-      console.error(`API Call failed to: ${url}`, err);
-      // Trigger error log endpoint on backend (non-blocking)
-      if (url !== '/api/errors' && token) {
-        fetch('/api/errors', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: err.code || 'Server-500',
-            user: 'admin',
-            module: url.split('/')[2] || 'context',
-            action: options.method || 'GET',
-            details: err.message
-          })
-        }).catch(() => {});
-      }
-      throw err;
-    }
-  };
-
   const loadData = async () => {
     setLoading(true);
     setDbError(null);
     try {
-      const data = await apiCall('/api/portfolio');
-      setStore(data);
-    } catch (err) {
-      console.warn("Using fallback portfolio data due to connection failure:", err.message);
-      if (err.code === 'DB-500') {
-        setDbError('DB-500');
+      const data = await storageService.getPortfolio();
+      if (data) {
+        storageService.saveLocalPortfolio(data);
+        setStore(data);
       } else {
-        setDbError('Server-500');
+        throw new Error('No data returned from storage');
       }
-      setStore(getFallbackState());
+    } catch (err) {
+      console.warn('Storage load failed. Using localStorage fallback:', err.message);
+      setDbError('Server-500');
+      const localData = localStorageService.getPortfolio();
+      setStore(localData);
     } finally {
       setLoading(false);
     }
@@ -183,82 +65,69 @@ export const PortfolioProvider = ({ children }) => {
     loadData();
   }, []);
 
+  // Persist every store change to localStorage
+  useEffect(() => {
+    if (!loading && store && store.personal && Object.keys(store.personal).length > 0) {
+      storageService.saveLocalPortfolio(store);
+    }
+  }, [store, loading]);
+
+  // ─── PERSONAL ──────────────────────────────────────────────────────────────
   const updatePersonal = async (payload) => {
-    try {
-      await apiCall('/api/admin/personal', { method: 'PUT', body: JSON.stringify(payload) });
-      setStore((prev) => ({
-        ...prev,
-        personal: { ...prev.personal, ...payload }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updatePersonal(payload); } catch (err) {
+      console.warn('updatePersonal API failed, persisting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, personal: { ...prev.personal, ...payload } }));
   };
 
+  // ─── SEO ───────────────────────────────────────────────────────────────────
   const updateSEO = async (payload) => {
-    try {
-      await apiCall('/api/admin/settings/seo', { method: 'PUT', body: JSON.stringify(payload) });
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          seo: { ...prev.settings.seo, ...payload }
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateSEO(payload); } catch (err) {
+      console.warn('updateSEO API failed, persisting locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, seo: { ...prev.settings.seo, ...payload } }
+    }));
   };
 
+  // ─── CONTACT SETTINGS ──────────────────────────────────────────────────────
   const updateContact = async (payload) => {
-    try {
-      await apiCall('/api/admin/settings/contact', { method: 'PUT', body: JSON.stringify(payload) });
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          contact: { ...prev.settings.contact, ...payload }
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateContact(payload); } catch (err) {
+      console.warn('updateContact API failed, persisting locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, contact: { ...prev.settings.contact, ...payload } }
+    }));
   };
 
+  // ─── APPEARANCE ────────────────────────────────────────────────────────────
   const updateAppearance = async (payload) => {
-    try {
-      await apiCall('/api/admin/settings/appearance', { method: 'PUT', body: JSON.stringify(payload) });
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          appearance: { ...prev.settings.appearance, ...payload }
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateAppearance(payload); } catch (err) {
+      console.warn('updateAppearance API failed, persisting locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, appearance: { ...prev.settings.appearance, ...payload } }
+    }));
   };
 
+  // ─── NAVBAR ────────────────────────────────────────────────────────────────
   const saveNavbarState = async (items, navbarConfig = {}) => {
-    try {
-      const payload = {
-        items,
-        type: navbarConfig.type || store.settings.navbar.type,
-        layout: navbarConfig.layout || store.settings.navbar.layout,
-        behavior: navbarConfig.behavior || store.settings.navbar.behavior
-      };
-      await apiCall('/api/admin/settings/navbar', { method: 'PUT', body: JSON.stringify(payload) });
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          navbar: { ...prev.settings.navbar, ...payload }
-        }
-      }));
-    } catch (err) {
-      throw err;
+    const payload = {
+      items,
+      type: navbarConfig.type || store.settings.navbar.type,
+      layout: navbarConfig.layout || store.settings.navbar.layout,
+      behavior: navbarConfig.behavior || store.settings.navbar.behavior
+    };
+    try { await storageService.updateNavbar(payload); } catch (err) {
+      console.warn('updateNavbar API failed, persisting locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, navbar: { ...prev.settings.navbar, ...payload } }
+    }));
   };
 
   const setNavbar = async (payload) => {
@@ -267,8 +136,7 @@ export const PortfolioProvider = ({ children }) => {
 
   const addNavbarItem = async (item) => {
     const newItem = { id: createId('nav'), active: true, ...item };
-    const nextItems = [...store.settings.navbar.items, newItem];
-    await saveNavbarState(nextItems);
+    await saveNavbarState([...store.settings.navbar.items, newItem]);
   };
 
   const updateNavbarItem = async (itemId, payload) => {
@@ -279,14 +147,14 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const deleteNavbarItem = async (itemId) => {
-    const nextItems = store.settings.navbar.items.filter((item) => item.id !== itemId);
-    await saveNavbarState(nextItems);
+    await saveNavbarState(store.settings.navbar.items.filter((item) => item.id !== itemId));
   };
 
   const reorderNavbarItems = async (items) => {
     await saveNavbarState(items);
   };
 
+  // ─── PROJECTS ──────────────────────────────────────────────────────────────
   const addProject = async (project) => {
     const nextProject = {
       title: project.title,
@@ -314,19 +182,17 @@ export const PortfolioProvider = ({ children }) => {
         ambiguitiesFound: Number(project.ambiguitiesFound) || 0,
         qualityImpact: project.qualityImpact
       },
-      enableMetrics: project.enableMetrics || true
+      enableMetrics: project.enableMetrics !== false
     };
-
     try {
-      const res = await apiCall('/api/admin/projects', { method: 'POST', body: JSON.stringify(nextProject) });
-      nextProject.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        projects: [nextProject, ...prev.projects]
-      }));
+      const res = await storageService.addProject(nextProject);
+      if (res?.id) nextProject.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addProject API failed, saving locally:', err.message);
+      nextProject.id = project.id || createId('project');
     }
+    if (!nextProject.id) nextProject.id = project.id || createId('project');
+    setStore((prev) => ({ ...prev, projects: [nextProject, ...prev.projects] }));
   };
 
   const updateProject = async (projectId, payload) => {
@@ -343,41 +209,29 @@ export const PortfolioProvider = ({ children }) => {
         qualityImpact: payload.qualityImpact
       }
     };
-    try {
-      await apiCall(`/api/admin/projects/${projectId}`, { method: 'PUT', body: JSON.stringify(updatedProject) });
-      setStore((prev) => ({
-        ...prev,
-        projects: prev.projects.map((project) =>
-          project.id === projectId ? { ...project, ...updatedProject } : project
-        )
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateProject(projectId, updatedProject); } catch (err) {
+      console.warn('updateProject API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      projects: prev.projects.map((p) => p.id === projectId ? { ...p, ...updatedProject } : p)
+    }));
   };
 
   const deleteProject = async (projectId) => {
-    try {
-      await apiCall(`/api/admin/projects/${projectId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        projects: prev.projects.filter((project) => project.id !== projectId)
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteProject(projectId); } catch (err) {
+      console.warn('deleteProject API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, projects: prev.projects.filter((p) => p.id !== projectId) }));
   };
 
   const duplicateProject = async (projectId) => {
     const project = store.projects.find((item) => item.id === projectId);
     if (!project) return;
-    const copy = {
-      ...project,
-      title: `${project.title} (Copy)`
-    };
-    await addProject(copy);
+    await addProject({ ...project, title: `${project.title} (Copy)` });
   };
 
+  // ─── SKILLS ────────────────────────────────────────────────────────────────
   const addSkill = async (skill) => {
     const nextSkill = {
       name: skill.name,
@@ -391,15 +245,14 @@ export const PortfolioProvider = ({ children }) => {
       status: skill.status || 'active'
     };
     try {
-      const res = await apiCall('/api/admin/skills', { method: 'POST', body: JSON.stringify(nextSkill) });
-      nextSkill.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        skills: [...prev.skills, nextSkill]
-      }));
+      const res = await storageService.addSkill(nextSkill);
+      if (res?.id) nextSkill.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addSkill API failed, saving locally:', err.message);
+      nextSkill.id = skill.id || createId('skill');
     }
+    if (!nextSkill.id) nextSkill.id = skill.id || createId('skill');
+    setStore((prev) => ({ ...prev, skills: [...prev.skills, nextSkill] }));
   };
 
   const updateSkill = async (skillId, payload) => {
@@ -409,44 +262,32 @@ export const PortfolioProvider = ({ children }) => {
       tools: splitCsv(payload.tools),
       relation: splitCsv(payload.relation)
     };
-    try {
-      await apiCall(`/api/admin/skills/${skillId}`, { method: 'PUT', body: JSON.stringify(updatedSkill) });
-      setStore((prev) => ({
-        ...prev,
-        skills: prev.skills.map((skill) =>
-          skill.id === skillId ? { ...skill, ...updatedSkill } : skill
-        )
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateSkill(skillId, updatedSkill); } catch (err) {
+      console.warn('updateSkill API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      skills: prev.skills.map((s) => s.id === skillId ? { ...s, ...updatedSkill } : s)
+    }));
   };
 
   const deleteSkill = async (skillId) => {
-    try {
-      await apiCall(`/api/admin/skills/${skillId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        skills: prev.skills.filter((skill) => skill.id !== skillId)
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteSkill(skillId); } catch (err) {
+      console.warn('deleteSkill API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, skills: prev.skills.filter((s) => s.id !== skillId) }));
   };
 
   const reorderSkills = async (newOrder) => {
     try {
-      const ids = newOrder.map((s) => s.id);
-      await apiCall('/api/admin/skills/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
-      setStore((prev) => ({
-        ...prev,
-        skills: newOrder
-      }));
+      await storageService.reorderSkills(newOrder.map((s) => s.id));
     } catch (err) {
-      throw err;
+      console.warn('reorderSkills API failed, reordering locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, skills: newOrder }));
   };
 
+  // ─── CERTIFICATIONS ────────────────────────────────────────────────────────
   const addCertification = async (cert) => {
     const nextCert = {
       title: cert.title,
@@ -460,15 +301,14 @@ export const PortfolioProvider = ({ children }) => {
       status: cert.status || 'Active'
     };
     try {
-      const res = await apiCall('/api/admin/certifications', { method: 'POST', body: JSON.stringify(nextCert) });
-      nextCert.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        certifications: [...prev.certifications, nextCert]
-      }));
+      const res = await storageService.addCertification(nextCert);
+      if (res?.id) nextCert.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addCertification API failed, saving locally:', err.message);
+      nextCert.id = cert.id || createId('cert');
     }
+    if (!nextCert.id) nextCert.id = cert.id || createId('cert');
+    setStore((prev) => ({ ...prev, certifications: [...prev.certifications, nextCert] }));
   };
 
   const updateCertification = async (certId, payload) => {
@@ -477,44 +317,32 @@ export const PortfolioProvider = ({ children }) => {
       tools: splitCsv(payload.tools),
       integrations: splitCsv(payload.integrations)
     };
-    try {
-      await apiCall(`/api/admin/certifications/${certId}`, { method: 'PUT', body: JSON.stringify(updatedCert) });
-      setStore((prev) => ({
-        ...prev,
-        certifications: prev.certifications.map((cert) =>
-          cert.id === certId ? { ...cert, ...updatedCert } : cert
-        )
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateCertification(certId, updatedCert); } catch (err) {
+      console.warn('updateCertification API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      certifications: prev.certifications.map((c) => c.id === certId ? { ...c, ...updatedCert } : c)
+    }));
   };
 
   const deleteCertification = async (certId) => {
-    try {
-      await apiCall(`/api/admin/certifications/${certId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        certifications: prev.certifications.filter((cert) => cert.id !== certId)
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteCertification(certId); } catch (err) {
+      console.warn('deleteCertification API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, certifications: prev.certifications.filter((c) => c.id !== certId) }));
   };
 
   const reorderCertifications = async (newOrder) => {
     try {
-      const ids = newOrder.map((c) => c.id);
-      await apiCall('/api/admin/certifications/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
-      setStore((prev) => ({
-        ...prev,
-        certifications: newOrder
-      }));
+      await storageService.reorderCertifications(newOrder.map((c) => c.id));
     } catch (err) {
-      throw err;
+      console.warn('reorderCertifications API failed, reordering locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, certifications: newOrder }));
   };
 
+  // ─── DOCUMENTATION ─────────────────────────────────────────────────────────
   const addDocumentationTemplate = async (template) => {
     const nextTpl = {
       title: template.title,
@@ -528,18 +356,17 @@ export const PortfolioProvider = ({ children }) => {
       strategies: splitCsv(template.strategies)
     };
     try {
-      const res = await apiCall('/api/admin/documentation', { method: 'POST', body: JSON.stringify(nextTpl) });
-      nextTpl.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        documentation: {
-          ...prev.documentation,
-          templates: [nextTpl, ...prev.documentation.templates]
-        }
-      }));
+      const res = await storageService.addDocumentation(nextTpl);
+      if (res?.id) nextTpl.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addDocumentation API failed, saving locally:', err.message);
+      nextTpl.id = template.id || createId('tpl');
     }
+    if (!nextTpl.id) nextTpl.id = template.id || createId('tpl');
+    setStore((prev) => ({
+      ...prev,
+      documentation: { ...prev.documentation, templates: [nextTpl, ...prev.documentation.templates] }
+    }));
   };
 
   const updateDocumentationTemplate = async (templateId, payload) => {
@@ -550,37 +377,34 @@ export const PortfolioProvider = ({ children }) => {
       checklist: splitCsv(payload.checklist),
       strategies: splitCsv(payload.strategies)
     };
-    try {
-      await apiCall(`/api/admin/documentation/${templateId}`, { method: 'PUT', body: JSON.stringify(updatedTpl) });
-      setStore((prev) => ({
-        ...prev,
-        documentation: {
-          ...prev.documentation,
-          templates: prev.documentation.templates.map((template) =>
-            template.id === templateId ? { ...template, ...updatedTpl } : template
-          )
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateDocumentation(templateId, updatedTpl); } catch (err) {
+      console.warn('updateDocumentation API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      documentation: {
+        ...prev.documentation,
+        templates: prev.documentation.templates.map((t) =>
+          t.id === templateId ? { ...t, ...updatedTpl } : t
+        )
+      }
+    }));
   };
 
   const deleteDocumentationTemplate = async (templateId) => {
-    try {
-      await apiCall(`/api/admin/documentation/${templateId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        documentation: {
-          ...prev.documentation,
-          templates: prev.documentation.templates.filter((template) => template.id !== templateId)
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteDocumentation(templateId); } catch (err) {
+      console.warn('deleteDocumentation API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      documentation: {
+        ...prev.documentation,
+        templates: prev.documentation.templates.filter((t) => t.id !== templateId)
+      }
+    }));
   };
 
+  // ─── MODULES ───────────────────────────────────────────────────────────────
   const addModule = async (module) => {
     const moduleId = module.id || `module-${Math.random().toString(36).slice(2, 9)}`;
     const nextNavbarItem = {
@@ -591,7 +415,6 @@ export const PortfolioProvider = ({ children }) => {
       status: module.status || 'active',
       creativeMessage: module.creativeMessage || ''
     };
-
     const nextModule = {
       id: moduleId,
       name: module.name,
@@ -607,23 +430,15 @@ export const PortfolioProvider = ({ children }) => {
       surfaceColor: module.surfaceColor || '#0f172a',
       animation: module.animation || 'fade-in'
     };
-
-    try {
-      await apiCall('/api/admin/modules', { method: 'POST', body: JSON.stringify(nextModule) });
-      
-      const nextNavbarItems = [...store.settings.navbar.items, nextNavbarItem];
-      await saveNavbarState(nextNavbarItems);
-
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          modules: [nextModule, ...prev.settings.modules]
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.addModule(nextModule); } catch (err) {
+      console.warn('addModule API failed, saving locally:', err.message);
     }
+    const nextNavbarItems = [...store.settings.navbar.items, nextNavbarItem];
+    await saveNavbarState(nextNavbarItems);
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, modules: [nextModule, ...prev.settings.modules] }
+    }));
   };
 
   const updateModule = async (moduleId, payload) => {
@@ -631,74 +446,54 @@ export const PortfolioProvider = ({ children }) => {
       ...payload,
       configurado: payload.configurado === true || payload.configurado === 1
     };
-
-    try {
-      await apiCall(`/api/admin/modules/${moduleId}`, { method: 'PUT', body: JSON.stringify(nextModule) });
-
-      const nextNavbarItems = store.settings.navbar.items.map((item) =>
-        item.id === `nav-${moduleId}` || item.path === `/modules/${moduleId}`
-          ? {
-              ...item,
-              name: payload.name || item.name,
-              active: payload.status === 'active' || payload.status === 'creative' || payload.active !== false,
-              status: payload.status || item.status || 'active',
-              creativeMessage: payload.creativeMessage || item.creativeMessage || ''
-            }
-          : item
-      );
-      await saveNavbarState(nextNavbarItems);
-
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          modules: prev.settings.modules.map((module) =>
-            module.id === moduleId ? { ...module, ...nextModule } : module
-          )
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.updateModule(moduleId, nextModule); } catch (err) {
+      console.warn('updateModule API failed, saving locally:', err.message);
     }
+    const nextNavbarItems = store.settings.navbar.items.map((item) =>
+      item.id === `nav-${moduleId}` || item.path === `/modules/${moduleId}`
+        ? {
+            ...item,
+            name: payload.name || item.name,
+            active: payload.status === 'active' || payload.status === 'creative' || payload.active !== false,
+            status: payload.status || item.status || 'active',
+            creativeMessage: payload.creativeMessage || item.creativeMessage || ''
+          }
+        : item
+    );
+    await saveNavbarState(nextNavbarItems);
+    setStore((prev) => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        modules: prev.settings.modules.map((m) => m.id === moduleId ? { ...m, ...nextModule } : m)
+      }
+    }));
   };
 
   const deleteModule = async (moduleId) => {
-    try {
-      await apiCall(`/api/admin/modules/${moduleId}`, { method: 'DELETE' });
-
-      const nextNavbarItems = store.settings.navbar.items.filter(
-        (item) => item.id !== `nav-${moduleId}` && item.path !== `/modules/${moduleId}`
-      );
-      await saveNavbarState(nextNavbarItems);
-
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          modules: prev.settings.modules.filter((module) => module.id !== moduleId)
-        }
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteModule(moduleId); } catch (err) {
+      console.warn('deleteModule API failed, deleting locally:', err.message);
     }
+    const nextNavbarItems = store.settings.navbar.items.filter(
+      (item) => item.id !== `nav-${moduleId}` && item.path !== `/modules/${moduleId}`
+    );
+    await saveNavbarState(nextNavbarItems);
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, modules: prev.settings.modules.filter((m) => m.id !== moduleId) }
+    }));
   };
 
   const reorderModules = async (newOrder) => {
     try {
-      const ids = newOrder.map((m) => m.id);
-      await apiCall('/api/admin/modules/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
-      setStore((prev) => ({
-        ...prev,
-        settings: {
-          ...prev.settings,
-          modules: newOrder
-        }
-      }));
+      await storageService.reorderModules(newOrder.map((m) => m.id));
     } catch (err) {
-      throw err;
+      console.warn('reorderModules API failed, reordering locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, settings: { ...prev.settings, modules: newOrder } }));
   };
 
+  // ─── ABOUT ITEMS ───────────────────────────────────────────────────────────
   const addAboutItem = async (item) => {
     const nextItem = {
       type: item.type || 'pilar',
@@ -710,60 +505,44 @@ export const PortfolioProvider = ({ children }) => {
       behavior: item.behavior || 'card'
     };
     try {
-      const res = await apiCall('/api/admin/about-items', { method: 'POST', body: JSON.stringify(nextItem) });
-      nextItem.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        aboutItems: [nextItem, ...prev.aboutItems]
-      }));
+      const res = await storageService.addAboutItem(nextItem);
+      if (res?.id) nextItem.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addAboutItem API failed, saving locally:', err.message);
+      nextItem.id = item.id || createId('about');
     }
+    if (!nextItem.id) nextItem.id = item.id || createId('about');
+    setStore((prev) => ({ ...prev, aboutItems: [nextItem, ...prev.aboutItems] }));
   };
 
   const updateAboutItem = async (itemId, payload) => {
-    const updatedItem = {
-      ...payload,
-      priority: Number(payload.priority)
-    };
-    try {
-      await apiCall(`/api/admin/about-items/${itemId}`, { method: 'PUT', body: JSON.stringify(updatedItem) });
-      setStore((prev) => ({
-        ...prev,
-        aboutItems: prev.aboutItems.map((item) =>
-          item.id === itemId ? { ...item, ...updatedItem } : item
-        )
-      }));
-    } catch (err) {
-      throw err;
+    const updatedItem = { ...payload, priority: Number(payload.priority) };
+    try { await storageService.updateAboutItem(itemId, updatedItem); } catch (err) {
+      console.warn('updateAboutItem API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      aboutItems: prev.aboutItems.map((a) => a.id === itemId ? { ...a, ...updatedItem } : a)
+    }));
   };
 
   const deleteAboutItem = async (itemId) => {
-    try {
-      await apiCall(`/api/admin/about-items/${itemId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        aboutItems: prev.aboutItems.filter((item) => item.id !== itemId)
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteAboutItem(itemId); } catch (err) {
+      console.warn('deleteAboutItem API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, aboutItems: prev.aboutItems.filter((a) => a.id !== itemId) }));
   };
 
   const reorderAboutItems = async (newOrder) => {
     try {
-      const ids = newOrder.map((a) => a.id);
-      await apiCall('/api/admin/about-items/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
-      setStore((prev) => ({
-        ...prev,
-        aboutItems: newOrder
-      }));
+      await storageService.reorderAboutItems(newOrder.map((a) => a.id));
     } catch (err) {
-      throw err;
+      console.warn('reorderAboutItems API failed, reordering locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, aboutItems: newOrder }));
   };
 
+  // ─── HERO CARDS ────────────────────────────────────────────────────────────
   const addHeroCard = async (card) => {
     const nextCard = {
       title: card.title,
@@ -773,68 +552,59 @@ export const PortfolioProvider = ({ children }) => {
       priority: Number(card.priority) || 0
     };
     try {
-      const res = await apiCall('/api/admin/hero-cards', { method: 'POST', body: JSON.stringify(nextCard) });
-      nextCard.id = res.id;
-      setStore((prev) => ({
-        ...prev,
-        heroCards: [nextCard, ...prev.heroCards]
-      }));
+      const res = await storageService.addHeroCard(nextCard);
+      if (res?.id) nextCard.id = res.id;
     } catch (err) {
-      throw err;
+      console.warn('addHeroCard API failed, saving locally:', err.message);
+      nextCard.id = card.id || createId('hero');
     }
+    if (!nextCard.id) nextCard.id = card.id || createId('hero');
+    setStore((prev) => ({ ...prev, heroCards: [nextCard, ...prev.heroCards] }));
   };
 
   const updateHeroCard = async (cardId, payload) => {
-    const updatedCard = {
-      ...payload,
-      priority: Number(payload.priority)
-    };
-    try {
-      await apiCall(`/api/admin/hero-cards/${cardId}`, { method: 'PUT', body: JSON.stringify(updatedCard) });
-      setStore((prev) => ({
-        ...prev,
-        heroCards: prev.heroCards.map((card) =>
-          card.id === cardId ? { ...card, ...updatedCard } : card
-        )
-      }));
-    } catch (err) {
-      throw err;
+    const updatedCard = { ...payload, priority: Number(payload.priority) };
+    try { await storageService.updateHeroCard(cardId, updatedCard); } catch (err) {
+      console.warn('updateHeroCard API failed, saving locally:', err.message);
     }
+    setStore((prev) => ({
+      ...prev,
+      heroCards: prev.heroCards.map((c) => c.id === cardId ? { ...c, ...updatedCard } : c)
+    }));
   };
 
   const deleteHeroCard = async (cardId) => {
-    try {
-      await apiCall(`/api/admin/hero-cards/${cardId}`, { method: 'DELETE' });
-      setStore((prev) => ({
-        ...prev,
-        heroCards: prev.heroCards.filter((card) => card.id !== cardId)
-      }));
-    } catch (err) {
-      throw err;
+    try { await storageService.deleteHeroCard(cardId); } catch (err) {
+      console.warn('deleteHeroCard API failed, deleting locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, heroCards: prev.heroCards.filter((c) => c.id !== cardId) }));
   };
 
   const reorderHeroCards = async (newOrder) => {
     try {
-      const ids = newOrder.map((h) => h.id);
-      await apiCall('/api/admin/hero-cards/reorder', { method: 'PUT', body: JSON.stringify({ ids }) });
-      setStore((prev) => ({
-        ...prev,
-        heroCards: newOrder
-      }));
+      await storageService.reorderHeroCards(newOrder.map((h) => h.id));
     } catch (err) {
-      throw err;
+      console.warn('reorderHeroCards API failed, reordering locally:', err.message);
     }
+    setStore((prev) => ({ ...prev, heroCards: newOrder }));
   };
 
   const duplicateHeroCard = async (cardId) => {
     const card = store.heroCards.find((item) => item.id === cardId);
     if (!card) return;
-    const copy = {
-      ...card,
-      title: `${card.title} (Copy)`
-    };
-    await addHeroCard(copy);
+    await addHeroCard({ ...card, title: `${card.title} (Copy)` });
+  };
+
+  // ─── CONTACT FORM SUBMISSION ───────────────────────────────────────────────
+  // Tries backend email API first; if offline, saves locally and returns success.
+  const submitContactForm = async (data) => {
+    try {
+      const result = await storageService.submitContact(data);
+      return result;
+    } catch (err) {
+      console.warn('submitContactForm failed via service, saving locally:', err.message);
+      return localStorageService.submitContact(data);
+    }
   };
 
   const actions = {
@@ -875,6 +645,7 @@ export const PortfolioProvider = ({ children }) => {
     deleteHeroCard,
     reorderHeroCards,
     duplicateHeroCard,
+    submitContactForm,
     reload: loadData
   };
 

@@ -13,7 +13,7 @@ const inputNormal = `${inputBase} focus:ring-2 focus:ring-offset-0`;
 
 const Contact = () => {
   const { t } = useTranslation();
-  const { store } = usePortfolio();
+  const { store, actions } = usePortfolio();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -48,7 +48,7 @@ const Contact = () => {
       reset();
     } catch (err) {
       console.error('Contact submission error:', err);
-      setSubmitError(err.message || t('contact.error_desc'));
+      setSubmitError(t('contact.error_desc'));
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, ShieldAlert, Key, Settings, AlertTriangle, RefreshCw, Home, ArrowRight } from 'lucide-react';
+import { Database, ShieldAlert, Key, Settings, AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 const ErrorScreen = ({ code = 'Server-500', customMessage = '', onRetry = null }) => {
 
@@ -23,7 +23,7 @@ const ErrorScreen = ({ code = 'Server-500', customMessage = '', onRetry = null }
         return {
           title: 'Error de Autenticación',
           subtitle: 'Tu sesión ha expirado o tus credenciales son incorrectas.',
-          description: customMessage || 'No tienes una sesión activa de administrador o la firma del token JWT no coincide con el servidor de seguridad.',
+          description: customMessage || 'No tienes una sesión activa válida o la firma de autenticación no coincide con el servidor de seguridad.',
           icon: Key,
           iconColor: 'text-emerald-400',
           iconBg: 'rgba(52,211,153,0.1)',

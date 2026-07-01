@@ -1,8 +1,7 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
-import * as LucideIcons from 'lucide-react';
 import {
   HelpCircle, X,
   Layers, Database, Server, HardDrive, GitBranch, Trello, Cloud,
@@ -13,9 +12,8 @@ import {
   FileText, Package, Box, Link, Eye, PlayCircle, PauseCircle,
 } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
-import StatusCard from '../components/StatusCard.jsx';
 
-// Mapa de íconos para lookup eficiente — sin importar toda la librería
+// Icon lookup map
 const ICON_MAP = {
   Layers, Database, Server, HardDrive, GitBranch, Trello, Cloud,
   Code, FileCode, Users, Activity, TrendingUp, ShieldAlert, FileCheck,
@@ -32,43 +30,53 @@ const Skills = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.04 } }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 100 } }
+    hidden: { opacity: 0, scale: 0.9, y: 8 },
+    visible: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 14 } }
   };
 
-  // Helper to dynamically render Lucide Icons by name using the predefined map
   const renderIcon = (iconName, className) => {
     const IconComponent = ICON_MAP[iconName] || HelpCircle;
     return <IconComponent className={className} />;
   };
 
-
   const visibleSkills = store.skills.filter(
     (skill) => skill.status !== 'inactive' && skill.status !== 'Inactivo'
   );
 
+  // Badge for special statuses
+  const getStatusBadge = (status) => {
+    if (status === 'learning') {
+      return (
+        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-400" title="En proceso de adquisición" />
+      );
+    }
+    if (status === 'maintenance') {
+      return (
+        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400" title="En mantenimiento" />
+      );
+    }
+    return null;
+  };
+
   return (
     <>
-      <SEO 
-        title={t('nav.skills')} 
+      <SEO
+        title={t('nav.skills')}
         description={t('skills.subtitle')}
         path="/skills"
       />
 
-      <div className="space-y-12">
+      <div className="space-y-10">
         {/* Title Block */}
-        <div className="space-y-4 max-w-3xl">
-          <h1 className="text-4xl font-display font-extrabold text-brand-navy-900 dark:text-white">
+        <div className="space-y-3 max-w-3xl">
+          <h1 className="text-3xl font-sans font-extrabold" style={{ color: 'var(--color-text)' }}>
             {t('skills.title')}
           </h1>
-          <p className="text-lg text-brand-navy-600 dark:text-brand-ash-400">
+          <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
             {t('skills.subtitle')}
           </p>
           <div className="h-1 w-20 bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded" />
@@ -105,38 +113,57 @@ const Skills = () => {
           ))}
         </motion.div>
 
-        {/* Dynamic Details Modal Overlay */}
+        {/* Details Modal */}
         <AnimatePresence mode="wait">
           {selectedSkill && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-navy-950/80 backdrop-blur-sm" role="dialog" aria-modal="true">
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Detalles de ${selectedSkill.name}`}
+              onClick={(e) => { if (e.target === e.currentTarget) setSelectedSkill(null); }}
+            >
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                initial={{ opacity: 0, scale: 0.95, y: 12 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                transition={{ duration: 0.45, cubicBezier: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-lg glass-card rounded-2xl shadow-2xl overflow-hidden border border-brand-ash-200 dark:border-brand-navy-800 bg-white dark:bg-brand-navy-950 flex flex-col  max-h-[85vh]"
+                exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+                style={{
+                  background: 'var(--bg-global)',
+                  border: '1px solid var(--color-border)'
+                }}
               >
                 {/* Modal Header */}
-                <div className="p-6 bg-brand-ash-100/50 dark:bg-brand-navy-900/50 border-b border-brand-ash-200 dark:border-brand-navy-800 flex items-center justify-between shrink-0">
+                <div
+                  className="p-5 flex items-center justify-between shrink-0"
+                  style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--bg-card)' }}
+                >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white dark:bg-brand-navy-950 rounded-lg border border-brand-ash-200 dark:border-brand-navy-800 shadow-sm">
-                      {renderIcon(selectedSkill.icon, "w-6 h-6 text-brand-electric-500")}
+                    <div
+                      className="p-2 rounded-lg"
+                      style={{ background: 'var(--bg-global)', border: '1px solid var(--color-border)' }}
+                    >
+                      {renderIcon(selectedSkill.icon, 'w-5 h-5')}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-brand-navy-900 dark:text-white">
+                      <h2 className="text-base font-bold" style={{ color: 'var(--color-text)' }}>
                         {selectedSkill.name}
                       </h2>
-                      <span className="text-xxs font-semibold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest block mt-0.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                         {selectedSkill.category}
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedSkill(null)}
-                    className="p-1.5 hover:bg-brand-ash-200 dark:hover:bg-brand-navy-800 rounded-lg text-brand-navy-600 dark:text-brand-ash-400 focus-visible:ring-2 focus-visible:ring-brand-electric-500"
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ color: 'var(--color-muted)' }}
                     aria-label={t('cta.close')}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-card)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = ''; }}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -145,64 +172,65 @@ const Skills = () => {
                   <div className="space-y-4 text-sm leading-relaxed">
                     {/* Desc */}
                     <div className="space-y-1">
-                      <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                        {t('skills.details_desc')}
+                      <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-button)' }}>
+                        {t('skills.details_exp')}
                       </h3>
-                      <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                        {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.desc`) : selectedSkill.description}
+                      <p style={{ color: 'var(--color-muted)' }}>
+                        {selectedSkill.translationKey
+                          ? t(`${selectedSkill.translationKey}.exp`)
+                          : selectedSkill.experience}
                       </p>
                     </div>
+                  )}
 
-                    {/* Experience */}
-                    {(selectedSkill.translationKey || selectedSkill.experience) && (
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                          {t('skills.details_exp')}
-                        </h3>
-                        <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                          {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.exp`) : selectedSkill.experience}
-                        </p>
-                      </div>
-                    )}
+                  {/* Use Cases */}
+                  {(selectedSkill.translationKey || selectedSkill.useCases) && (
+                    <div className="space-y-1">
+                      <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-button)' }}>
+                        {t('skills.details_use_cases')}
+                      </h3>
+                      <p style={{ color: 'var(--color-muted)' }}>
+                        {selectedSkill.translationKey
+                          ? t(`${selectedSkill.translationKey}.use_cases`)
+                          : selectedSkill.useCases}
+                      </p>
+                    </div>
+                  )}
 
-                    {/* Use Cases */}
-                    {(selectedSkill.translationKey || selectedSkill.useCases) && (
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                          {t('skills.details_use_cases')}
-                        </h3>
-                        <p className="text-brand-navy-600 dark:text-brand-ash-400">
-                          {selectedSkill.translationKey ? t(`${selectedSkill.translationKey}.use_cases`) : selectedSkill.useCases}
-                        </p>
+                  {/* Tools */}
+                  {selectedSkill.tools && selectedSkill.tools.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-button)' }}>
+                        {t('skills.details_tools')}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedSkill.tools.map((tool, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 text-xs font-semibold rounded-full"
+                            style={{
+                              background: 'var(--bg-card)',
+                              border: '1px solid var(--color-border)',
+                              color: 'var(--color-text)'
+                            }}
+                          >
+                            {tool}
+                          </span>
+                        ))}
                       </div>
-                    )}
-
-                    {/* Tech details */}
-                    {selectedSkill.tools && selectedSkill.tools.length > 0 && (
-                      <div className="space-y-2 pt-2">
-                        <h3 className="font-semibold text-brand-navy-800 dark:text-brand-ash-200">
-                          {t('skills.details_tools')}
-                        </h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          {selectedSkill.tools.map((tool, idx) => (
-                            <span 
-                              key={idx}
-                              className="px-2 py-0.5 bg-brand-ash-100 dark:bg-brand-navy-900/60 text-brand-navy-700 dark:text-brand-ash-300 text-xs font-semibold rounded border border-brand-ash-200/50 dark:border-brand-navy-800/40"
-                            >
-                              {tool}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Footer action */}
-                <div className="p-4 bg-brand-ash-100/30 dark:bg-brand-navy-900/30 border-t border-brand-ash-200/50 dark:border-brand-navy-800/50 flex justify-end shrink-0">
+                {/* Footer */}
+                <div
+                  className="p-4 flex justify-end shrink-0"
+                  style={{ borderTop: '1px solid var(--color-border)', background: 'var(--bg-card)' }}
+                >
                   <button
                     onClick={() => setSelectedSkill(null)}
-                    className="px-4 py-2 bg-brand-navy-800 dark:bg-brand-navy-900 text-white dark:text-brand-ash-100 hover:opacity-90 font-bold text-xs rounded-lg shadow transition-opacity"
+                    className="px-4 py-2 text-xs font-bold rounded-lg transition-opacity hover:opacity-80"
+                    style={{ background: 'var(--color-button)', color: '#fff' }}
                   >
                     {t('cta.close')}
                   </button>
