@@ -27,8 +27,8 @@ build/
 *.sw?
 
 # checklist Qas
-qa/
-*.checklist.md
+# qa/
+# *.checklist.md
 
 # Environment variables
 .env
@@ -39,7 +39,8 @@ qa/
 .env.staging
 
 # Private Admin Documentation
-docs/
+# docs/
+
 
 # vista del admin completo (do not ignore src/admin)
 # admin/

@@ -55,9 +55,9 @@
   }
 
   body {
-    background-color: var(--bg-global);
-    color: var(--color-text);
-    @apply antialiased;
+    background-color: var(--bg-global, #89b7e6);
+    color: var(--color-text, #0f172a);
+    @apply antialiased selection:bg-brand-electric-500 dark:selection:bg-brand-lilac-500 selection:text-white;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: 'Inter', sans-serif;
   }
@@ -80,7 +80,8 @@
 }
 
 @layer components {
-  /* ── Glass card ─────────────────────────────────────────── */
+
+  /* Premium Glassmorphism styling variables using dynamic CSS properties */
   .glass-card {
     background-color: var(--bg-card);
     border: 1px solid var(--color-border);
@@ -112,11 +113,11 @@
 
   /* ── Glow effects ────────────────────────────────────────── */
   .glow-blue {
-    box-shadow: 0 0 24px -4px var(--color-button);
+    @apply shadow-[0_0_20px_-3px_rgba(0, 191, 255, 0.2)] dark:shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
   }
 
   .glow-lilac {
-    box-shadow: 0 0 24px -4px var(--color-accent);
+    @apply shadow-[0_0_20px_-3px_rgba(168, 85, 247, 0.2)];
   }
 
   /* ── Primary button ──────────────────────────────────────── */
@@ -142,27 +143,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* ── Form inputs ─────────────────────────────────────────── */
-  .form-input {
-    background-color: var(--bg-global);
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    border-radius: 0.5rem;
-    padding: 0.625rem 1rem;
-    width: 100%;
-    font-size: 0.875rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .form-input:focus {
-    outline: none;
-    border-color: var(--color-button);
-    /* Uses theme-aware variable instead of hardcoded rgba */
-    box-shadow: 0 0 0 3px var(--color-button-glow);
-  }
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-ash-300 dark:bg-brand-navy-800 rounded-full hover:bg-brand-ash-400 dark:hover:bg-brand-navy-700;
 }
-
-/* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar          { width: 6px; height: 6px; }
-::-webkit-scrollbar-track    { background: var(--bg-global); }
-::-webkit-scrollbar-thumb    { background: var(--color-border); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-button); }

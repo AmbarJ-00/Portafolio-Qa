@@ -34,7 +34,7 @@ import Modal from '../../components/Modal.jsx';
 const skillSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   category: z.string().min(3, 'La categoría es obligatoria'),
-  level: z.number().min(0, 'El nivel debe ser al menos 0').max(100, 'El nivel no puede superar 100'),
+  level: z.number().optional().default(100),
   icon: z.string().min(2, 'El icono es obligatorio'),
   color: z.string().min(3, 'El color es obligatorio'),
   tools: z.string().optional(),
@@ -59,7 +59,6 @@ const helpIcons = [
   { name: 'Code', Icon: Code },
   { name: 'Bug', Icon: Bug },
   { name: 'Database', Icon: Database },
-  { name: 'container', Icon: container },
   { name: 'Shield', Icon: Shield },
   { name: 'Globe', Icon: Globe },
   { name: 'Monitor', Icon: Monitor },
@@ -82,11 +81,10 @@ const SortableItem = ({ skill, onEdit, onDelete, listeners, attributes, setNodeR
         <h3 className="font-semibold text-[#E2E8F0] flex items-center gap-2">
           {skill.name}
           {skill.status && skill.status !== 'active' && (
-            <span className={`text-[9px] border px-2 py-0.5 rounded-full font-semibold uppercase ${
-              skill.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' : 
-              skill.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' : 
-              'bg-red-950/80 text-red-400 border-red-500/20'
-            }`}>
+            <span className={`text-[9px] border px-2 py-0.5 rounded-full font-semibold uppercase ${skill.status === 'maintenance' ? 'bg-amber-950/80 text-amber-400 border-amber-500/20' :
+                skill.status === 'learning' ? 'bg-indigo-950/80 text-indigo-400 border-indigo-500/20' :
+                  'bg-red-950/80 text-red-400 border-red-500/20'
+              }`}>
               {skill.status === 'maintenance' ? 'Mantenimiento' : skill.status === 'learning' ? 'En proceso' : 'Inactivo'}
             </span>
           )}
@@ -274,25 +272,13 @@ const SkillsManager = () => {
               </div>
             ))}
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-white">Nivel (%)</label>
-                <input
-                  type="number"
-                  {...register('level', { valueAsNumber: true })}
-                  className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
-                />
-                <p className="text-xs text-[#C9F7EE]">Valor entre 0 y 100</p>
-                {errors.level && <p className="text-xs text-[#FCA5A5]">{errors.level.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-white">Color</label>
-                <input
-                  type="color"
-                  {...register('color')}
-                  className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white">Color</label>
+              <input
+                type="color"
+                {...register('color')}
+                className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+              />
             </div>
 
             <div className="space-y-2">
@@ -394,9 +380,9 @@ const SkillsManager = () => {
           </div>
         }
       >
-        <form 
-          id="edit-skill-form" 
-          onSubmit={handleSubmitEdit(onUpdateSkill)} 
+        <form
+          id="edit-skill-form"
+          onSubmit={handleSubmitEdit(onUpdateSkill)}
           className="space-y-5 max-h-[60vh] overflow-y-auto pr-2"
         >
           {[
@@ -418,25 +404,13 @@ const SkillsManager = () => {
             </div>
           ))}
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white">Nivel (%)</label>
-              <input
-                type="number"
-                {...registerEdit('level', { valueAsNumber: true })}
-                className="w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] px-4 py-3 text-white outline-none focus:border-[#09D8C7] focus:ring-2 focus:ring-[#09D8C7]/30"
-              />
-              <p className="text-xs text-[#C9F7EE]">Valor entre 0 y 100</p>
-              {editErrors.level && <p className="text-xs text-[#FCA5A5]">{editErrors.level.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white">Color</label>
-              <input
-                type="color"
-                {...registerEdit('color')}
-                className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-white">Color</label>
+            <input
+              type="color"
+              {...registerEdit('color')}
+              className="h-12 w-full rounded-2xl border border-[#17364F] bg-[#0D1A2F] p-2 outline-none focus:ring-2 focus:ring-[#09D8C7]/30"
+            />
           </div>
 
           <div className="space-y-2">

@@ -1,0 +1,29 @@
+# Tasks - Integration between Backoffice and Public View
+
+- [x] Fix default theme to Light mode & correct `toggleTheme` logic in [ThemeContext.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/context/ThemeContext.jsx)
+- [x] Fix Lucide icon bug and status rendering in public [Skills.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/pages/Skills.jsx)
+- [x] Implement data fallback logic, checklists, strategies rendering, and copy updates in public [Documentation.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/pages/Documentation.jsx)
+- [x] Add Global Background configuration and explicit styling tags in [AppearanceManager.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/admin/sections/AppearanceManager.jsx), and update the help popup
+- [x] Inject dynamic appearance colors and variables in [Layout.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/Layout.jsx) and reference them in [index.css](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/index.css)
+- [x] Implement a dynamic navbar "More" dropdown and responsive layout to prevent overflows in [Navbar.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/Navbar.jsx)
+- [x] Update [NavbarManager.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/admin/sections/NavbarManager.jsx) and [Layout.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/Layout.jsx) to support the centralized status system (Active, Inactive, Mantenimiento, En proceso creativo)
+- [x] Add the POST `/api/create-module` middleware in [vite.config.js](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/vite.config.js) to support physical file persistence
+- [x] Update [PortfolioContext.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/context/PortfolioContext.jsx) actions to sync module changes with `settings.navbar.items`
+- [x] Restructure [ModulesManager.jsx](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/admin/sections/ModulesManager.jsx) to support the dynamic creation flow, elements forms, and file persistence trigger
+- [x] Create integration test suite [integration.test.js](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/qa/integration-admin-public/integration.test.js)
+- [x] Verify execution by building the application and running the smoke & integration test suites
+
+## Phase 2: MySQL, Security & Advanced Error System
+
+- [x] Install backend dependencies (`express`, `mysql2`, `jsonwebtoken`, `bcryptjs`, `cors`, `dotenv`)
+- [x] Create environment configuration template file [`.env`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/.env)
+- [x] Create MySQL connection pool and migrations in [`db.js`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/config/db.js)
+- [x] Implement backend server [`server.js`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/server.js) with JWT auth, error logging, and OWASP security headers
+- [x] Configure Vite proxy for development mode in [`vite.config.js`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/vite.config.js)
+- [x] Create centralized frontend error pages in [`ErrorScreen.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/ErrorScreen.jsx)
+- [x] Update [`ErrorBoundary.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/ErrorBoundary.jsx) and handle database/server loading crashes in [`Layout.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/components/Layout.jsx)
+- [x] Refactor [`PortfolioContext.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/context/PortfolioContext.jsx) to sync state modifications to backend API routes
+- [x] Set unconfigured state rules in [`ModulesManager.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/admin/sections/ModulesManager.jsx) and [`CustomModule.jsx`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/src/pages/CustomModule.jsx)
+- [x] Build security validation tests in [`security.test.js`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/qa/security_tests/security.test.js)
+- [x] Build error handling tests in [`error.test.js`](file:///c:/Users/ambar/.gemini/antigravity-ide/scratch/qa-portfolio/qa/error_tests/error.test.js)
+- [x] Run full pipelines (smoke tests, integration tests, security tests, error tests, build checks)

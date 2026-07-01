@@ -79,56 +79,37 @@ const Skills = () => {
           <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
             {t('skills.subtitle')}
           </p>
-          <div className="h-1 w-16 rounded" style={{ background: 'linear-gradient(to right, var(--color-button), var(--color-accent))' }} />
-        </div>
-
-        {/* Skills Grid — Compact, minimal, professional */}
-        <motion.div
+          <div className="h-1 w-20 bg-gradient-to-r from-brand-electric-500 to-brand-lilac-500 rounded" />
+        </div>        {/* Skills Cards Grid */}
+        <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
         >
           {visibleSkills.map((skill) => (
-            <motion.button
-              key={skill.id}
-              variants={itemVariants}
-              onClick={() => setSelectedSkill(skill)}
-              className="relative group flex flex-col items-center gap-1.5 p-2.5 rounded-xl text-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 transition-all duration-200"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text)'
-              }}
-              aria-haspopup="dialog"
-              aria-label={`Detalles de ${skill.name}`}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-button)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px var(--color-shadow)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '';
-              }}
-            >
-              {/* Status dot */}
-              {getStatusBadge(skill.status)}
-
-              {/* Icon */}
-              <div
-                className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0 transition-colors duration-200"
-                style={{ background: 'rgba(128,128,128,0.08)' }}
+            <StatusCard key={skill.id} status={skill.status} type="skill">
+              <motion.button
+                variants={itemVariants}
+                onClick={() => setSelectedSkill(skill)}
+                className="glass-card glass-card-hover p-4 rounded-xl flex flex-col items-center gap-3 text-center w-full focus-visible:ring-2 focus-visible:ring-brand-electric-500 cursor-pointer shadow-sm relative group overflow-hidden h-full"
+                aria-haspopup="dialog"
+                aria-label={`Show details for ${skill.name}`}
               >
-                {renderIcon(skill.icon, 'w-4 h-4')}
-              </div>
-
-              {/* Name */}
-              <span className="text-[10px] font-semibold leading-tight line-clamp-2 w-full text-center" style={{ color: 'var(--color-text)' }}>
-                {skill.name}
-              </span>
-            </motion.button>
+                {/* Decorative side accent */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-brand-electric-500 dark:bg-brand-electric-500/80 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                
+                <div className="p-2 bg-brand-ash-100 dark:bg-brand-navy-800 rounded-lg group-hover:bg-brand-electric-500/10 group-hover:text-brand-electric-500 transition-colors">
+                  {renderIcon(skill.icon, "w-5 h-5 text-brand-navy-800 dark:text-brand-ash-200 group-hover:text-brand-electric-500 transition-colors")}
+                </div>
+                
+                <div className="w-full">
+                  <span className="font-bold text-brand-navy-900 dark:text-white text-xs block truncate">
+                    {skill.name}
+                  </span>
+                </div>
+              </motion.button>
+            </StatusCard>
           ))}
         </motion.div>
 
@@ -187,21 +168,9 @@ const Skills = () => {
                 </div>
 
                 {/* Modal Content */}
-                <div className="p-5 space-y-5 overflow-y-auto flex-1 text-sm">
-                  {/* Description */}
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-button)' }}>
-                      {t('skills.details_desc')}
-                    </h3>
-                    <p style={{ color: 'var(--color-muted)' }}>
-                      {selectedSkill.translationKey
-                        ? t(`${selectedSkill.translationKey}.desc`)
-                        : selectedSkill.description || '—'}
-                    </p>
-                  </div>
-
-                  {/* Experience */}
-                  {(selectedSkill.translationKey || selectedSkill.experience) && (
+                <div className="p-6 space-y-6 overflow-y-auto flex-1">
+                  <div className="space-y-4 text-sm leading-relaxed">
+                    {/* Desc */}
                     <div className="space-y-1">
                       <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-button)' }}>
                         {t('skills.details_exp')}

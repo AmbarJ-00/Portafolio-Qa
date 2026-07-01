@@ -261,9 +261,10 @@ export const es = {
     val_message_min: "El mensaje debe contener al menos 10 caracteres",
     val_query_req: "El tipo de consulta es obligatorio",
     
-    // Feedback
+     // Feedback
     success_title: "Mensaje Enviado con Éxito",
-    success_desc: "Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.",
+    success_desc: "Gracias por contactarme. Me pondré en contacto contigo a la brevedad.",
+    error_title: "Error de Envío",
     error_desc: "No se pudo enviar el mensaje. Inténtalo nuevamente más tarde."
   },
   footer: {

@@ -52,6 +52,20 @@ export const StatusCard = ({ status, type = 'project', children }) => {
           <p className="text-sm text-slate-400 leading-relaxed">
             Actualmente trabajando en el desarrollo, estudio y validación práctica de este conjunto de tecnologías.
           </p>
+
+          {/* Progress bar */}
+          <div className="space-y-1.5 pt-2">
+            <div className="flex justify-between text-xs text-slate-450">
+              <span>Progreso de estudio</span>
+              <span className="font-bold text-indigo-400 animate-pulse">65%</span>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-indigo-500 to-violet-400 h-full rounded-full animate-pulse" 
+                style={{ width: '65%' }}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="pt-4 mt-auto border-t border-slate-800/60 flex items-center gap-2 text-xs text-indigo-400 font-semibold">
