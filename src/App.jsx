@@ -40,10 +40,10 @@ const AdminRoute = lazy(() => import('./admin/AdminRoute.jsx'));
 const Loader = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
     <div className="relative">
-      <div className="w-12 h-12 rounded-full border-4 border-brand-ash-200 border-t-brand-electric-500 animate-spin" />
-      <Terminal className="w-5 h-5 text-brand-electric-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+      <div className="w-12 h-12 rounded-full border-4 border-gray-300 border-t-current animate-spin" style={{ color: 'var(--color-button)' }} />
+      <Terminal className="w-5 h-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style={{ color: 'var(--color-button)' }} />
     </div>
-    <span className="text-xs font-semibold text-brand-navy-500 dark:text-brand-ash-400 uppercase tracking-widest animate-pulse">
+    <span className="text-xs font-semibold uppercase tracking-widest animate-pulse" style={{ color: 'var(--color-muted)' }}>
       Loading QA Ecosystem...
     </span>
   </div>

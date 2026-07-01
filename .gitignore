@@ -41,6 +41,7 @@ qa/
 # Private Admin Documentation
 docs/
 
+
 # vista del admin completo (do not ignore src/admin)
 # admin/
 
