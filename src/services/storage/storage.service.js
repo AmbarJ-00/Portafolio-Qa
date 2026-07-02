@@ -51,145 +51,145 @@ export const storageService = {
   // Update personal info
   updatePersonal: withFallback(
     (payload) => databaseService.updatePersonal(payload),
-    null
+    (payload) => localStorageService.updatePersonal(payload)
   ),
 
   updateSEO: withFallback(
     (payload) => databaseService.updateSEO(payload),
-    null
+    (payload) => localStorageService.updateSEO(payload)
   ),
 
   updateContact: withFallback(
     (payload) => databaseService.updateContact(payload),
-    null
+    (payload) => localStorageService.updateContact(payload)
   ),
 
   updateAppearance: withFallback(
     (payload) => databaseService.updateAppearance(payload),
-    null
+    (payload) => localStorageService.updateAppearance(payload)
   ),
 
   updateNavbar: withFallback(
     (payload) => databaseService.updateNavbar(payload),
-    null
+    (payload) => localStorageService.updateNavbar(payload)
   ),
 
   // Skills
   addSkill: withFallback(
     (payload) => databaseService.addSkill(payload),
-    null
+    (payload) => localStorageService.addSkill(payload)
   ),
   updateSkill: withFallback(
     (id, payload) => databaseService.updateSkill(id, payload),
-    null
+    (id, payload) => localStorageService.updateSkill(id, payload)
   ),
   deleteSkill: withFallback(
     (id) => databaseService.deleteSkill(id),
-    null
+    (id) => localStorageService.deleteSkill(id)
   ),
   reorderSkills: withFallback(
     (ids) => databaseService.reorderSkills(ids),
-    null
+    (ids) => localStorageService.reorderSkills(ids)
   ),
 
   // Projects
   addProject: withFallback(
     (payload) => databaseService.addProject(payload),
-    null
+    (payload) => localStorageService.addProject(payload)
   ),
   updateProject: withFallback(
     (id, payload) => databaseService.updateProject(id, payload),
-    null
+    (id, payload) => localStorageService.updateProject(id, payload)
   ),
   deleteProject: withFallback(
     (id) => databaseService.deleteProject(id),
-    null
+    (id) => localStorageService.deleteProject(id)
   ),
 
   // Certifications
   addCertification: withFallback(
     (payload) => databaseService.addCertification(payload),
-    null
+    (payload) => localStorageService.addCertification(payload)
   ),
   updateCertification: withFallback(
     (id, payload) => databaseService.updateCertification(id, payload),
-    null
+    (id, payload) => localStorageService.updateCertification(id, payload)
   ),
   deleteCertification: withFallback(
     (id) => databaseService.deleteCertification(id),
-    null
+    (id) => localStorageService.deleteCertification(id)
   ),
   reorderCertifications: withFallback(
     (ids) => databaseService.reorderCertifications(ids),
-    null
+    (ids) => localStorageService.reorderCertifications(ids)
   ),
 
   // Documentation
   addDocumentation: withFallback(
     (payload) => databaseService.addDocumentation(payload),
-    null
+    (payload) => localStorageService.addDocumentation(payload)
   ),
   updateDocumentation: withFallback(
     (id, payload) => databaseService.updateDocumentation(id, payload),
-    null
+    (id, payload) => localStorageService.updateDocumentation(id, payload)
   ),
   deleteDocumentation: withFallback(
     (id) => databaseService.deleteDocumentation(id),
-    null
+    (id) => localStorageService.deleteDocumentation(id)
   ),
 
   // Modules
   addModule: withFallback(
     (payload) => databaseService.addModule(payload),
-    null
+    (payload) => localStorageService.addModule(payload)
   ),
   updateModule: withFallback(
     (id, payload) => databaseService.updateModule(id, payload),
-    null
+    (id, payload) => localStorageService.updateModule(id, payload)
   ),
   deleteModule: withFallback(
     (id) => databaseService.deleteModule(id),
-    null
+    (id) => localStorageService.deleteModule(id)
   ),
   reorderModules: withFallback(
     (ids) => databaseService.reorderModules(ids),
-    null
+    (ids) => localStorageService.reorderModules(ids)
   ),
 
   // About Items
   addAboutItem: withFallback(
     (payload) => databaseService.addAboutItem(payload),
-    null
+    (payload) => localStorageService.addAboutItem(payload)
   ),
   updateAboutItem: withFallback(
     (id, payload) => databaseService.updateAboutItem(id, payload),
-    null
+    (id, payload) => localStorageService.updateAboutItem(id, payload)
   ),
   deleteAboutItem: withFallback(
     (id) => databaseService.deleteAboutItem(id),
-    null
+    (id) => localStorageService.deleteAboutItem(id)
   ),
   reorderAboutItems: withFallback(
     (ids) => databaseService.reorderAboutItems(ids),
-    null
+    (ids) => localStorageService.reorderAboutItems(ids)
   ),
 
   // Hero Cards
   addHeroCard: withFallback(
     (payload) => databaseService.addHeroCard(payload),
-    null
+    (payload) => localStorageService.addHeroCard(payload)
   ),
   updateHeroCard: withFallback(
     (id, payload) => databaseService.updateHeroCard(id, payload),
-    null
+    (id, payload) => localStorageService.updateHeroCard(id, payload)
   ),
   deleteHeroCard: withFallback(
     (id) => databaseService.deleteHeroCard(id),
-    null
+    (id) => localStorageService.deleteHeroCard(id)
   ),
   reorderHeroCards: withFallback(
     (ids) => databaseService.reorderHeroCards(ids),
-    null
+    (ids) => localStorageService.reorderHeroCards(ids)
   ),
 
   // Direct localStorage access

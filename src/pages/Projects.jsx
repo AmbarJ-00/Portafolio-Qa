@@ -57,7 +57,7 @@ const Projects = () => {
                 <MotionLink
                   to={`/projects/${project.id}`}
                   variants={cardVariants}
-                  className="glass-card glass-card-hover rounded-2xl flex flex-col justify-between overflow-hidden relative group h-full text-left no-underline hover:no-underline focus:outline-none"
+                  className="glass-card glass-card-hover rounded-2xl flex flex-col justify-between overflow-hidden relative group h-full text-left no-underline hover:no-underline focus:outline-none focus:ring-2"
                   style={{ border: '1px solid var(--color-border)' }}
                 >
                   {/* Top accent bar */}
@@ -69,7 +69,7 @@ const Projects = () => {
                         <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--color-button)' }}>
                           {project.category}
                         </span>
-                        <h2 className="text-2xl font-bold transition-colors group-hover:opacity-80" style={{ color: 'var(--color-text)' }}>
+                        <h2 className="text-2xl font-bold transition-colors group-hover:text-brand-electric-500 group-hover:opacity-80" style={{ color: 'var(--color-text)' }}>
                           {title}
                         </h2>
                       </div>

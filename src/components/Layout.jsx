@@ -49,7 +49,7 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     const root = document.documentElement;
-<<<<<<< HEAD
+
     // Set custom properties dynamically on document root using original brand palette colors
     root.style.setProperty('--bg-global', currentColors.background || (theme === 'dark' ? '#231537' : '#E8ECEF'));
     root.style.setProperty('--bg-card', currentColors.card || (theme === 'dark' ? '#4F3179' : '#A7C7E7'));
@@ -64,7 +64,7 @@ const Layout = ({ children }) => {
     // Apply body style background color dynamically
     document.body.style.backgroundColor = currentColors.background || (theme === 'dark' ? '#231537' : '#E8ECEF');
     document.body.style.color = currentColors.text || (theme === 'dark' ? '#ffffff' : '#1C2B48');
-=======
+
     root.style.setProperty('--bg-global',      currentColors.background || defaults.background);
     root.style.setProperty('--bg-card',        currentColors.card       || defaults.card);
     root.style.setProperty('--color-button',   currentColors.button     || defaults.button);
@@ -81,7 +81,6 @@ const Layout = ({ children }) => {
     );
     document.body.style.backgroundColor = currentColors.background || defaults.background;
     document.body.style.color           = currentColors.text       || defaults.text;
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
   }, [theme, currentColors]);
 
   // Status routing
@@ -166,13 +165,12 @@ const Layout = ({ children }) => {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
-<<<<<<< HEAD
+
         transition={{ duration: 0.4, cubicBezier: [0.16, 1, 0.3, 1] }}
-        className="flex-grow max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-14 py-10"
-=======
+
         transition={{ duration: 0.4 }}
         className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
+
       >
         {children}
       </motion.main>

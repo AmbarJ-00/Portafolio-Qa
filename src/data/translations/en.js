@@ -263,14 +263,8 @@ export const en = {
     
     // Feedback
     success_title: "Message Sent Successfully",
-<<<<<<< HEAD
     success_desc: "Message sent successfully. We will get in touch with you soon.",
     error_desc: "Could not send the message. Please try again later."
-=======
-    success_desc: "Thank you for reaching out! I will get back to you as soon as possible.",
-    error_title: "Sending Error",
-    error_desc: "No se pudo enviar el mensaje. Inténtalo nuevamente más tarde."
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
   },
   footer: {
     rights: "All rights reserved.",

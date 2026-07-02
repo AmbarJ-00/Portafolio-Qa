@@ -54,7 +54,6 @@ const Navbar = () => {
 
           {/* Logo */}
           <div className="flex-shrink-0">
-<<<<<<< HEAD
             <Link 
               to="/" 
               className="font-sans font-bold text-base tracking-tight text-brand-navy-800 dark:text-white flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand-electric-500 rounded"
@@ -62,19 +61,6 @@ const Navbar = () => {
             >
               <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-navy-800 to-brand-electric-500 dark:from-brand-electric-500 dark:to-brand-lilac-500 flex items-center justify-center text-white shadow-sm">
                 <Radar className="w-4 h-4" />
-=======
-            <Link
-              to="/"
-              className="font-display font-bold text-xl tracking-tight flex items-center gap-2 hover:opacity-90 rounded"
-              style={{ color: 'var(--color-text)' }}
-              aria-label="Ambar Ramon QA Lead Home"
-            >
-              <span
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-extrabold shadow-sm"
-                style={{ background: 'linear-gradient(135deg, var(--color-text), var(--color-button))' }}
-              >
-                AR
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
               </span>
               <span className="hidden sm:inline">Ambar Ramon</span>
               <span

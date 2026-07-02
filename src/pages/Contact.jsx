@@ -37,7 +37,6 @@ const Contact = () => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-<<<<<<< HEAD
       if (!actions || !actions.submitContactForm) {
         throw new Error("Contact actions not initialized");
       }
@@ -45,15 +44,6 @@ const Contact = () => {
       if (!result || !result.success) {
         throw new Error(t('contact.error_desc'));
       }
-=======
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || t('contact.error_desc'));
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
       setIsSubmitted(true);
       reset();
     } catch (err) {

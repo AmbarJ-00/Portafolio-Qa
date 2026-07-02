@@ -80,27 +80,46 @@ export const getFallbackState = () => ({
 const LOCAL_STORAGE_KEY = 'qa-portfolio-data';
 const CONTACT_MESSAGES_KEY = 'qa-contact-messages';
 
-export const localStorageService = {
-  getPortfolio: () => {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!data) {
-      const fallback = getFallbackState();
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fallback));
-      return fallback;
-    }
-    try {
-      return JSON.parse(data);
-    } catch (e) {
-      console.error('Failed to parse portfolio data from localStorage', e);
-      const fallback = getFallbackState();
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fallback));
-      return fallback;
-    }
-  },
+const createId = (prefix = 'item') => `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 
-  savePortfolio: (data) => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-  },
+const reorderByIds = (items, ids) => {
+  const lookup = items.reduce((acc, item) => ({ ...acc, [item.id]: item }), {});
+  const ordered = ids.map((id) => lookup[id]).filter(Boolean);
+  return ordered.concat(items.filter((item) => !ids.includes(item.id)));
+};
+
+const getStoredPortfolio = () => {
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (!data) {
+    const fallback = getFallbackState();
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fallback));
+    return fallback;
+  }
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    console.error('Failed to parse portfolio data from localStorage', e);
+    const fallback = getFallbackState();
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fallback));
+    return fallback;
+  }
+};
+
+const saveStoredPortfolio = (data) => {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+};
+
+const mutatePortfolio = (mutator) => {
+  const portfolio = getStoredPortfolio();
+  const result = mutator(portfolio);
+  saveStoredPortfolio(portfolio);
+  return result || { success: true };
+};
+
+export const localStorageService = {
+  getPortfolio: getStoredPortfolio,
+
+  savePortfolio: saveStoredPortfolio,
 
   submitContact: (data) => {
     try {
@@ -117,5 +136,145 @@ export const localStorageService = {
       console.error('Failed to save contact message to localStorage', e);
       return { success: false, error: e.message };
     }
-  }
+  },
+
+  updatePersonal: (payload) => mutatePortfolio((portfolio) => {
+    portfolio.personal = { ...portfolio.personal, ...payload };
+  }),
+
+  updateSEO: (payload) => mutatePortfolio((portfolio) => {
+    portfolio.settings.seo = { ...portfolio.settings.seo, ...payload };
+  }),
+
+  updateContact: (payload) => mutatePortfolio((portfolio) => {
+    portfolio.settings.contact = { ...portfolio.settings.contact, ...payload };
+  }),
+
+  updateAppearance: (payload) => mutatePortfolio((portfolio) => {
+    portfolio.settings.appearance = { ...portfolio.settings.appearance, ...payload };
+  }),
+
+  updateNavbar: (payload) => mutatePortfolio((portfolio) => {
+    portfolio.settings.navbar = { ...portfolio.settings.navbar, ...payload };
+  }),
+
+  addSkill: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('skill');
+    portfolio.skills = [...portfolio.skills, { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateSkill: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.skills = portfolio.skills.map((skill) => skill.id === id ? { ...skill, ...payload } : skill);
+  }),
+
+  deleteSkill: (id) => mutatePortfolio((portfolio) => {
+    portfolio.skills = portfolio.skills.filter((skill) => skill.id !== id);
+  }),
+
+  reorderSkills: (ids) => mutatePortfolio((portfolio) => {
+    portfolio.skills = reorderByIds(portfolio.skills, ids);
+  }),
+
+  addProject: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('project');
+    portfolio.projects = [{ ...payload, id }, ...(portfolio.projects || [])];
+    return { success: true, id };
+  }),
+
+  updateProject: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.projects = portfolio.projects.map((project) => project.id === id ? { ...project, ...payload } : project);
+  }),
+
+  deleteProject: (id) => mutatePortfolio((portfolio) => {
+    portfolio.projects = portfolio.projects.filter((project) => project.id !== id);
+  }),
+
+  addCertification: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('cert');
+    portfolio.certifications = [...(portfolio.certifications || []), { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateCertification: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.certifications = portfolio.certifications.map((cert) => cert.id === id ? { ...cert, ...payload } : cert);
+  }),
+
+  deleteCertification: (id) => mutatePortfolio((portfolio) => {
+    portfolio.certifications = portfolio.certifications.filter((cert) => cert.id !== id);
+  }),
+
+  reorderCertifications: (ids) => mutatePortfolio((portfolio) => {
+    portfolio.certifications = reorderByIds(portfolio.certifications, ids);
+  }),
+
+  addDocumentation: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('doc');
+    portfolio.documentation.templates = [...(portfolio.documentation.templates || []), { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateDocumentation: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.documentation.templates = portfolio.documentation.templates.map((template) =>
+      template.id === id ? { ...template, ...payload } : template
+    );
+  }),
+
+  deleteDocumentation: (id) => mutatePortfolio((portfolio) => {
+    portfolio.documentation.templates = portfolio.documentation.templates.filter((template) => template.id !== id);
+  }),
+
+  addModule: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('module');
+    portfolio.settings.modules = [...(portfolio.settings.modules || []), { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateModule: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.settings.modules = portfolio.settings.modules.map((module) => module.id === id ? { ...module, ...payload } : module);
+  }),
+
+  deleteModule: (id) => mutatePortfolio((portfolio) => {
+    portfolio.settings.modules = portfolio.settings.modules.filter((module) => module.id !== id);
+  }),
+
+  reorderModules: (ids) => mutatePortfolio((portfolio) => {
+    portfolio.settings.modules = reorderByIds(portfolio.settings.modules, ids);
+  }),
+
+  addAboutItem: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('about');
+    portfolio.aboutItems = [...(portfolio.aboutItems || []), { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateAboutItem: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.aboutItems = portfolio.aboutItems.map((item) => item.id === id ? { ...item, ...payload } : item);
+  }),
+
+  deleteAboutItem: (id) => mutatePortfolio((portfolio) => {
+    portfolio.aboutItems = portfolio.aboutItems.filter((item) => item.id !== id);
+  }),
+
+  reorderAboutItems: (ids) => mutatePortfolio((portfolio) => {
+    portfolio.aboutItems = reorderByIds(portfolio.aboutItems, ids);
+  }),
+
+  addHeroCard: (payload) => mutatePortfolio((portfolio) => {
+    const id = payload.id || createId('hero');
+    portfolio.heroCards = [...(portfolio.heroCards || []), { ...payload, id }];
+    return { success: true, id };
+  }),
+
+  updateHeroCard: (id, payload) => mutatePortfolio((portfolio) => {
+    portfolio.heroCards = portfolio.heroCards.map((card) => card.id === id ? { ...card, ...payload } : card);
+  }),
+
+  deleteHeroCard: (id) => mutatePortfolio((portfolio) => {
+    portfolio.heroCards = portfolio.heroCards.filter((card) => card.id !== id);
+  }),
+
+  reorderHeroCards: (ids) => mutatePortfolio((portfolio) => {
+    portfolio.heroCards = reorderByIds(portfolio.heroCards, ids);
+  })
 };
