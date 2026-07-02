@@ -165,10 +165,7 @@ const Layout = ({ children }) => {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
-
         transition={{ duration: 0.4, cubicBezier: [0.16, 1, 0.3, 1] }}
-
-        transition={{ duration: 0.4 }}
         className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"
 
       >

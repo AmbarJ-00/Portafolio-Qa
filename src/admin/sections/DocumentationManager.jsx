@@ -190,7 +190,7 @@ const DocumentationManager = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onCreateTemplate)} className="mt-6 space-y-5">
+          <form onSubmit={handleSubmitCreate(onCreateTemplate)} className="mt-6 space-y-5">
             {[
               { name: 'title', label: 'Título', placeholder: 'Plantilla de reporte QA' },
               { name: 'category', label: 'Categoría', placeholder: 'Checklist, Guía, Reporte' },

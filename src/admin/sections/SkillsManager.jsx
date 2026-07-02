@@ -109,6 +109,22 @@ const SortableItem = ({ skill, onEdit, onDelete, listeners, attributes, setNodeR
   </div>
 );
 
+const SortableSkillItem = ({ skill, onEdit, onDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: skill.id });
+  return (
+    <SortableItem
+      skill={skill}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      listeners={listeners}
+      attributes={attributes}
+      setNodeRef={setNodeRef}
+      transform={transform}
+      transition={transition}
+    />
+  );
+};
+
 const SkillsManager = () => {
   const { store, actions } = usePortfolio();
   const { toast } = useToast();
@@ -473,22 +489,6 @@ const SkillsManager = () => {
         onCancel={() => setIsDeleteConfirmOpen(false)}
       />
     </div>
-  );
-};
-
-const SortableSkillItem = ({ skill, onEdit, onDelete }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: skill.id });
-  return (
-    <SortableItem
-      skill={skill}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      listeners={listeners}
-      attributes={attributes}
-      setNodeRef={setNodeRef}
-      transform={transform}
-      transition={transition}
-    />
   );
 };
 

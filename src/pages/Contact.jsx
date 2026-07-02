@@ -14,6 +14,11 @@ const inputNormal = `${inputBase} focus:ring-2 focus:ring-offset-0`;
 const Contact = () => {
   const { t } = useTranslation();
   const { store, actions } = usePortfolio();
+  const emailAddress = store.personal?.email || store.settings?.contact?.email || '';
+  const linkedinUrl = store.personal?.linkedin || store.settings?.contact?.linkedin || '#';
+  const contactCountry = store.personal?.location || store.settings?.contact?.country || '';
+  const workModeLabel = store.personal?.workMode || (store.personal?.workModeKey ? t(store.personal.workModeKey) : '');
+  const availabilityLabel = store.personal?.availability || (store.personal?.availabilityKey ? t(store.personal.availabilityKey) : '');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -99,8 +104,8 @@ const Contact = () => {
                   <span className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                     {t('contact.email_label')}
                   </span>
-                  <a href={`mailto:${store.personal.email}`} className="text-sm font-bold hover:underline" style={{ color: 'var(--color-text)' }}>
-                    {store.personal.email}
+                  <a href={`mailto:${emailAddress}`} className="text-sm font-bold hover:underline" style={{ color: 'var(--color-text)' }}>
+                    {emailAddress}
                   </a>
                 </div>
               </div>
@@ -112,8 +117,8 @@ const Contact = () => {
                   <span className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                     {t('contact.linkedin_label')}
                   </span>
-                  <a href={store.personal.linkedin} target="_blank" rel="noopener noreferrer" className="text-sm font-bold hover:underline" style={{ color: 'var(--color-text)' }}>
-                    {store.personal.name}
+                  <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-bold hover:underline" style={{ color: 'var(--color-text)' }}>
+                    {store.personal.name || linkedinUrl}
                   </a>
                 </div>
               </div>
@@ -125,7 +130,7 @@ const Contact = () => {
                   <span className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                     {t('contact.country_residence')}
                   </span>
-                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{store.personal.location}</p>
+                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{contactCountry}</p>
                 </div>
               </div>
 
@@ -136,7 +141,7 @@ const Contact = () => {
                   <span className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                     {t('contact.work_mode_label')}
                   </span>
-                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t(store.personal.workModeKey)}</p>
+                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{workModeLabel}</p>
                 </div>
               </div>
 
@@ -147,7 +152,7 @@ const Contact = () => {
                   <span className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: 'var(--color-muted)' }}>
                     {t('contact.availability_label')}
                   </span>
-                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t(store.personal.availabilityKey)}</p>
+                  <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{availabilityLabel}</p>
                 </div>
               </div>
             </div>

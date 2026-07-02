@@ -51,12 +51,16 @@ const Skills = () => {
   const getStatusBadge = (status) => {
     if (status === 'learning') {
       return (
-        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-400" title="En proceso de adquisición" />
+        <span className="absolute top-2 right-2 rounded-full bg-indigo-500/10 text-indigo-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+          En aprendizaje
+        </span>
       );
     }
     if (status === 'maintenance') {
       return (
-        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400" title="En mantenimiento" />
+        <span className="absolute top-2 right-2 rounded-full bg-amber-500/10 text-amber-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+          En mantenimiento
+        </span>
       );
     }
     return null;
@@ -101,7 +105,7 @@ const Skills = () => {
                 color: 'var(--color-text)'
               }}
               aria-haspopup="dialog"
-              aria-label={`Detalles de ${skill.name}`}
+              aria-label={`Detalles de ${skill.name}${skill.status ? ` (${skill.status})` : ''}`}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'var(--color-button)';
                 e.currentTarget.style.transform = 'translateY(-2px)';

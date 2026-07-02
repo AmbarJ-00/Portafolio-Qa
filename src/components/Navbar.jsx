@@ -82,6 +82,7 @@ const Navbar = () => {
               <NavLink
                 key={link.path}
                 to={link.path}
+                end={link.path === '/'}
                 className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200"
                 style={({ isActive }) => isActive ? linkActive : linkIdle}
               >
@@ -218,6 +219,7 @@ const Navbar = () => {
                 <NavLink
                   key={link.path}
                   to={link.path}
+                  end={link.path === '/'}
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2.5 rounded-md text-base font-semibold transition-all"
                   style={({ isActive }) => isActive ? linkActive : linkIdle}

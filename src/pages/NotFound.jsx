@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileQuestion, Home } from 'lucide-react';
+import { FileQuestion, Home, ArrowLeft } from 'lucide-react';
 import SEO from '../components/SEO.jsx';
 
 const NotFound = () => {
@@ -63,8 +63,6 @@ const NotFound = () => {
               <Home className="w-4 h-4" />
               <span>Ir al Inicio</span>
             </Link>
-<<<<<<< HEAD
-=======
             <Link
               to="/backoffice"
               className="glass-card glass-card-hover inline-flex items-center justify-center gap-2 px-5 py-3 font-semibold rounded-xl text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -73,7 +71,6 @@ const NotFound = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>Volver al Panel</span>
             </Link>
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
           </div>
         </motion.div>
       </div>

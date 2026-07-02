@@ -27,12 +27,12 @@ const ContactManager = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      email: settings.contact?.email || '',
-      linkedin: settings.contact?.linkedin || '',
-      github: settings.contact?.github || '',
+      email: settings.contact?.email || store.personal?.email || '',
+      linkedin: settings.contact?.linkedin || store.personal?.linkedin || '',
+      github: settings.contact?.github || store.personal?.github || '',
       phone: settings.contact?.phone || '',
       alternativeContact: settings.contact?.alternativeContact || '',
-      country: settings.contact?.country || '',
+      country: settings.contact?.country || store.personal?.location || '',
       availability: store.personal?.availability || '',
       workMode: store.personal?.workMode || ''
     }

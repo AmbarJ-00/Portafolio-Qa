@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, ShieldAlert, Key, Settings, AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { Database, ShieldAlert, Key, Settings, AlertTriangle, RefreshCw, Home, ArrowRight } from 'lucide-react';
 
 const ErrorScreen = ({ code = 'Server-500', customMessage = '', onRetry = null }) => {
 
@@ -29,13 +29,7 @@ const ErrorScreen = ({ code = 'Server-500', customMessage = '', onRetry = null }
           iconBg: 'rgba(52,211,153,0.1)',
           iconBorder: 'rgba(52,211,153,0.2)',
           codeLabel: 'Error #Auth-401',
-<<<<<<< HEAD
-          actions: [
-            { label: 'Volver al inicio', onClick: () => window.location.href = '/', primary: true, icon: Home }
-          ]
-=======
           actions: [{ label: 'Ir al Login', onClick: () => window.location.href = '/backoffice/login', primary: true, icon: ArrowRight }]
->>>>>>> 02d962fc1d76a170f1cebcdb14f6f7ba1c61aa6b
         };
       case 'Permission-403':
         return {

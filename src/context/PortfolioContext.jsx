@@ -96,10 +96,17 @@ export const PortfolioProvider = ({ children }) => {
     try { await storageService.updateContact(payload); } catch (err) {
       console.warn('updateContact API failed, persisting locally:', err.message);
     }
-    setStore((prev) => ({
-      ...prev,
-      settings: { ...prev.settings, contact: { ...prev.settings.contact, ...payload } }
-    }));
+    setStore((prev) => {
+      const nextPersonal = { ...prev.personal };
+      if (payload.email !== undefined) nextPersonal.email = payload.email;
+      if (payload.linkedin !== undefined) nextPersonal.linkedin = payload.linkedin;
+      if (payload.github !== undefined) nextPersonal.github = payload.github;
+      return {
+        ...prev,
+        personal: nextPersonal,
+        settings: { ...prev.settings, contact: { ...prev.settings.contact, ...payload } }
+      };
+    });
   };
 
   // ─── APPEARANCE ────────────────────────────────────────────────────────────
